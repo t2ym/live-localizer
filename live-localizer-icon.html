@@ -1,0 +1,237 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
+<dom-module id="live-localizer-icon">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        margin: 8px;
+
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+
+        --paper-tooltip: {
+          padding: 4px;
+        }
+      }
+      .download-link {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+        border-radius: 12px;
+        @apply(--paper-font-common-base);
+        font-size: 12px;
+        text-align: center;
+        background-color: lightgrey;
+        @apply(--shadow-elevation-4dp);
+      }
+      .download-icon {
+        display: block;
+        text-align: center;
+        margin: auto;
+        width: 48px;
+        height: 48px;
+      }
+      paper-card.download-link:not([selected]) {
+        color: black;
+        opacity: 0.35;
+      }
+      .file-name {
+        text-align: center;
+        display: block;
+      }
+    </style>
+    <paper-card id="card" class="download-link layout vertical" selected$="{{selected}}">
+      <iron-image class="download-icon" src="{{flag(file.locale)}}" alt="{{file.locale}}" sizing="contain"></iron-image>
+      <div class="flex"></div>
+      <div class="file-name">{{file.locale}}</div>
+      <paper-ripple></paper-ripple>
+    </paper-card>
+    <paper-tooltip for="card" offset="-10">{{tooltip(selected)}}</paper-tooltip>
+  </template>
+  <script>
+  (function () {
+    var lang2country = {
+      "af": "ZA",
+      "ak": "GH",
+      "ar": "SA",
+      "az": "AZ",
+      "az-Latn": "AZ",
+      "be": "BY",
+      "bem": "ZM",
+      "bg": "BG",
+      "bm": "ML",
+      "bn": "BD",
+      "bs": "BA",
+      "bs-Latn": "BA",
+      "ckb": "IQ",
+      "ckb": "IR",
+      "cs": "CZ",
+      "da": "DK",
+      "de": "DE",
+      "dyo": "SN",
+      "dz": "BT",
+      "ee": "GH",
+      "el": "GR",
+      "en": "US",
+      "es": "ES",
+      "et": "EE",
+      "fa": "IR",
+      "fi": "FI",
+      "fil": "PH",
+      "fo": "FO",
+      "fr": "FR",
+      "ga": "IE",
+      "gv": "IM",
+      "ha": "NG",
+      "he": "IL",
+      "hi": "IN",
+      "hr": "HR",
+      "hu": "HU",
+      "hy": "AM",
+      "id": "ID",
+      "ig": "NG",
+      "is": "IS",
+      "it": "IT",
+      "ja": "JP",
+      "kab": "DZ",
+      "kam": "KE",
+      "kea": "CV",
+      "khq": "ML",
+      "ki": "KE",
+      "kk": "KZ",
+      "kl": "GL",
+      "kln": "KE",
+      "km": "KH",
+      "ko": "KR",
+      "lb": "LU",
+      "lo": "LA",
+      "lrc": "IR",
+      "lt": "LT",
+      "lu": "CD",
+      "lv": "LV",
+      "mfe": "MU",
+      "mg": "MG",
+      "mgh": "MZ",
+      "mk": "MK",
+      "mn": "MN",
+      "ms": "MY",
+      "mt": "MT",
+      "my": "MM",
+      "naq": "NA",
+      "nb": "NO",
+      "nb": "SJ",
+      "ne": "NP",
+      "nl": "NL",
+      "nn": "NO",
+      "no": "NO",
+      "nus": "SS",
+      "pl": "PL",
+      "ps": "AF",
+      "pt": "BR",
+      "qu": "PE",
+      "rm": "CH",
+      "rn": "BI",
+      "ro": "RO",
+      "ru": "RU",
+      "rw": "RW",
+      "se": "NO",
+      "seh": "MZ",
+      "ses": "ML",
+      "sg": "CF",
+      "si": "LK",
+      "sk": "SK",
+      "sl": "SI",
+      "so": "SO",
+      "sq": "AL",
+      "th": "TH",
+      "tk": "TM",
+      "to": "TO",
+      "tr": "TR",
+      "ur": "PK",
+      "uz": "UZ",
+      "uz-Latn": "UZ",
+      "vai": "LR",
+      "vai-Vaii": "LR",
+      "vi": "VN",
+      "wae": "CH",
+      "zh": "CN",
+      "zh-Hans": "CN",
+      "zh-Hant": "TW",
+      "zu": "ZA"
+    };
+
+    function locale2country (locale) {
+      var match = locale.match(/^\(.*\)-\([A-Z][A-Z]\)$/)
+      if (match) {
+        return match[2];
+      }
+      else if (lang2country[locale]) {
+        return lang2country[locale];
+      }
+      else {
+        return '';
+      }
+    }
+
+    Polymer({
+
+      is: 'live-localizer-icon',
+
+      properties: {
+        file: {
+          type: Object
+        },
+
+        selected: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+      },
+
+      flag: function (locale) {
+        var flag;
+        if (locale) {
+          flag = locale2country(locale);
+        }
+        if (flag) {
+          var url = document.createElement('a');
+          url.href = this.resolveUrl('../region-flags/png/' + flag + '.png');
+          return ('/' + url.pathname).replace(/^\/\//, '/');
+        }
+        else {
+          return '';
+        }
+      },
+
+      tooltip: function (selected) {
+        if (selected) {
+          return 'Save XLIFF';
+        }
+        else {
+          return 'Switch Locale';
+        }
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

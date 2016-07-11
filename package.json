@@ -1,0 +1,50 @@
+{
+  "name": "live-localizer",
+  "version": "0.0.1",
+  "description": "Live Localizer widget for Polymer i18n-behavior",
+  "main": "live-localizer.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "wct && if [ \"${TRAVIS_BRANCH}\" != \"\" ]; then coveralls <./test/coverage-report/lcov.info; fi",
+    "clean": "rm -rvf ./test/coverage-report"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t2ym/live-localizer.git"
+  },
+  "keywords": [
+    "polymer",
+    "web-components",
+    "web-component",
+    "i18n",
+    "internationalization",
+    "l10n",
+    "localization",
+    "xliff"
+  ],
+  "author": "Tetsuya Mori <t2y3141592@gmail.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/t2ym/live-localizer/issues"
+  },
+  "homepage": "https://github.com/t2ym/live-localizer#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-debug": "^2.1.2",
+    "gulp-grep-contents": "0.0.1",
+    "gulp-i18n-add-locales": "^0.1.0",
+    "gulp-i18n-leverage": "^1.1.0",
+    "gulp-i18n-preprocess": "^1.1.1",
+    "gulp-if": "^2.0.1",
+    "gulp-ignore": "^2.0.1",
+    "gulp-match": "^1.0.2",
+    "gulp-sort": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "json-stringify-safe": "^5.0.1",
+    "strip-bom": "^3.0.0",
+    "through2": "^2.0.1",
+    "xliff-conv": "^1.0.3"
+  }
+}

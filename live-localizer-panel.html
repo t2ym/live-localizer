@@ -1,0 +1,255 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="live-localizer-model.html">
+<link rel="import" href="live-localizer-icon.html">
+
+<dom-module id="live-localizer-panel">
+  <template>
+    <style include="iron-flex"></style>
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+
+        --paper-icon-button: {
+          padding: 0px;
+          width: 32px;
+          height: 24px;
+          padding-left: 4px;
+          padding-right: 4px;
+        }
+
+        --paper-tooltip: {
+          padding: 4px;
+        }
+      }
+      .panel-toolbar {
+        display: block;
+        width: 100%;
+        height: 31px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-color: lightgrey;
+      }
+      .toolbar-item {
+        display: inline-flex;
+        height: 31px;
+      }
+      .view-selector {
+        border-style: solid;
+        border-top-width: 1px;
+        border-bottom-width: 1px;
+        border-left-width: 1px;
+        border-right-width: 0px;
+        border-color: lightgrey;
+        height: 26px;
+        width: 26px;
+        padding: 0px 1px 0px 0px;
+        margin-top: 3px;
+      }
+      .view-selector.first {
+        border-top-left-radius: 2px;
+        border-bottom-left-radius: 2px;
+        padding-right: 0px;
+      }
+      .view-selector.last {
+        border-right-width: 1px;
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px;
+      }
+      .view-selector[selected-view] {
+        background-color: dimgrey;
+        color: lightgrey;
+      }
+      .droparea {
+        width: 100%;
+        height: calc(100% - 32px);
+        max-height: calc(100% - 32px);
+        overflow-y: auto;
+      }
+      .filelistarea {
+        padding: 16px;
+      }
+      input.hidden {
+        display: none;
+        visibility: hidden;
+        position: relative;
+      }
+      div.toolbar-pad {
+        width: 8px;
+      }
+    </style>
+    <div id="toolbar" class="panel-toolbar layout horizontal">
+      <div class="flex toolbar-item"></div>
+      <paper-icon-button id="iconview-button" name="iconview" class="toolbar-item view-selector first" icon="apps" on-tap="onSelectView"></paper-icon-button>
+      <paper-tooltip for="iconview-button" offset="0">Show Icons</paper-tooltip>
+      <paper-icon-button id="listview-button" name="listview" class="toolbar-item view-selector" icon="view-list" on-tap="onSelectView"></paper-icon-button>
+      <paper-tooltip for="listview-button" offset="0">Show List</paper-tooltip>
+      <paper-icon-button id="detailview-button" name="detailview" class="toolbar-item view-selector last" icon="view-column" on-tap="onSelectView"></paper-icon-button>
+      <div class="toolbar-pad toolbar-item"></div>
+      <paper-icon-button id="load" class="toolbar-item" icon="file-upload"></paper-icon-button>
+      <paper-tooltip for="load" offset="0">Load XLIFF</paper-tooltip>
+      <input id="fileLoad" type="file" class="hidden">
+      <paper-icon-button id="locales" class="toolbar-item" icon="language"></paper-icon-button>
+      <div class="toolbar-pad toolbar-item"></div>
+    </div>
+    <div id="droparea" class="droparea">
+      <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
+        <div name="iconview" class="panel filelistarea layout horizontal wrap">
+          <template is="dom-repeat" items="{{filelist}}">
+            <live-localizer-icon id="download-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" selected="{{isSelected(item.locale,html.lang)}}"></live-localizer-icon>
+          </template>
+        </div>
+        <div name="listview" class="panel">listview</div>
+      </iron-pages>
+    </div>
+    <paper-tooltip id="droptooltip" for="droparea" offset="-20" manual-mode>Drag and drop XLIFF to load</paper-tooltip>
+    <live-localizer-model id="model" filelist="{{filelist}}"></live-localizer-model>
+  </template>
+  <script>
+    Polymer({
+
+      is: 'live-localizer-panel',
+
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
+
+      properties: {
+        panel: {
+          type: String,
+          value: 'iconview',
+          observer: 'onPanelChanged'
+        },
+
+        filelist: {
+          type: Array
+        },
+
+        html: {
+          type: Object,
+          value: function () {
+            return document.querySelector('html');
+          }
+        }
+      },
+
+      listeners: {
+        'droparea.dragover': 'onDragOver',
+        'droparea.drop': 'onDrop',
+        'droparea.mouseenter': 'onDropAreaMouseenter',
+        'load.tap': 'onFileLoad',
+        'fileLoad.change': 'onFileChange',
+        'iron-resize': 'onIronResize',
+        'locales.tap': 'onLocales'
+      },
+
+      attached: function () {
+        if (this._parentResizable) {
+          this._parentResizable.addEventListener('height-changed', this.onIronResize.bind(this));
+        }
+      },
+
+      isSelected: function (locale, htmlLang) {
+        // TODO: incorrect multiple selected=true results for fallback languages must be fixed
+        var fallbackLanguages = this.$.model._enumerateFallbackLanguages(htmlLang);
+        var bundleLocales = this.$.model.bundleLocales;
+        while (fallbackLanguages.length > 0) {
+          var lang = fallbackLanguages.shift();
+          if (locale === lang) {
+            console.log('isSelected(' + locale + ') = ' + true);
+            return true;
+          }
+        }
+        return false;
+      },
+
+      onFileChange: function (e) {
+        console.log('onFileChange');
+        var files = e.target.files;
+
+        this.$.model.processFiles(files);
+
+        e.preventDefault();
+      },
+
+      onDrop: function (e) {
+        console.log('onDrop');
+        var files = e.dataTransfer.files;
+
+        this.$.model.processFiles(files);
+
+        e.preventDefault();
+      },
+
+      onDropAreaMouseenter: function (e) {
+        this.$.droptooltip.show();
+        setTimeout(function () {
+          this.$.droptooltip.hide();
+        }.bind(this), 3000);
+      },
+
+      onPanelChanged: function (panel) {
+        var viewSelectors = Polymer.dom(this.root).querySelectorAll('.view-selector');
+        viewSelectors.forEach(function (viewSelector) {
+          if (viewSelector.getAttribute('name') === panel) {
+            viewSelector.setAttribute('selected-view', '');
+          }
+          else {
+            viewSelector.removeAttribute('selected-view');
+          }
+        });
+        return false;
+      },
+
+      onSelectView: function (e) {
+        var panel = Polymer.dom(e).localTarget;
+        this.panel = panel.getAttribute('name');
+      },
+
+      onLocales: function (e) {
+        this.$.model.fetch();
+      },
+
+      onDragOver: function (e) {
+        console.log('onDragOver');
+        e.preventDefault();
+      },
+
+      onFileLoad: function (e) {
+        this.$.fileLoad.click();
+      },
+
+      onIronResize: function (e) {
+        this.$.droparea.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px'
+        console.log('onIronResize ' + this.$.droparea.style.height);
+      },
+
+      onLocaleIconTap: function (e) {
+        var icon = Polymer.dom(e).localTarget;
+        var file = icon.file;
+        if (icon.selected) {
+          this.$.model.saveToLocalFile(file);
+        }
+        else {
+          this.html.lang = file.locale;
+          this.$.model.getFilelist();
+        }
+      }
+
+    });
+  </script>
+</dom-module>

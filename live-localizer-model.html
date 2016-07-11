@@ -1,0 +1,260 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../i18n-behavior/i18n-controller-behavior.html">
+<script src="../xliff-conv/xliff-conv.js"></script>
+
+<dom-module id="live-localizer-model">
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+      .hidden-anchor {
+        visibility: hidden;
+      }
+    </style>
+    <iron-ajax id="ajax"
+      handle-as="json"
+      url="{{startUrl}}bundle.json"
+      on-response="handleBundleResponse"
+      on-error="handleBundleError">
+    </iron-ajax>
+    <a id="anchor" class="hidden-anchor" target="_blank"></a>
+  </template>
+  <script>
+    Polymer({
+
+      is: 'live-localizer-model',
+
+      behaviors: [
+        BehaviorsStore.I18nControllerBehavior,
+        BehaviorsStore.I18nBehavior
+      ],
+
+      properties: {
+        filelist: {
+          type: Array,
+          value: function () { return []; },
+          notify: true
+        },
+
+        defaultBundle: {
+          type: Object
+        },
+
+        bundleLocales: {
+          type: Array
+        }
+      },
+
+      observers: [
+        'getFilelist(masterBundles.*)'
+      ],
+
+      listeners: {
+        'default-bundle-fetched': 'onDefaultBundleFetched',
+        'lang-updated': '_langUpdated',
+        'bundle-fetched': '_langUpdated',
+        'bundle-set-fetched': 'onBundleSetFetched'
+      },
+
+      ready: function () {
+        this.observeHtmlLang = false;
+      },
+
+      attached: function () {
+        this.fetch();
+      },
+
+      fetch: function () {
+        this.$.ajax.generateRequest();
+      },
+
+      processFiles: function (files) {
+        var xliffConv = new XliffConv();
+        for (var i = 0; i < files.length; i++) {
+          var f = files[i];
+          console.log('f.name:' + f.name + 'f.type:' + f.type + 'f.size:' + (f.size / 1000) + ' KB ');
+          var reader = new FileReader();
+          reader.onload = (function(f) {
+            return function(e) {
+              var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
+              var locale = '';
+              if (match && match[1] !== this.defaultLang) {
+                locale = match[1];
+              }
+              else {
+                console.log('incorrect locale');
+              }
+              if (locale && this.masterBundles[locale] && this.masterBundles[locale].bundle) {
+                xliffConv.parseXliff(e.target.result, { bundle: this.masterBundles[locale] }, function (output) {
+                  console.log('updated locale = ' + locale + ' from XLIFF');
+                  var html = document.querySelector('html');
+                  html.setAttribute('lang', '');
+                  setTimeout(function () {
+                    html.setAttribute('lang', locale);
+                    this.getFilelist();
+                  }.bind(this), 1000);
+                }.bind(this));
+              }
+              var file;
+              for (var i = 0; i < this.filelist.length; i++) {
+                if (this.filelist[i].locale === locale) {
+                  file = this.filelist[i];
+                  file.text = e.target.result;
+                }
+              }
+            }.bind(this);
+          }.bind(this))(f);
+          reader.readAsText(f);
+        }
+      },
+
+      handleBundleResponse: function (event) {
+        this.defaultBundle = event.detail.response;
+        this.fire('default-bundle-fetched', { success: true });
+        return false;
+      },
+
+      handleBundleError: function (event) {
+        this.fire('default-bundle-fetched', { success: false });
+        return false;
+      },
+
+      onDefaultBundleFetched: function (event) {
+        console.log('onDefaultBundleFetched', event.detail);
+        if (event.detail.success) {
+          if (!this.fetchingBundleLocales) {
+            this.fetchBundleSet();
+          }
+        }
+        return false;
+      },
+
+      getLocaleList: function () {
+        var locales = [];
+        if (this.defaultBundle) {
+          for (var module in this.defaultBundle) {
+            if (this.defaultBundle[module].meta &&
+                this.defaultBundle[module].meta.locales) {
+              for (var i = 0; i < this.defaultBundle[module].meta.locales.length; i++) {
+                if (locales.indexOf(this.defaultBundle[module].meta.locales[i]) < 0) {
+                  locales.push(this.defaultBundle[module].meta.locales[i]);
+                }
+              }
+            }
+          }
+        }
+        return locales;
+      },
+
+      fetchBundleSet: function () {
+        this.bundleLocales = this.getLocaleList();
+        console.log('locales = ', this.bundleLocales);
+        this.fetchingBundleLocales = deepcopy(this.bundleLocales);
+
+        this._doFetchBundle();
+      },
+
+      _doFetchBundle: function () {
+        var locale = this.fetchingBundleLocales.shift();
+        if (locale) {
+          console.log('fetching bundle for locale = ' + locale);
+          this.lang = locale;
+        }
+        else {
+          this.fire('bundle-set-fetched');
+        }
+      },
+
+      _langUpdated: function (e) {
+        if (Polymer.dom(e).rootTarget === this) {
+          if (this.fetchingBundleLocales) {
+            console.log('lang-updated');
+            this._doFetchBundle();
+          }
+        }
+        return false;
+      },
+
+      onBundleSetFetched: function (e) {
+        console.log('onBundleSetFetched');
+        this.fetchingBundleLocales = null;
+        this.lang = '';
+        this.getFilelist();
+      },
+
+      getFilelist: function () {
+        if (this.defaultLang) {
+          var xliffConv = new XliffConv();
+          var locale;
+          var file;
+          while (this.shift('filelist')) {}
+          this.bundleLocales.unshift(this.defaultLang);
+          for (var i = 0; i < this.bundleLocales.length; i++) {
+            locale = this.bundleLocales[i];
+            if (locale) {
+              file = Object.create(null);
+              file.locale = locale;
+              this.push('filelist', file);
+            }
+          }
+          this.bundleLocales.shift();
+        }
+      },
+
+      setXliff: function (file, callback) {
+        if (this.defaultLang) {
+          var xliffConv = new XliffConv();
+          var locale = file.locale;
+          if (locale) {
+            (function (destLanguage) {
+              var bundles = { '': this.defaultBundle };
+              bundles[destLanguage] = deepcopy(this.masterBundles[destLanguage]);
+              xliffConv.parseJSON(bundles, {
+                srcLanguage: this.defaultLang,
+                destLanguage: destLanguage
+              }, function (output) {
+                var file = Object.create(null);
+                var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
+                file.name = 'bundle.' + destLanguage + '.xlf';
+                file.text = output;
+                file.locale = destLanguage;
+                callback(file);
+              }.bind(this));
+            }.bind(this))(locale);
+          }
+          else {
+            callback();
+          }
+        }
+        else {
+          callback();
+        }
+      },
+
+      saveToLocalFile: function (file) {
+        file.text = null;
+        this.setXliff(file, function (result) {
+          if (result && result.text) {
+            var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
+            var blob = new Blob([result.text], { type: type });
+            if (window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveOrOpenBlob(blob, result.name);
+            }
+            else {
+              this.$.anchor.download = result.name;
+              this.$.anchor.href = URL.createObjectURL(blob);
+              this.$.anchor.click();
+            }
+          }
+        }.bind(this));
+      }
+
+    });
+  </script>
+</dom-module>
