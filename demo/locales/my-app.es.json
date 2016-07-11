@@ -29,9 +29,9 @@
     ]
   },
   "model": {},
-  "app-drawer-layout_3:app-drawer:app-toolbar": "Menu",
-  "app-drawer-layout_3:app-drawer:iron-selector_1:a": "View One",
-  "app-drawer-layout_3:app-drawer:iron-selector_1:a_1": "View Two",
-  "app-drawer-layout_3:app-drawer:iron-selector_1:a_2": "View Three",
-  "app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1": "My App"
+  "app-drawer-layout_3:app-drawer:app-toolbar": "es Menu",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a": "es View One",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a_1": "es View Two",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a_2": "es View Three",
+  "app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1": "es My App"
 }
