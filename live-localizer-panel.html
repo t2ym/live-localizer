@@ -110,7 +110,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
         <div name="iconview" class="panel filelistarea layout horizontal wrap">
           <template is="dom-repeat" items="{{filelist}}">
-            <live-localizer-icon id="download-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" selected="{{isSelected(item.locale)}}"></live-localizer-icon>
+            <live-localizer-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" selected="{{isSelected(item.locale)}}"></live-localizer-icon>
           </template>
         </div>
         <div name="listview" class="panel">listview</div>
