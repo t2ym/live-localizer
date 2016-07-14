@@ -137,13 +137,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
         filelist: {
           type: Array
-        },
-
-        html: {
-          type: Object,
-          value: function () {
-            return document.querySelector('html');
-          }
         }
       },
 
@@ -235,7 +228,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           this.$.model.saveToLocalFile(file);
         }
         else {
-          this.html.lang = file.locale;
+          this.$.model.html.lang = file.locale;
           this.$.model.getFilelist();
         }
       }
