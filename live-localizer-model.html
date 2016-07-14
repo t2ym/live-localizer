@@ -93,10 +93,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               if (locale && this.masterBundles[locale] && this.masterBundles[locale].bundle) {
                 xliffConv.parseXliff(e.target.result, { bundle: this.masterBundles[locale] }, function (output) {
                   console.log('updated locale = ' + locale + ' from XLIFF');
-                  var html = document.querySelector('html');
-                  html.setAttribute('lang', '');
+                  this.html.setAttribute('lang', '');
                   setTimeout(function () {
-                    html.setAttribute('lang', locale);
+                    this.html.setAttribute('lang', locale);
                     this.getFilelist();
                   }.bind(this), 1000);
                 }.bind(this));
