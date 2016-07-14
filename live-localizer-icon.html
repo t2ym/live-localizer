@@ -177,7 +177,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     };
 
     function locale2country (locale) {
-      var match = locale.match(/^\(.*\)-\([A-Z][A-Z]\)$/);
+      var match = locale.match(/^(.*)-([A-Z][A-Z])$/);
       if (match) {
         return match[2];
       }
