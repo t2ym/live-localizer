@@ -110,7 +110,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
         <div name="iconview" class="panel filelistarea layout horizontal wrap">
           <template is="dom-repeat" items="{{filelist}}">
-            <live-localizer-icon id="download-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" selected="{{isSelected(item.locale,html.lang)}}"></live-localizer-icon>
+            <live-localizer-icon id="download-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" selected="{{isSelected(item.locale)}}"></live-localizer-icon>
           </template>
         </div>
         <div name="listview" class="panel">listview</div>
@@ -163,18 +163,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
-      isSelected: function (locale, htmlLang) {
-        // TODO: incorrect multiple selected=true results for fallback languages must be fixed
-        var fallbackLanguages = this.$.model._enumerateFallbackLanguages(htmlLang);
-        var bundleLocales = this.$.model.bundleLocales;
-        while (fallbackLanguages.length > 0) {
-          var lang = fallbackLanguages.shift();
-          if (locale === lang) {
-            console.log('isSelected(' + locale + ') = ' + true);
-            return true;
-          }
-        }
-        return false;
+      isSelected: function (locale) {
+        return this.$.model.isSelected(locale);
       },
 
       onFileChange: function (e) {

@@ -253,6 +253,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }
         }.bind(this));
+      },
+
+      isSelected: function (locale) {
+        var lang;
+        var fallbackLanguages = this._enumerateFallbackLanguages(this.html.lang);
+        locale = this._enumerateFallbackLanguages(locale).shift();
+        for (var i = 0; !lang && i < fallbackLanguages.length; i++) {
+          for (var j = 0; !lang && j < this.bundleLocales.length; j++) {
+            if (this.bundleLocales[j] === fallbackLanguages[i]) {
+              lang = this.bundleLocales[j];
+              break;
+            }
+          }
+        }
+        return locale === lang ||
+               (!lang && locale === this.defaultLang);
       }
 
     });
