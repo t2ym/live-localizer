@@ -149,42 +149,43 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       fetchBundleSet: function () {
-        this.bundleLocales = this.getLocaleList();
-        console.log('locales = ', this.bundleLocales);
-        this.fetchingBundleLocales = deepcopy(this.bundleLocales);
+        var it = this;
+        it.bundleLocales = it.getLocaleList();
+        console.log('locales = ', it.bundleLocales);
+        it.fetchingBundleLocales = deepcopy(it.bundleLocales);
 
-        this.map(this.fetchingBundleLocales, function (locale) {
+        it.map(it.fetchingBundleLocales, function (locale) {
           return new Promise(function (resolve, reject) {
             var langUpdated = function (e) {
               console.log('lang-updated', e.detail);
-              this.removeEventListener('lang-updated', langUpdated);
-              if (this.masterBundles[locale] &&
-                  this.masterBundles[locale].bundle &&
-                  Object.keys(this.masterBundles[locale]).length > 1) {
+              it.removeEventListener('lang-updated', langUpdated);
+              if (it.masterBundles[locale] &&
+                  it.masterBundles[locale].bundle &&
+                  Object.keys(it.masterBundles[locale]).length > 1) {
                 resolve(locale);
               }
               else {
                 reject(new Error('Could not fetch bundle for ' + locale));
               }
-            }.bind(this);
-            this.addEventListener('lang-updated', langUpdated);
+            };
+            it.addEventListener('lang-updated', langUpdated);
             console.log('fetching bundle for locale = ' + locale);
-            this.lang = locale;
-          }.bind(this));
-        }.bind(this))
+            it.lang = locale;
+          });
+        })
         .then(function (result) {
           console.log('fetched bundles', result);
-          this.fetchedBundleLocales = [];
-          this.fetchedBundleLocales.push(this.defaultLang);
+          it.fetchedBundleLocales = [];
+          it.fetchedBundleLocales.push(it.defaultLang);
           result.forEach(function (locale) {
             if (typeof locale === 'string') {
-              this.fetchedBundleLocales.push(locale);
+              it.fetchedBundleLocales.push(locale);
             }
-          }.bind(this));
-          this.fetchingBundleLocales = null;
-          this.lang = '';
-          this.getFilelist();
-        }.bind(this))
+          });
+          it.fetchingBundleLocales = null;
+          it.lang = '';
+          it.getFilelist();
+        });
       },
 
       getFilelist: function () {
