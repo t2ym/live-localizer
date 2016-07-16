@@ -267,11 +267,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                (!lang && locale === this.defaultLang);
       },
 
-      map: function (array, fn) {
+      map: function (array, fn, assign) {
+        assign = assign || function (value, index, array) {
+          array[index] = value;
+          return index + 1;
+        };
         return (function wrapper (array, index) {
           function next (value) {
-            array[index] = value;
-            return wrapper(array, index + 1);
+            return wrapper(array, assign(value, index, array));
           }
           return index < array.length ? fn(array[index], index, array).then(next).catch(next) : array;
         })(array, 0);
