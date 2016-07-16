@@ -216,7 +216,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 destLanguage: destLanguage
               }, function (output) {
                 var file = Object.create(null);
-                var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
                 file.name = 'bundle.' + destLanguage + '.xlf';
                 file.text = output;
                 file.locale = destLanguage;
