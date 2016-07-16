@@ -51,16 +51,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
-      observers: [
-        //'getFilelist(masterBundles.*)'
-      ],
-
       listeners: {
         'default-bundle-fetched': 'onDefaultBundleFetched'
-      },
-
-      ready: function () {
-        this.observeHtmlLang = false;
       },
 
       attached: function () {
@@ -69,6 +61,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       fetch: function () {
         this.$.ajax.generateRequest();
+      },
+
+      refresh: function () {
+        if (this.defaultLang) {
+          var file;
+          var filelist = [];
+          while (file = this.shift('filelist')) {
+            filelist.push(file);
+          }
+          for (var i = 0; i < filelist.length; i++) {
+            file = Object.create(null);
+            file.locale = filelist[i].locale;
+            this.push('filelist', file);
+          }
+        }
       },
 
       processFiles: function (files) {
@@ -93,7 +100,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   this.html.setAttribute('lang', '');
                   setTimeout(function () {
                     this.html.setAttribute('lang', locale);
-                    this.getFilelist();
                   }.bind(this), 1000);
                 }.bind(this));
               }
@@ -124,7 +130,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       onDefaultBundleFetched: function (event) {
         console.log('onDefaultBundleFetched', event.detail);
         if (event.detail.success) {
-          if (!this.fetchingBundleLocales) {
+          if (!this.fetchingFilelist) {
             this.fetchBundleSet();
           }
         }
@@ -151,57 +157,51 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       fetchBundleSet: function () {
         var it = this;
         it.bundleLocales = it.getLocaleList();
-        console.log('locales = ', it.bundleLocales);
-        it.fetchingBundleLocales = deepcopy(it.bundleLocales);
+        console.log('bundleLocales = ', it.bundleLocales);
+        it.fetchingFilelist = it.bundleLocales.map(function (locale) {
+          var file = Object.create(null);
+          file.locale = locale;
+          return file;
+        });
 
-        it.map(it.fetchingBundleLocales, function (locale) {
+        while (it.shift('filelist')) {} // clean up filelist
+
+        // default lang
+        var defaultFile = Object.create(null);
+        defaultFile.locale = it.defaultLang;
+        console.log('push ' + defaultFile.locale + ' to filelist');
+        it.push('filelist', defaultFile);
+
+        // fetch non-default
+        it.map(it.fetchingFilelist, function (file) {
           return new Promise(function (resolve, reject) {
             var langUpdated = function (e) {
               console.log('lang-updated', e.detail);
               it.removeEventListener('lang-updated', langUpdated);
-              if (it.masterBundles[locale] &&
-                  it.masterBundles[locale].bundle &&
-                  Object.keys(it.masterBundles[locale]).length > 1) {
-                resolve(locale);
+              if (it.masterBundles[file.locale] &&
+                  it.masterBundles[file.locale].bundle &&
+                  Object.keys(it.masterBundles[file.locale]).length > 1) {
+                resolve(file);
               }
               else {
-                reject(new Error('Could not fetch bundle for ' + locale));
+                reject(new Error('Could not fetch bundle for ' + file.locale));
               }
             };
             it.addEventListener('lang-updated', langUpdated);
-            console.log('fetching bundle for locale = ' + locale);
-            it.lang = locale;
+            console.log('fetching bundle for locale = ' + file.locale);
+            it.lang = file.locale;
+          })
+          .then(function (file) {
+            console.log('push ' + file.locale + ' to filelist');
+            it.push('filelist', file);
+            return file;
           });
         })
         .then(function (result) {
           console.log('fetched bundles', result);
-          it.fetchedBundleLocales = [];
-          it.fetchedBundleLocales.push(it.defaultLang);
-          result.forEach(function (locale) {
-            if (typeof locale === 'string') {
-              it.fetchedBundleLocales.push(locale);
-            }
-          });
-          it.fetchingBundleLocales = null;
+          it.fetchingFilelist = null;
           it.lang = '';
-          it.getFilelist();
         });
-      },
-
-      getFilelist: function () {
-        if (this.defaultLang) {
-          var locale;
-          var file;
-          while (this.shift('filelist')) {}
-          for (var i = 0; i < this.fetchedBundleLocales.length; i++) {
-            locale = this.fetchedBundleLocales[i];
-            if (locale) {
-              file = Object.create(null);
-              file.locale = locale;
-              this.push('filelist', file);
-            }
-          }
-        }
       },
 
       setXliff: function (file, callback) {
@@ -265,6 +265,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
         return locale === lang ||
                (!lang && locale === this.defaultLang);
+      },
+
+      _handleHtmlLangChange: function (mutations) {
+        mutations.forEach(function(mutation) {
+          switch (mutation.type) {
+          case 'attributes':
+            if (mutation.attributeName === 'lang') {
+              this.refresh();
+            }
+            break;
+          default:
+            break;
+          }
+        }, this);
       },
 
       map: function (array, fn, assign) {
