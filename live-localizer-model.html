@@ -67,6 +67,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       refresh: function () {
         if (this.defaultLang) {
+          // TODO: should be simpler to trigger just rerendering
           var file;
           var filelist = [];
           while (file = this.shift('filelist')) {
@@ -74,7 +75,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           }
           for (var i = 0; i < filelist.length; i++) {
             file = Object.create(null);
-            file.locale = filelist[i].locale;
+            for (var prop in filelist[i]) {
+              file[prop] = filelist[i][prop];
+            }
             this.push('filelist', file);
           }
         }
