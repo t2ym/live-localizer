@@ -202,7 +202,40 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+
+        model: {
+          type: Object
         }
+      },
+
+      observers: [
+        'updateSelected(file,model)'
+      ],
+
+      ready: function () {
+        this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
+      },
+
+      attached: function () {
+        if (this.model) {
+          this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+        }
+      },
+
+      detached: function () {
+        if (this.model) {
+          this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+        }
+      },
+
+      onHtmlLangMutation: function (e) {
+        this.updateSelected(this.file, this.model);
+        return false;
+      },
+
+      updateSelected: function (file, model) {
+        this.selected = model.isSelected(file.locale);
       },
 
       flag: function (locale) {

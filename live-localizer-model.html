@@ -65,24 +65,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.$.ajax.generateRequest();
       },
 
-      refresh: function () {
-        if (this.defaultLang) {
-          // TODO: should be simpler to trigger just rerendering
-          var file;
-          var filelist = [];
-          while (file = this.shift('filelist')) {
-            filelist.push(file);
-          }
-          for (var i = 0; i < filelist.length; i++) {
-            file = Object.create(null);
-            for (var prop in filelist[i]) {
-              file[prop] = filelist[i][prop];
-            }
-            this.push('filelist', file);
-          }
-        }
-      },
-
       processFiles: function (files) {
         var xliffConv = new XliffConv();
         for (var i = 0; i < files.length; i++) {
@@ -277,7 +259,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           switch (mutation.type) {
           case 'attributes':
             if (mutation.attributeName === 'lang') {
-              this.refresh();
+              this.fire('html-lang-mutation');
             }
             break;
           default:
