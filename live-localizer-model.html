@@ -42,6 +42,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           notify: true
         },
 
+        listItems: {
+          type: Array,
+          value: function () { return []; },
+          notify: true
+        },
+
         defaultBundle: {
           type: Object
         },
@@ -50,6 +56,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           type: Array
         }
       },
+
+      observers: [
+        'fileAddedOrRemoved(filelist.splices)'
+      ],
 
       listeners: {
         'default-bundle-fetched': 'onDefaultBundleFetched'
@@ -198,15 +208,19 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           if (locale) {
             (function (destLanguage) {
               var bundles = { '': this.defaultBundle };
-              bundles[destLanguage] = deepcopy(this.masterBundles[destLanguage]);
+              bundles[destLanguage] = deepcopy(locale === this.defaultLang
+                                                ? this.defaultBundle
+                                                : this.masterBundles[destLanguage]);
               xliffConv.parseJSON(bundles, {
                 srcLanguage: this.defaultLang,
                 destLanguage: destLanguage
-              }, function (output) {
+              }, function (output, stats) {
                 var file = Object.create(null);
                 file.name = 'bundle.' + destLanguage + '.xlf';
                 file.text = output;
+                file.stats = stats;
                 file.locale = destLanguage;
+                //console.log(file.name, JSON.stringify(stats, null, 2));
                 callback(file);
               }.bind(this));
             }.bind(this))(locale);
@@ -236,6 +250,63 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }
         }.bind(this));
+      },
+
+      fileAddedOrRemoved: function (changeRecord) {
+        var it = this;
+        if (changeRecord && changeRecord.indexSplices) {
+          it.map(changeRecord.indexSplices, function (splice) {
+            return new Promise(function (resolve, reject) {
+              it.splice('listItems', splice.index, splice.removed.length);
+              var added = [];
+              for (var i = 0; i < splice.addedCount; i++) {
+                added.push(splice.object[splice.index + i]);
+              }
+              it.map(added, function (file, index, array) {
+                return new Promise(function (resolveAdded, rejectAdded) {
+                  it.setXliff(file, function (result) {
+                    if (result && result.stats) {
+                      var stats = result.stats.xliff;
+                      /*
+                        <th>Name</th>
+                        <th>Locale</th>
+                        <th>Total Units</th>
+                        <th>Translated</th>
+                        <th>Needs Review</th>
+                        <th>Needs Translation</th>
+                        <th>New</th>
+                        */
+                      var value = [
+                        result.name,
+                        result.locale,
+                        stats.total.units || 0,
+                        stats.total.states.translated || 0,
+                        stats.total.states['needs-review'] || 0,
+                        stats.total.states['needs-translation'] || 0,
+                        stats.total.states.new || 0
+                      ];
+                      it.splice('listItems', splice.index + index, 0, value);
+                      if (it.isSelected(result.locale)) {
+                        it.fire('selected-item-added', { locale: result.locale, index: splice.index + index });
+                      }
+                      resolveAdded(file);
+                    }
+                    else {
+                      rejectAdded(file);
+                    }
+                  });
+                });
+              })
+              .then(function (value) {
+                //console.log('added ', value);
+                resolve(splice);
+              });
+            });
+          })
+          .then(function (result) {
+            //console.log('fileAddedOrRemoved', result);
+          });
+        }
       },
 
       isSelected: function (locale) {
