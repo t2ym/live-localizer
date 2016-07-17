@@ -49,7 +49,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         width: 48px;
         height: 48px;
       }
-      paper-card.download-link:not([selected]) {
+      paper-card.download-link:not(.selected) {
         color: black;
         opacity: 0.35;
       }
@@ -58,7 +58,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         display: block;
       }
     </style>
-    <paper-card id="card" class="download-link layout vertical" selected$="{{selected}}">
+    <paper-card id="card" class="download-link layout vertical">
       <iron-image class="download-icon" src="{{flag(file.locale)}}" alt="{{file.locale}}" sizing="contain"></iron-image>
       <div class="flex"></div>
       <div class="file-name">{{file.locale}}</div>
@@ -201,7 +201,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         selected: {
           type: Boolean,
           value: false,
-          reflectToAttribute: true
+          reflectToAttribute: true,
+          observer: 'selectedChanged'
         },
 
         model: {
@@ -236,6 +237,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       updateSelected: function (file, model) {
         this.selected = model.isSelected(file.locale);
+      },
+
+      selectedChanged: function (value) {
+        this.toggleClass('selected', this.selected, this.$.card);
       },
 
       flag: function (locale) {
