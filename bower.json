@@ -1,6 +1,6 @@
 {
   "name": "live-localizer",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "authors": [
     "Tetsuya Mori <t2y3141592@gmail.com>"
   ],
@@ -35,7 +35,6 @@
     "paper-ripple": "polymerelements/paper-ripple#^1.0.8",
     "paper-tooltip": "polymerelements/paper-tooltip#^1.1.2",
     "neon-animation": "polymerelements/neon-animation#^1.2.3",
-    "ag-grid": "^5.0.3",
     "vaadin-core-elements": "^1.1.0"
   },
   "devDependencies": {
