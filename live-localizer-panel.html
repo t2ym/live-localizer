@@ -197,6 +197,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         if (this._parentResizable) {
           this._parentResizable.addEventListener('height-changed', this.onIronResize.bind(this));
         }
+        this.setUpNumberRenderer();
       },
 
       isSelected: function (locale) {
@@ -272,6 +273,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
         else {
           this.$.model.html.lang = file.locale;
+        }
+      },
+
+      setUpNumberRenderer: function () {
+        for (var i = 2; i <= 6; i++) {
+          this.$.list.columns[i].renderer = function(cell) {
+            cell.element.innerHTML = '<i18n-number style="margin-left: auto;">' + cell.data + '</i18n-number>';
+          };
         }
       },
 
