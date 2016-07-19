@@ -326,6 +326,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                (!lang && locale === this.defaultLang);
       },
 
+      getNormalizedLocale: function (locale) {
+        return this._enumerateFallbackLanguages(locale).shift();
+      },
+
       _handleHtmlLangChange: function (mutations) {
         mutations.forEach(function(mutation) {
           switch (mutation.type) {

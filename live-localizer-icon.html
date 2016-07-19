@@ -102,7 +102,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <div class="file-name">{{file.locale}}</div>
       <paper-ripple></paper-ripple>
     </paper-card>
-    <paper-fab id="badge" mini class="badge"></paper-fab>
+    <paper-fab id="badge" mini class="badge" on-tap="onBadgeTap"></paper-fab>
     <paper-tooltip for="card" offset="-10">{{tooltip(selected)}}</paper-tooltip>
   </template>
   <script>
@@ -300,6 +300,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             this.$.badge.classList.remove(color);
           }
         }, this);
+      },
+
+      onBadgeTap: function (e) {
+        e.stopPropagation();
+        this.fire('badge-tap', { locale: this.file.locale });
       },
 
       flag: function (locale) {

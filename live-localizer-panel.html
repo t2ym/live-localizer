@@ -114,7 +114,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
         <div name="iconview" class="panel filelistarea layout horizontal wrap">
           <template is="dom-repeat" items="{{filelist}}">
-            <live-localizer-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" model="{{model}}"></live-localizer-icon>
+            <live-localizer-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-icon>
           </template>
         </div>
         <div name="listview" class="panel">
@@ -186,7 +186,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'iron-resize': 'onIronResize',
         'locales.tap': 'onLocales',
         'list.selected-items-changed': 'onListSelection',
-        'model.list-item-added': 'onListAdded'
+        'model.list-item-added': 'onListAdded',
+        'model.html-lang-mutation': 'onHtmlLangMutation'
       },
 
       ready: function () {
@@ -239,6 +240,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             viewSelector.removeAttribute('selected-view');
           }
         });
+        if (panel === 'listview') {
+          setTimeout(function () {
+            this.$.list.refreshItems();
+          }.bind(this), 200)
+        }
         return false;
       },
 
@@ -274,6 +280,32 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           this.$.model.html.lang = file.locale;
         }
+      },
+
+      onHtmlLangMutation: function (e) {
+        console.log('onHtmlLangMutation ', this.model.html.lang);
+        var locale = this.model.getNormalizedLocale(this.model.html.lang);
+        var selected = this.$.list.selection.selected();
+        var selectedLocale = '';
+        if (selected.length > 0 &&
+            this.listItems.length > selected[0]) {
+          selectedLocale = this.listItems[selected[0]][1];
+        }
+        if (selectedLocale !== locale) {
+          for (var i = 0; i < this.listItems.length; i++) {
+            if (this.listItems[i][1] === locale) {
+              this.$.list.selection.select(i);
+              break;
+            }
+          }
+        }
+        e.stopPropagation();
+      },
+
+      onBadgeTap: function (e) {
+        e.stopPropagation();
+        this.$.model.html.lang = e.detail.locale;
+        this.$['listview-button'].click();
       },
 
       setUpNumberRenderer: function () {
