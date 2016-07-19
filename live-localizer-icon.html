@@ -11,6 +11,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../paper-fab/paper-fab.html">
 
 <dom-module id="live-localizer-icon">
   <template>
@@ -28,6 +29,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
         --paper-tooltip: {
           padding: 4px;
+        }
+
+        --paper-fab-background: lightgrey;
+        --paper-fab-keyboard-focus-background: lightgrey;
+        --paper-fab-iron-icon: {
+          color: white;
+          width: 16px;
+          height: 16px;
         }
       }
       .download-link {
@@ -57,6 +66,35 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         text-align: center;
         display: block;
       }
+      paper-fab.badge {
+        position: relative;
+        font-size: 9pt;
+        padding: 1px;
+        top: -84px;
+        left: 60px;
+        width: 32px;
+        height: 32px;
+      }
+      paper-fab.badge:not(.selected) {
+        color: black;
+        opacity: 0.35;
+      }
+      paper-fab.badge.blue {
+        visibility: visible;
+        background-color: blue;
+      }
+      paper-fab.badge.orangered {
+        visibility: visible;
+        background-color: orangered;
+      }
+      paper-fab.badge.yellow {
+        visibility: visible;
+        color: slategrey;
+        background-color: yellow;
+      }
+      paper-fab.badge {
+        visibility: hidden;
+      }
     </style>
     <paper-card id="card" class="download-link layout vertical">
       <iron-image class="download-icon" src="{{flag(file.locale)}}" alt="{{file.locale}}" sizing="contain"></iron-image>
@@ -64,6 +102,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <div class="file-name">{{file.locale}}</div>
       <paper-ripple></paper-ripple>
     </paper-card>
+    <paper-fab id="badge" mini class="badge"></paper-fab>
     <paper-tooltip for="card" offset="-10">{{tooltip(selected)}}</paper-tooltip>
   </template>
   <script>
@@ -211,7 +250,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       observers: [
-        'updateSelected(file,model)'
+        'updateSelected(file,model)',
+        'updateTasks(file.tasks)'
       ],
 
       ready: function () {
@@ -241,6 +281,25 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       selectedChanged: function (value) {
         this.toggleClass('selected', this.selected, this.$.card);
+        this.toggleClass('selected', this.selected, this.$.badge);
+      },
+
+      updateTasks: function (tasks) {
+        console.log('updateTasks ' + this.file.locale, this.file.tasks);
+        var badgeColor = '';
+        if (tasks > 0) {
+          badgeColor = 'orangered';
+        }
+
+        this.$.badge.label = '' + this.file.tasks;
+        [ 'blue', 'orangered', 'yellow' ].forEach(function (color) {
+          if (color === badgeColor) {
+            this.$.badge.classList.add(color);
+          }
+          else {
+            this.$.badge.classList.remove(color);
+          }
+        }, this);
       },
 
       flag: function (locale) {

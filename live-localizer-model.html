@@ -287,12 +287,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                         stats.total.states.new || 0
                       ];
                       it.splice('listItems', splice.index + index, 0, value);
-                      if (it.isSelected(result.locale)) {
-                        it.fire('selected-item-added', { locale: result.locale, index: splice.index + index });
-                      }
+                      file.tasks = value[2] - value[3]; // remaining units
+                      it.fire('list-item-added', { locale: result.locale, index: splice.index + index });
                       resolveAdded(file);
                     }
                     else {
+                      file.tasks = 0;
                       rejectAdded(file);
                     }
                   });
