@@ -244,6 +244,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           observer: 'selectedChanged'
         },
 
+        followSelected: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
         model: {
           type: Object
         }
@@ -271,7 +277,15 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       onHtmlLangMutation: function (e) {
-        this.updateSelected(this.file, this.model);
+        if (this.followSelected) {
+          var tmpFile = this.model.selectedFile();
+          if (tmpFile) {
+            this.file = tmpFile;
+          }
+        }
+        if (this.file) {
+          this.updateSelected(this.file, this.model);
+        }
         return false;
       },
 

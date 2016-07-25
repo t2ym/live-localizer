@@ -1,0 +1,130 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../vaadin-core-elements/vaadin-core-elements.html">
+
+<dom-module id="live-localizer-list-view">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .gridlistarea {
+        margin-left: 2px;
+      }
+    </style>
+    <vaadin-grid id="list" class="gridlistarea" items="{{listItems}}" selection-mode="single">
+      <table>
+        <colgroup>
+          <col>
+          <col>
+          <col>
+          <col>
+          <col>
+          <col>
+          <col>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Locale</th>
+            <th>Total Units</th>
+            <th>Translated</th>
+            <th>Needs Review</th>
+            <th>Needs Translation</th>
+            <th>New</th>
+          </tr>
+        </thead>
+      </table>
+    </vaadin-grid>
+  </template>
+  <script>
+    Polymer({
+
+      is: 'live-localizer-list-view',
+
+      properties: {
+        model: {
+          type: Object
+        },
+
+        listItems: {
+          type: Array
+        }
+      },
+
+      listeners: {
+        'list.selected-items-changed': 'onListSelection'
+      },
+
+      attached: function () {
+        this.setUpNumberRenderer();
+        this.onListAddedBindThis = this.onListAdded.bind(this);
+        this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
+        this.model.addEventListener('list-item-added', this.onListAddedBindThis);
+        this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+      },
+
+      detached: function () {
+        this.model.removeEventListener('list-item-added', this.onListAddedBindThis);
+        this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+      },
+
+      isSelected: function (locale) {
+        return this.model.isSelected(locale);
+      },
+
+      refresh: function () {
+        this.$.list.refreshItems();
+      },
+
+      onHtmlLangMutation: function (e) {
+        console.log('onHtmlLangMutation ', this.model.html.lang);
+        var locale = this.model.getNormalizedLocale(this.model.html.lang);
+        var selected = this.$.list.selection.selected();
+        var selectedLocale = '';
+        if (selected.length > 0 &&
+            this.model.listItems.length > selected[0]) {
+          selectedLocale = this.model.listItems[selected[0]][1];
+        }
+        if (selectedLocale !== locale) {
+          for (var i = 0; i < this.model.listItems.length; i++) {
+            if (this.model.listItems[i][1] === locale) {
+              this.$.list.selection.select(i);
+              break;
+            }
+          }
+        }
+        e.stopPropagation();
+      },
+
+      setUpNumberRenderer: function () {
+        for (var i = 2; i <= 6; i++) {
+          this.$.list.columns[i].renderer = function(cell) {
+            cell.element.innerHTML = '<i18n-number style="margin-left: auto;">' + cell.data + '</i18n-number>';
+          };
+        }
+      },
+
+      onListSelection: function (e) {
+        var selected = this.$.list.selection.selected();
+        if (selected.length > 0 &&
+            this.model.listItems &&
+            this.model.listItems.length > selected[0]) {
+          this.model.html.lang = this.model.listItems[selected[0]][1];
+        }
+      },
+
+      onListAdded: function (e) {
+        if (e.detail && e.detail.locale) {
+          if (this.isSelected(e.detail.locale)) {
+            this.$.list.selection.select(e.detail.index);
+          }
+        }
+      }
+
+    });
+  </script>
+</dom-module>

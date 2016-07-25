@@ -1,0 +1,95 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-icons/av-icons.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="live-localizer-icon.html">
+<link rel="import" href="live-localizer-local-file-storage.html">
+
+<dom-module id="live-localizer-storage-view">
+  <template>
+    <style include="iron-flex"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      div.storage-group {
+        display: inline-block;
+        width: calc(100% - 32px);
+        height: 96px;
+        margin: 8px;
+        padding: 8px;
+        border-radius: 12px;
+        @apply(--paper-font-common-base);
+        font-size: 12px;
+        text-align: left;
+        background-color: whitesmoke;
+        @apply(--shadow-elevation-4dp);
+      }
+      div.storage-group-header {
+        width: 64px;
+      }
+    </style>
+    <div class="layout vertical">
+      <div id="cloud" class="storage-group">
+        <div class="layout horizontal">
+          <div class="storage-group-header layout vertical">
+            <iron-icon icon="cloud"></iron-icon>
+            <div>Cloud</div>
+            <div class="flex"></div>
+          </div>
+          <div>cloud storage icons</div>
+        </div>
+      </div>
+      <div id="browser" class="storage-group">
+        <div class="layout horizontal">
+          <div class="storage-group-header layout vertical">
+            <iron-icon icon="av:web-asset"></iron-icon>
+            <div>Browser</div>
+            <div class="flex"></div>
+          </div>
+          <live-localizer-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-icon>
+          <div>browser storage icons</div>
+        </div>
+      </div>
+      <div id="device" class="storage-group">
+        <div class="layout horizontal">
+          <div class="storage-group-header layout vertical">
+            <iron-icon icon="hardware:computer"></iron-icon>
+            <div>Device</div>
+            <div class="flex"></div>
+          </div>
+          <live-localizer-local-file-storage id="file-storage" model="{{model}}"></live-localizer-local-file-storage>
+          <div>device storage icons</div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+
+      is: 'live-localizer-storage-view',
+
+      properties: {
+        model: {
+          type: Object
+        }
+      },
+
+      onBadgeTap: function (e) {
+        e.stopPropagation();
+        this.fire('locale-badge-tap', { locale: this.$['locale-icon'].file.locale });
+      }
+
+    });
+  </script>
+</dom-module>

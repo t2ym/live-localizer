@@ -11,10 +11,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
-<link rel="import" href="../vaadin-core-elements/vaadin-core-elements.html">
 
 <link rel="import" href="live-localizer-model.html">
 <link rel="import" href="live-localizer-icon.html">
+<link rel="import" href="live-localizer-list-view.html">
+<link rel="import" href="live-localizer-storage-view.html">
 
 <dom-module id="live-localizer-panel">
   <template>
@@ -84,9 +85,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       .filelistarea {
         padding: 16px;
       }
-      .gridlistarea {
-        margin-left: 2px;
-      }
       input.hidden {
         display: none;
         visibility: hidden;
@@ -102,7 +100,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <paper-tooltip for="iconview-button" offset="0">Show Icons</paper-tooltip>
       <paper-icon-button id="listview-button" name="listview" class="toolbar-item view-selector" icon="view-list" on-tap="onSelectView"></paper-icon-button>
       <paper-tooltip for="listview-button" offset="0">Show List</paper-tooltip>
-      <paper-icon-button id="detailview-button" name="detailview" class="toolbar-item view-selector last" icon="view-column" on-tap="onSelectView"></paper-icon-button>
+      <paper-icon-button id="detailview-button" name="detailview" class="toolbar-item view-selector" icon="view-column" on-tap="onSelectView"></paper-icon-button>
+      <paper-icon-button id="storageview-button" name="storageview" class="toolbar-item view-selector last" icon="cloud-circle" on-tap="onSelectView"></paper-icon-button>
+      <paper-tooltip for="storageview-button" offset="0">Show Storage</paper-tooltip>
       <div class="toolbar-pad toolbar-item"></div>
       <paper-icon-button id="load" class="toolbar-item" icon="file-upload"></paper-icon-button>
       <paper-tooltip for="load" offset="0">Load XLIFF</paper-tooltip>
@@ -118,30 +118,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           </template>
         </div>
         <div name="listview" class="panel">
-          <vaadin-grid id="list" class="gridlistarea" items="{{listItems}}" selection-mode="single">
-            <table>
-              <colgroup>
-                <col>
-                <col>
-                <col>
-                <col>
-                <col>
-                <col>
-                <col>
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Locale</th>
-                  <th>Total Units</th>
-                  <th>Translated</th>
-                  <th>Needs Review</th>
-                  <th>Needs Translation</th>
-                  <th>New</th>
-                </tr>
-              </thead>
-            </table>
-          </vaadin-grid>
+          <live-localizer-list-view id="list" model="{{model}}" list-items="{{listItems}}"></live-localizer-list-view>
+        </div>
+        <div name="storageview" class="panel">
+          <live-localizer-storage-view id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"></live-localizer-storage-view>
         </div>
       </iron-pages>
     </div>
@@ -168,13 +148,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           type: Array
         },
 
-        model: {
-          type: Object
+        listItems: {
+          type: Array
         },
 
-        listItems: {
+        model: {
           type: Object
         }
+
       },
 
       listeners: {
@@ -184,10 +165,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'load.tap': 'onFileLoad',
         'fileLoad.change': 'onFileChange',
         'iron-resize': 'onIronResize',
-        'locales.tap': 'onLocales',
-        'list.selected-items-changed': 'onListSelection',
-        'model.list-item-added': 'onListAdded',
-        'model.html-lang-mutation': 'onHtmlLangMutation'
+        'locales.tap': 'onLocales'
       },
 
       ready: function () {
@@ -198,11 +176,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         if (this._parentResizable) {
           this._parentResizable.addEventListener('height-changed', this.onIronResize.bind(this));
         }
-        this.setUpNumberRenderer();
-      },
-
-      isSelected: function (locale) {
-        return this.$.model.isSelected(locale);
       },
 
       onFileChange: function (e) {
@@ -242,7 +215,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
         if (panel === 'listview') {
           setTimeout(function () {
-            this.$.list.refreshItems();
+            this.$.list.refresh();
           }.bind(this), 200)
         }
         return false;
@@ -282,54 +255,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
-      onHtmlLangMutation: function (e) {
-        console.log('onHtmlLangMutation ', this.model.html.lang);
-        var locale = this.model.getNormalizedLocale(this.model.html.lang);
-        var selected = this.$.list.selection.selected();
-        var selectedLocale = '';
-        if (selected.length > 0 &&
-            this.listItems.length > selected[0]) {
-          selectedLocale = this.listItems[selected[0]][1];
-        }
-        if (selectedLocale !== locale) {
-          for (var i = 0; i < this.listItems.length; i++) {
-            if (this.listItems[i][1] === locale) {
-              this.$.list.selection.select(i);
-              break;
-            }
-          }
-        }
-        e.stopPropagation();
-      },
-
       onBadgeTap: function (e) {
         e.stopPropagation();
         this.$.model.html.lang = e.detail.locale;
         this.$['listview-button'].click();
-      },
-
-      setUpNumberRenderer: function () {
-        for (var i = 2; i <= 6; i++) {
-          this.$.list.columns[i].renderer = function(cell) {
-            cell.element.innerHTML = '<i18n-number style="margin-left: auto;">' + cell.data + '</i18n-number>';
-          };
-        }
-      },
-
-      onListSelection: function (e) {
-        var selected = this.$.list.selection.selected();
-        if (selected.length > 0 &&
-            this.listItems.length > selected[0]) {
-          this.$.model.html.lang = this.listItems[selected[0]][1];
-        }
-      },
-
-      onListAdded: function (e) {
-        if (e.detail && e.detail.locale) {
-          if (this.isSelected(e.detail.locale)) {
-            this.$.list.selection.select(e.detail.index);
-          }
-        }
       }
 
     });
