@@ -344,6 +344,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             if (this.filelist[k].locale === lang) {
               return this.filelist[k];
             }
+            else if (!lang && this.filelist[k].locale === this.defaultLang) {
+              return this.filelist[k];
+            }
           }
         }
         return null;
