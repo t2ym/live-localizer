@@ -1,0 +1,62 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="live-localizer-icon.html">
+
+<dom-module id="live-localizer-icon-view">
+  <template>
+    <style include="iron-flex"></style>
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .filelistarea {
+        padding: 16px;
+      }
+    </style>
+    <div class="panel filelistarea layout horizontal wrap">
+      <template is="dom-repeat" items="{{filelist}}">
+        <live-localizer-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-icon>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+
+      is: 'live-localizer-icon-view',
+
+      properties: {
+        filelist: {
+          type: Array
+        },
+
+        model: {
+          type: Object
+        }
+      },
+
+      onLocaleIconTap: function (e) {
+        var icon = Polymer.dom(e).localTarget;
+        var file = icon.file;
+        if (icon.selected) {
+          this.model.saveToLocalFile(file);
+        }
+        else {
+          this.model.html.lang = file.locale;
+        }
+      },
+
+      onBadgeTap: function (e) {
+        e.stopPropagation();
+        this.fire('locale-badge-tap', { locale: e.detail.locale });
+      }
+
+    });
+  </script>
+</dom-module>
