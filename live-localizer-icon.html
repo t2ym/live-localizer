@@ -103,7 +103,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <paper-ripple></paper-ripple>
     </paper-card>
     <paper-fab id="badge" mini class="badge" on-tap="onBadgeTap"></paper-fab>
-    <paper-tooltip for="card" offset="-10">{{tooltip(selected)}}</paper-tooltip>
+    <paper-tooltip for="card" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
   </template>
   <script>
   (function () {
@@ -250,6 +250,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           reflectToAttribute: true
         },
 
+        tooltips: {
+          type: Array,
+          value: function () {
+            return [ 'Save XLIFF', 'Switch Locale' ];
+          }
+        },
+
         model: {
           type: Object
         }
@@ -336,12 +343,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
-      tooltip: function (selected) {
-        if (selected) {
-          return 'Save XLIFF';
+      tooltip: function (selected, tooltips) {
+        if (tooltips) {
+          if (selected) {
+            return tooltips[0];
+          }
+          else {
+            return tooltips[1];
+          }
         }
         else {
-          return 'Switch Locale';
+          return '';
         }
       }
 

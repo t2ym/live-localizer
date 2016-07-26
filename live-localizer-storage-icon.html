@@ -73,7 +73,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <div class="file-name">{{label}}</div>
       <paper-ripple></paper-ripple>
     </paper-card>
-    <paper-tooltip for="card" offset="-10">{{tooltip(selected,selectedTooltip,unselectedTooltip)}}</paper-tooltip>
+    <paper-tooltip for="card" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
   </template>
   <script>
   (function () {
@@ -93,12 +93,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           value: ''
         },
 
-        selectedTooltip: {
-          type: String
-        },
-
-        unselectedTooltip: {
-          type: String
+        tooltips: {
+          type: Array,
+          value: function () {
+            return [ 'Not implemented yet', 'Not implemented yet' ];
+          }
         },
 
         selected: {
@@ -138,12 +137,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.toggleClass('selected', this.selected, this.$.badge);
       },
 
-      tooltip: function (selected,selectedTooltip,unselectedTooltip) {
-        if (selected) {
-          return selectedTooltip;
+      tooltip: function (selected, tooltips) {
+        if (tooltips) {
+          if (selected) {
+            return tooltips[0];
+          }
+          else {
+            return tooltips[1];
+          }
         }
         else {
-          return unselectedTooltip;
+          return '';
         }
       }
 
