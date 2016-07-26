@@ -166,26 +166,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           mode = 'none';
         }
         return mode;
-      },
-
-      getPointer: function (dragState, selected) {
-        var pointer;
-        if (selected) {
-          switch (dragState) {
-          case 'dragged':
-          case 'dragging':
-            pointer = 'copy';
-            break;
-          case 'released':
-          default:
-            pointer = 'pointer'
-            break;
-          }
-        }
-        else {
-          pointer = 'pointer';
-        }
-        return pointer;
       }
 
     });

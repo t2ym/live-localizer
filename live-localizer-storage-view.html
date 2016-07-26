@@ -100,6 +100,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      listeners: {
+        'drag-and-drop': 'onDragAndDrop'
+      },
+
       attached: function () {
         [ '.storage.cloud', '.storage.browser', '.storage.device' ].forEach(function (selector) {
           this.getContentChildren('content[select="' + selector + '"]').forEach(function (storage) {
@@ -111,6 +115,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       onBadgeTap: function (e) {
         e.stopPropagation();
         this.fire('locale-badge-tap', { locale: this.$['locale-icon'].file.locale });
+      },
+
+      onDragAndDrop: function (e) {
+        console.log('drag-and-drop event ', e.detail.src, e.detail.dest);
+        e.stopPropagation();
       }
 
     });

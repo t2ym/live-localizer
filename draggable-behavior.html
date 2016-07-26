@@ -206,6 +206,7 @@ BehaviorsStore.DraggableBehavior = {
       switch (this.dragHandleMode) {
       case 'drag':
         this.toggleClass('drag-target', true, this);
+        this.dropTarget = null;
         if (this.dropTargets) {
           this.dropTargets.split(/[ ]{1,}/).forEach(function (targetGroup) {
             if (this.dragDropGroupMembers[targetGroup]) {
@@ -289,9 +290,17 @@ BehaviorsStore.DraggableBehavior = {
             if (this.dragDropGroupMembers[targetGroup]) {
               this.dragDropGroupMembers[targetGroup].forEach(function (target) {
                 target.toggleClass('drop-target', false, target);
-              });
+                if (target.dragState === 'dropped') {
+                  this.dropTarget = target;
+                  target.dragState = 'released';
+                }
+              }, this);
             }
           }, this);
+        }
+        if (this.dropTarget) {
+          //console.log('drag-and-drop src = ', this, 'dest = ', this.dropTarget);
+          this.fire('drag-and-drop', { src: this, dest: this.dropTarget });
         }
         break;
       case 'position':
@@ -345,7 +354,22 @@ BehaviorsStore.DraggableBehavior = {
   },
 
   onMouseOver: function (e) {
-    console.log(this.is, e.type);
+    if (this.classList.contains('drop-target')) {
+      switch (e.type) {
+      case 'mouseenter':
+        this.dragState = 'drag-hover';
+        break;
+      case 'mouseleave':
+        this.dragState = 'released';
+        break;
+      case 'mouseup':
+        this.dragState = 'dropped';
+        break;
+      default:
+        break;
+      }
+    }
+    //console.log(this.is, e.type, this.dragState);
   },
 
   getDragHandleMode: function (e) {
