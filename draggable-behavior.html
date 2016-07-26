@@ -34,6 +34,35 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       [drag-handle-mode=lower-right] {
         cursor: nwse-resize;
       }
+      [drag-handle-mode=drag] {
+        cursor: pointer;
+      }
+      .drag-target {
+        cursor: pointer;
+      }
+      .drag-target[drag-state=dragging] {
+        cursor: copy;
+      }
+      .drop-target {
+        cursor: copy;
+      }
+    </style>
+  </template>
+</dom-module>
+<dom-module id="drag-field">
+  <template>
+    <style>
+      .drag-field {
+        z-index: 0;
+      }
+      .drag-target {
+        z-index: 1;
+        opacity: 0.75;
+      }
+      .drop-target {
+        z-index: 2;
+        opacity: 0.75;
+      }
     </style>
   </template>
 </dom-module>
@@ -77,11 +106,13 @@ BehaviorsStore.DraggableBehavior = {
     },
     dragState: {
       type: String,
-      value: 'released'
+      value: 'released',
+      reflectToAttribute: true
     },
     dragHandleMode: {
       type: String,
-      value: 'position'
+      value: 'position',
+      reflectToAttribute: true
     },
     fullscreen: {
       type: Boolean,
@@ -91,6 +122,14 @@ BehaviorsStore.DraggableBehavior = {
     resizable: {
       type: Boolean,
       value: false,
+      reflectToAttribute: true
+    },
+    dragDropGroups: {
+      type: String,
+      reflectToAttribute: true
+    },
+    dropTargets: {
+      type: String,
       reflectToAttribute: true
     }
   },
@@ -103,7 +142,24 @@ BehaviorsStore.DraggableBehavior = {
   ],
 
   listeners: {
-    'track': '_handleTrack'
+    'track': '_handleTrack',
+    'mouseover': 'onMouseOver',
+    'mouseenter': 'onMouseOver',
+    'mouseup': 'onMouseOver',
+    'mouseleave': 'onMouseOver',
+    'mouseout': 'onMouseOver'
+  },
+
+  // shared property
+  dragDropGroupMembers: {},
+
+  ready: function () {
+    if (this.dragDropGroups) {
+      this.dragDropGroups.split(/[ ]{1,}/).forEach(function (group) {
+        this.dragDropGroupMembers[group] = this.dragDropGroupMembers[group] || new Array();
+        this.dragDropGroupMembers[group].push(this);
+      }, this);
+    }
   },
 
   attached: function () {
@@ -147,6 +203,23 @@ BehaviorsStore.DraggableBehavior = {
     case 'start':
       this.dragState = 'dragged';
       this.dragHandleMode = this.getDragHandleMode(e);
+      switch (this.dragHandleMode) {
+      case 'drag':
+        this.toggleClass('drag-target', true, this);
+        if (this.dropTargets) {
+          this.dropTargets.split(/[ ]{1,}/).forEach(function (targetGroup) {
+            if (this.dragDropGroupMembers[targetGroup]) {
+              this.dragDropGroupMembers[targetGroup].forEach(function (target) {
+                target.toggleClass('drop-target', true, target);
+              });
+            }
+          }, this);
+        }
+        break;
+      default:
+        this.toggleClass('drag-target', false, this);
+        break;
+      }
       break;
     case 'track':
       this.dragState = 'dragging';
@@ -154,6 +227,7 @@ BehaviorsStore.DraggableBehavior = {
       this.dy = Number(e.detail.dy);
       switch (this.dragHandleMode) {
       case 'position':
+      case 'drag':
         this.style.left = (Number(this.x) + Number(this.dx)) + 'px';
         this.style.top = (Number(this.y) + Number(this.dy)) + 'px';
         break;
@@ -204,6 +278,22 @@ BehaviorsStore.DraggableBehavior = {
     default:
     case 'end':
       switch (this.dragHandleMode) {
+      case 'drag':
+        this.x = Number(this.x) + Number(this.dx);
+        this.y = Number(this.y) + Number(this.dy);
+        this.x = Number(this.x) - Number(this.dx);
+        this.y = Number(this.y) - Number(this.dy);
+        this.toggleClass('drag-target', false, this);
+        if (this.dropTargets) {
+          this.dropTargets.split(/[ ]{1,}/).forEach(function (targetGroup) {
+            if (this.dragDropGroupMembers[targetGroup]) {
+              this.dragDropGroupMembers[targetGroup].forEach(function (target) {
+                target.toggleClass('drop-target', false, target);
+              });
+            }
+          }, this);
+        }
+        break;
       case 'position':
         this.x = Number(this.x) + Number(this.dx);
         this.y = Number(this.y) + Number(this.dy);
@@ -248,10 +338,14 @@ BehaviorsStore.DraggableBehavior = {
       this.dx = 0;
       this.dy = 0;
       this.dragState = 'released';
-      this.dragHandleMode = 'position';
+      this.dragHandleMode = this.getDragHandleMode(e);
       break;
     }
     //console.log('x = ', this.x, ' y = ', this.y, ' left = ', this.style.left, ' top = ', this.style.top, ' width = ', this.style.width, ' height = ', this.style.height, ' dx = ', this.dx, ' dy = ', this.dy);
+  },
+
+  onMouseOver: function (e) {
+    console.log(this.is, e.type);
   },
 
   getDragHandleMode: function (e) {

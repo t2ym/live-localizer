@@ -12,12 +12,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="draggable-behavior.html">
 
 <dom-module id="live-localizer-icon">
   <template>
     <style>
       :host {
         display: inline-block;
+        position: relative;
         width: 80px;
         height: 80px;
         margin: 8px;
@@ -96,7 +98,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         visibility: hidden;
       }
     </style>
-    <paper-card id="card" class="download-link layout vertical">
+    <paper-card id="card" class="download-link layout vertical" drag-handle-mode$="{{getPointer(dragState,selected)}}">
       <iron-image class="download-icon" src="{{flag(file.locale)}}" alt="{{file.locale}}" sizing="contain"></iron-image>
       <div class="flex"></div>
       <div class="file-name">{{file.locale}}</div>
@@ -232,6 +234,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       is: 'live-localizer-icon',
 
+      behaviors: [
+        BehaviorsStore.DraggableBehavior
+      ],
+
       properties: {
         file: {
           type: Object
@@ -355,6 +361,37 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           return '';
         }
+      },
+
+      getDragHandleMode: function (e) {
+        var mode;
+        if (this.selected && this.followSelected) {
+          mode = 'drag';
+        }
+        else {
+          mode = 'none';
+        }
+        return mode;
+      },
+
+      getPointer: function (dragState, selected) {
+        var pointer;
+        if (selected) {
+          switch (dragState) {
+          case 'dragged':
+          case 'dragging':
+            pointer = 'copy';
+            break;
+          case 'released':
+          default:
+            pointer = 'pointer'
+            break;
+          }
+        }
+        else {
+          pointer = 'pointer';
+        }
+        return pointer;
       }
 
     });

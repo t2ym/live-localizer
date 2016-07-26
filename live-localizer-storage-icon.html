@@ -12,12 +12,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="draggable-behavior.html">
 
 <dom-module id="live-localizer-storage-icon">
   <template>
     <style>
       :host {
         display: inline-block;
+        position: relative;
         width: 80px;
         height: 80px;
         margin: 8px;
@@ -81,6 +83,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     Polymer({
 
       is: 'live-localizer-storage-icon',
+
+      behaviors: [
+        BehaviorsStore.DraggableBehavior
+      ],
 
       properties: {
         icon: {
@@ -149,6 +155,37 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           return '';
         }
+      },
+
+      getDragHandleMode: function (e) {
+        var mode;
+        if (this.selected) {
+          mode = 'drag';
+        }
+        else {
+          mode = 'none';
+        }
+        return mode;
+      },
+
+      getPointer: function (dragState, selected) {
+        var pointer;
+        if (selected) {
+          switch (dragState) {
+          case 'dragged':
+          case 'dragging':
+            pointer = 'copy';
+            break;
+          case 'released':
+          default:
+            pointer = 'pointer'
+            break;
+          }
+        }
+        else {
+          pointer = 'pointer';
+        }
+        return pointer;
       }
 
     });

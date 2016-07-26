@@ -14,9 +14,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-fab/paper-fab.html">
 
 <link rel="import" href="live-localizer-storage-icon.html">
+<link rel="import" href="draggable-behavior.html">
 
 <dom-module id="live-localizer-local-file-storage">
   <template>
+    <style include="drag-handle-mode"></style>
+    <style include="drag-field"></style>
     <style>
       :host {
         display: inline-block;
@@ -27,6 +30,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       icon="{{icon}}"
       label="{{label}}"
       on-tap=""
+      drag-handle-mode="drag"
+      drag-drop-groups="save-targets"
+      drop-targets="load-targets"
       model="{{model}}"></live-localizer-storage-icon>
   </template>
   <script>
@@ -49,7 +55,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
         selected: {
           type: Boolean,
-          value: false,
+          value: true,
           reflectToAttribute: true
         },
 

@@ -12,15 +12,25 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 
+<link rel="import" href="draggable-behavior.html">
 <link rel="import" href="live-localizer-icon.html">
 <link rel="import" href="live-localizer-local-file-storage.html">
 
 <dom-module id="live-localizer-storage-view">
   <template>
     <style include="iron-flex"></style>
+    <style include="drag-handle-mode"></style>
+    <style include="drag-field"></style>
     <style>
       :host {
         display: block;
+
+        --no-select: {
+          -moz-user-select: none;
+          -ms-user-select: none;
+          -webkit-user-select: none;
+          user-select: none;
+        }
       }
       div.storage-group {
         display: inline-block;
@@ -34,12 +44,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         text-align: left;
         background-color: whitesmoke;
         @apply(--shadow-elevation-4dp);
+        @apply(--no-select);
       }
       div.storage-group-header {
         width: 64px;
       }
     </style>
-    <div class="layout vertical">
+    <div class="layout vertical drag-field">
       <div id="cloud" class="storage-group">
         <div class="layout horizontal">
           <div class="storage-group-header layout vertical">
@@ -47,6 +58,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div>Cloud</div>
             <div class="flex"></div>
           </div>
+          <content select=".storage.cloud"></content>
           <div>cloud storage icons</div>
         </div>
       </div>
@@ -58,7 +70,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="flex"></div>
           </div>
           <live-localizer-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"
-            tooltips='[ "Not implemented yet", "Not implemented yet" ]'></live-localizer-icon>
+            tooltips='[ "Not implemented yet", "Not implemented yet" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-icon>
+          <content select=".storage.browser"></content>
           <div>browser storage icons</div>
         </div>
       </div>
@@ -70,6 +83,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="flex"></div>
           </div>
           <live-localizer-local-file-storage id="file-storage" model="{{model}}"></live-localizer-local-file-storage>
+          <content select=".storage.device"></content>
           <div>device storage icons</div>
         </div>
       </div>
@@ -84,6 +98,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         model: {
           type: Object
         }
+      },
+
+      attached: function () {
+        [ '.storage.cloud', '.storage.browser', '.storage.device' ].forEach(function (selector) {
+          this.getContentChildren('content[select="' + selector + '"]').forEach(function (storage) {
+            storage.model = this.model;
+          }, this);
+        }, this);
       },
 
       onBadgeTap: function (e) {
