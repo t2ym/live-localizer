@@ -1,6 +1,6 @@
 {
   "name": "live-localizer",
-  "version": "0.0.15",
+  "version": "0.0.0",
   "description": "Live Localizer widget for Polymer i18n-behavior",
   "main": "live-localizer.html",
   "directories": {
@@ -31,20 +31,5 @@
   },
   "homepage": "https://github.com/t2ym/live-localizer#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-debug": "^2.1.2",
-    "gulp-grep-contents": "0.0.1",
-    "gulp-i18n-add-locales": "^0.1.0",
-    "gulp-i18n-leverage": "^1.1.0",
-    "gulp-i18n-preprocess": "^1.1.1",
-    "gulp-if": "^2.0.1",
-    "gulp-ignore": "^2.0.1",
-    "gulp-match": "^1.0.2",
-    "gulp-sort": "^2.0.0",
-    "gulp-util": "^3.0.7",
-    "json-stringify-safe": "^5.0.1",
-    "strip-bom": "^3.0.0",
-    "through2": "^2.0.1",
-    "xliff-conv": "^1.0.3"
   }
 }

@@ -3,15 +3,9 @@
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../paper-card/paper-card.html">
-<link rel="import" href="live-localizer-fab.html">
-<link rel="import" href="live-localizer-dialog.html">
-<link rel="import" href="live-localizer-panel.html">
-
 <!--
 `live-localizer`
-Live Localizer widget for Polymer i18n-behavior
+Live Localizer widget for Polymer i18n-behavior (dummy version)
 
 @demo demo/index.html 
 -->
@@ -19,83 +13,13 @@ Live Localizer widget for Polymer i18n-behavior
   <template>
     <style>
       :host {
-        display: fixed;
-
-        font-family: 'Roboto', 'Noto', sans-serif;
-        line-height: normal;
-
-        --live-localizer-dialog-content-div: {
-          background-color: whitesmoke;
-          color: dimgrey;
-          box-shadow: 1px 1px 1px rgba(0,0,0,0.4) inset;
-        }
+        display: none;
       }
     </style>
-    <live-localizer-fab id="fab" on-tap="_fabTapped"></live-localizer-fab>
-    <live-localizer-dialog 
-      id="dialog"
-      on-iron-overlay-closed="_dialogClosed">
-      <live-localizer-panel></live-localizer-panel>
-    </live-localizer-dialog>
   </template>
-
   <script>
     Polymer({
-
-      is: 'live-localizer',
-
-      behaviors: [
-      ],
-
-      properties: {
-        opened: {
-          type: Boolean,
-          value: false,
-          observer: '_openedChanged'
-        }
-      },
-
-      attached: function () {
-        if (!this.fab) {
-          this.fab = this.$.fab;
-          this.fab.open();
-          this.opened = false;
-        }
-        if (!this.dialog) {
-          this.dialog = this.$.dialog;
-          this.dialog.originElement = this.fab;
-        }
-      },
-
-      _openedChanged: function (opened) {
-        if (opened) {
-          if (this.fab) {
-            this.fab.close();
-          }
-          if (this.dialog) {
-            this.dialog.resetPosition();
-            this.dialog.open();
-          }
-        }
-        else {
-          if (this.dialog && this.dialog.opened) {
-            this.dialog.close();
-          }
-          if (this.fab) {
-            this.fab.open();
-          }
-        }
-      },
-
-      _fabTapped: function (e) {
-        this.opened = true;
-        console.log('fab tapped');
-      },
-
-      _dialogClosed: function (e) {
-        this.opened = false;
-        console.log('dialog closed');
-      }
+      is: 'live-localizer'
     });
   </script>
 </dom-module>

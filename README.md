@@ -1,4 +1,4 @@
-# Live Localizer
+# Live Localizer (dummy version 0.0.0)
 
 Live Localizer widget for Polymer [i18n-behavior](https://github.com/t2ym/i18n-behavior) (work in progress)
 
