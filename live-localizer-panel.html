@@ -13,7 +13,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="live-localizer-model.html">
-<link rel="import" href="live-localizer-icon-view.html">
+<link rel="import" href="live-localizer-locale-icon-view.html">
 <link rel="import" href="live-localizer-list-view.html">
 <link rel="import" href="live-localizer-storage-view.html">
 
@@ -113,7 +113,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <div id="droparea" class="droparea">
       <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
         <div name="iconview" class="panel">
-          <live-localizer-icon-view id="icon" model="{{model}}" filelist="{{filelist}}" on-locale-badge-tap="onBadgeTap"></live-localizer-icon-view>
+          <live-localizer-locale-icon-view id="icon" model="{{model}}" filelist="{{filelist}}" on-locale-badge-tap="onBadgeTap"></live-localizer-locale-icon-view>
         </div>
         <div name="listview" class="panel">
           <live-localizer-list-view id="list" model="{{model}}" list-items="{{listItems}}"></live-localizer-list-view>

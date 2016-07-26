@@ -13,7 +13,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 
 <link rel="import" href="draggable-behavior.html">
-<link rel="import" href="live-localizer-icon.html">
+<link rel="import" href="live-localizer-locale-icon.html">
 <link rel="import" href="live-localizer-local-file-storage.html">
 
 <dom-module id="live-localizer-storage-view">
@@ -69,8 +69,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div>Browser</div>
             <div class="flex"></div>
           </div>
-          <live-localizer-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"
-            tooltips='[ "Not implemented yet", "Not implemented yet" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-icon>
+          <live-localizer-locale-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"
+            tooltips='[ "Not implemented yet", "Not implemented yet" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-locale-icon>
           <content select=".storage.browser"></content>
           <div>browser storage icons</div>
         </div>

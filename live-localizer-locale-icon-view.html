@@ -5,9 +5,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import" href="live-localizer-icon.html">
+<link rel="import" href="live-localizer-locale-icon.html">
 
-<dom-module id="live-localizer-icon-view">
+<dom-module id="live-localizer-locale-icon-view">
   <template>
     <style include="iron-flex"></style>
     <style>
@@ -22,14 +22,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     </style>
     <div class="panel filelistarea layout horizontal wrap">
       <template is="dom-repeat" items="{{filelist}}">
-        <live-localizer-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-icon>
+        <live-localizer-locale-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-locale-icon>
       </template>
     </div>
   </template>
   <script>
     Polymer({
 
-      is: 'live-localizer-icon-view',
+      is: 'live-localizer-locale-icon-view',
 
       properties: {
         filelist: {
