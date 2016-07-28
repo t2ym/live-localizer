@@ -16,15 +16,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         width: 100%;
         height: 100%;
       }
+      .droparea {
+        height: 100%;
+      }
       .filelistarea {
         padding: 16px;
       }
     </style>
-    <div class="panel filelistarea layout horizontal wrap">
-      <template is="dom-repeat" items="{{filelist}}">
-        <live-localizer-locale-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-locale-icon>
-      </template>
+    <div id="droparea" class="droparea layout vertical">
+      <div class="filelistarea layout horizontal wrap">
+        <template is="dom-repeat" items="{{filelist}}">
+          <live-localizer-locale-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-locale-icon>
+        </template>
+      </div>
+      <div class="flex"></div>
     </div>
+    <paper-tooltip id="droptooltip" for="droparea" offset="-20" manual-mode>Drag and drop XLIFF to load</paper-tooltip>
   </template>
   <script>
     Polymer({
@@ -41,15 +48,42 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      listeners: {
+        'droparea.dragover': 'onDragOver',
+        'droparea.drop': 'onDrop',
+        'droparea.mouseenter': 'onDropAreaMouseenter'
+      },
+
       onLocaleIconTap: function (e) {
         var icon = Polymer.dom(e).localTarget;
         var file = icon.file;
         if (icon.selected) {
-          this.model.saveToLocalFile(file);
+          this.model.storage['file-storage'].saveToLocalFile(file);
         }
         else {
           this.model.html.lang = file.locale;
         }
+      },
+
+      onDragOver: function (e) {
+        console.log('onDragOver');
+        e.preventDefault();
+      },
+
+      onDrop: function (e) {
+        console.log('onDrop');
+        var files = e.dataTransfer.files;
+
+        this.model.storage['file-storage'].processFiles(files);
+
+        e.preventDefault();
+      },
+
+      onDropAreaMouseenter: function (e) {
+        this.$.droptooltip.show();
+        setTimeout(function () {
+          this.$.droptooltip.hide();
+        }.bind(this), 3000);
       },
 
       onBadgeTap: function (e) {

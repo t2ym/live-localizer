@@ -23,7 +23,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       on-response="handleBundleResponse"
       on-error="handleBundleError">
     </iron-ajax>
-    <a id="anchor" class="hidden-anchor" target="_blank"></a>
   </template>
   <script>
     Polymer({
@@ -46,6 +45,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           type: Array,
           value: function () { return []; },
           notify: true
+        },
+
+        storage: {
+          type: Object,
+          value: function () { return {}; }
         },
 
         defaultBundle: {
@@ -75,43 +79,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.$.ajax.generateRequest();
       },
 
-      processFiles: function (files) {
+      parseXliff: function (xliff, options, callback) {
         var xliffConv = new XliffConv();
-        for (var i = 0; i < files.length; i++) {
-          var f = files[i];
-          console.log('f.name:' + f.name + 'f.type:' + f.type + 'f.size:' + (f.size / 1000) + ' KB ');
-          var reader = new FileReader();
-          reader.onload = (function(f) {
-            return function(e) {
-              var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
-              var locale = '';
-              if (match && match[1] !== this.defaultLang) {
-                locale = match[1];
-              }
-              else {
-                console.log('incorrect locale');
-              }
-              if (locale && this.masterBundles[locale] && this.masterBundles[locale].bundle) {
-                xliffConv.parseXliff(e.target.result, { bundle: this.masterBundles[locale] }, function (output) {
-                  console.log('updated locale = ' + locale + ' from XLIFF');
-                  this.html.setAttribute('lang', '');
-                  setTimeout(function () {
-                    this.html.setAttribute('lang', locale);
-                    this.fetch();
-                  }.bind(this), 1000);
-                }.bind(this));
-              }
-              var file;
-              for (var i = 0; i < this.filelist.length; i++) {
-                if (this.filelist[i].locale === locale) {
-                  file = this.filelist[i];
-                  file.text = e.target.result;
-                }
-              }
-            }.bind(this);
-          }.bind(this))(f);
-          reader.readAsText(f);
-        }
+        xliffConv.parseXliff(xliff, options, callback);
+      },
+
+      updateLocale: function (locale) {
+        console.log('updateLocale ' + locale);
+        this.html.setAttribute('lang', '');
+        setTimeout(function () {
+          this.html.setAttribute('lang', locale);
+          this.fetch();
+        }.bind(this), 1000);
       },
 
       handleBundleResponse: function (event) {
@@ -233,24 +212,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           callback();
         }
-      },
-
-      saveToLocalFile: function (file) {
-        file.text = null;
-        this.setXliff(file, function (result) {
-          if (result && result.text) {
-            var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
-            var blob = new Blob([result.text], { type: type });
-            if (window.navigator.msSaveOrOpenBlob) {
-              window.navigator.msSaveOrOpenBlob(blob, result.name);
-            }
-            else {
-              this.$.anchor.download = result.name;
-              this.$.anchor.href = URL.createObjectURL(blob);
-              this.$.anchor.click();
-            }
-          }
-        }.bind(this));
       },
 
       fileAddedOrRemoved: function (changeRecord) {

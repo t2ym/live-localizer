@@ -24,6 +24,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       :host {
         display: inline-block;
       }
+      .hidden-anchor {
+        display: none;
+      }
+      .hidden-input {
+        display: none;
+      }
     </style>
     <live-localizer-storage-icon
       id="file-storage-icon"
@@ -35,6 +41,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       drag-drop-groups="save-targets"
       drop-targets="load-targets"
       model="{{model}}"></live-localizer-storage-icon>
+    <a id="anchor" class="hidden-anchor" target="_blank"></a>
+    <input id="fileLoad" type="file" class="hidden-input">
   </template>
   <script>
   (function () {
@@ -65,13 +73,76 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      listeners: {
+        'fileLoad.change': 'onFileChange',
+      },
+
       ready: function () {
+        this.$['file-storage-icon'].storage = this;
       },
 
-      attached: function () {
+      loadFile: function () {
+        this.$.fileLoad.click();
       },
 
-      detached: function () {
+      onFileChange: function (e) {
+        console.log('onFileChange');
+        var files = e.target.files;
+
+        this.processFiles(files);
+
+        e.preventDefault();
+      },
+
+      processFiles: function (files) {
+        for (var i = 0; i < files.length; i++) {
+          var f = files[i];
+          console.log('f.name:' + f.name + 'f.type:' + f.type + 'f.size:' + (f.size / 1000) + ' KB ');
+          var reader = new FileReader();
+          reader.onload = (function(f) {
+            return function(e) {
+              var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
+              var locale = '';
+              if (match && match[1] !== this.defaultLang) {
+                locale = match[1];
+              }
+              else {
+                console.log('processFiles: incorrect locale');
+              }
+              if (locale && this.model.masterBundles[locale] && this.model.masterBundles[locale].bundle) {
+                this.model.parseXliff(e.target.result, { bundle: this.model.masterBundles[locale] }, function (output) {
+                  this.model.updateLocale(locale);
+                }.bind(this));
+              }
+              var file;
+              for (var i = 0; i < this.model.filelist.length; i++) {
+                if (this.model.filelist[i].locale === locale) {
+                  file = this.model.filelist[i];
+                  file.text = e.target.result;
+                }
+              }
+            }.bind(this);
+          }.bind(this))(f);
+          reader.readAsText(f);
+        }
+      },
+
+      saveToLocalFile: function (file) {
+        file.text = null;
+        this.model.setXliff(file, function (result) {
+          if (result && result.text) {
+            var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
+            var blob = new Blob([result.text], { type: type });
+            if (window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveOrOpenBlob(blob, result.name);
+            }
+            else {
+              this.$.anchor.download = result.name;
+              this.$.anchor.href = URL.createObjectURL(blob);
+              this.$.anchor.click();
+            }
+          }
+        }.bind(this));
       }
 
     });

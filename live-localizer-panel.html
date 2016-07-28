@@ -76,19 +76,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         background-color: dimgrey;
         color: lightgrey;
       }
-      .droparea {
+      .panelarea {
         width: 100%;
         height: calc(100% - 32px);
         max-height: calc(100% - 32px);
         overflow-y: auto;
       }
-      .filelistarea {
-        padding: 16px;
+      .panel-selector {
+        height: 100%;
       }
-      input.hidden {
-        display: none;
-        visibility: hidden;
-        position: relative;
+      .panel {
+        height: 100%;
       }
       div.toolbar-pad {
         width: 8px;
@@ -106,24 +104,16 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <div class="toolbar-pad toolbar-item"></div>
       <paper-icon-button id="load" class="toolbar-item" icon="file-upload"></paper-icon-button>
       <paper-tooltip for="load" offset="0">Load XLIFF</paper-tooltip>
-      <input id="fileLoad" type="file" class="hidden">
       <paper-icon-button id="locales" class="toolbar-item" icon="language"></paper-icon-button>
       <div class="toolbar-pad toolbar-item"></div>
     </div>
-    <div id="droparea" class="droparea">
-      <iron-pages role="panel" selected="[[panel]]" attr-for-selected="name">
-        <div name="iconview" class="panel">
-          <live-localizer-locale-icon-view id="icon" model="{{model}}" filelist="{{filelist}}" on-locale-badge-tap="onBadgeTap"></live-localizer-locale-icon-view>
-        </div>
-        <div name="listview" class="panel">
-          <live-localizer-list-view id="list" model="{{model}}" list-items="{{listItems}}"></live-localizer-list-view>
-        </div>
-        <div name="storageview" class="panel">
-          <live-localizer-storage-view id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"><content></content></live-localizer-storage-view>
-        </div>
+    <div id="panelarea" class="panelarea">
+      <iron-pages class="panel-selector" role="panel" selected="[[panel]]" attr-for-selected="name">
+        <live-localizer-locale-icon-view name="iconview" class="panel" id="icon" model="{{model}}" filelist="{{filelist}}" on-locale-badge-tap="onBadgeTap"></live-localizer-locale-icon-view>
+        <live-localizer-list-view name="listview" class="panel" id="list" model="{{model}}" list-items="{{listItems}}"></live-localizer-list-view>
+        <live-localizer-storage-view name="storageview" class="panel" id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"><content></content></live-localizer-storage-view>
       </iron-pages>
     </div>
-    <paper-tooltip id="droptooltip" for="droparea" offset="-20" manual-mode>Drag and drop XLIFF to load</paper-tooltip>
     <live-localizer-model id="model" filelist="{{filelist}}" list-items="{{listItems}}"></live-localizer-model>
   </template>
   <script>
@@ -157,11 +147,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       listeners: {
-        'droparea.dragover': 'onDragOver',
-        'droparea.drop': 'onDrop',
-        'droparea.mouseenter': 'onDropAreaMouseenter',
         'load.tap': 'onFileLoad',
-        'fileLoad.change': 'onFileChange',
         'iron-resize': 'onIronResize',
         'locales.tap': 'onLocales'
       },
@@ -174,31 +160,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         if (this._parentResizable) {
           this._parentResizable.addEventListener('height-changed', this.onIronResize.bind(this));
         }
-      },
-
-      onFileChange: function (e) {
-        console.log('onFileChange');
-        var files = e.target.files;
-
-        this.$.model.processFiles(files);
-
-        e.preventDefault();
-      },
-
-      onDrop: function (e) {
-        console.log('onDrop');
-        var files = e.dataTransfer.files;
-
-        this.$.model.processFiles(files);
-
-        e.preventDefault();
-      },
-
-      onDropAreaMouseenter: function (e) {
-        this.$.droptooltip.show();
-        setTimeout(function () {
-          this.$.droptooltip.hide();
-        }.bind(this), 3000);
       },
 
       onPanelChanged: function (panel) {
@@ -225,37 +186,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       onLocales: function (e) {
-        this.$.model.fetch();
-      },
-
-      onDragOver: function (e) {
-        console.log('onDragOver');
-        e.preventDefault();
+        this.model.fetch();
       },
 
       onFileLoad: function (e) {
-        this.$.fileLoad.click();
+        this.model.storage['file-storage'].loadFile();
       },
 
       onIronResize: function (e) {
-        this.$.droparea.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px';
-        console.log('onIronResize ' + this.$.droparea.style.height);
-      },
-
-      onLocaleIconTap: function (e) {
-        var icon = Polymer.dom(e).localTarget;
-        var file = icon.file;
-        if (icon.selected) {
-          this.$.model.saveToLocalFile(file);
-        }
-        else {
-          this.$.model.html.lang = file.locale;
-        }
+        this.$.panelarea.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px';
+        console.log('onIronResize ' + this.$.panelarea.style.height);
       },
 
       onBadgeTap: function (e) {
         e.stopPropagation();
-        this.$.model.html.lang = e.detail.locale;
+        this.model.html.lang = e.detail.locale;
         this.$['listview-button'].click();
       }
 

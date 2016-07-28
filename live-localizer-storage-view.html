@@ -108,8 +108,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         [ '.storage.cloud', '.storage.browser', '.storage.device' ].forEach(function (selector) {
           this.getContentChildren('content[select="' + selector + '"]').forEach(function (storage) {
             storage.model = this.model;
+            this.model.storage[storage.id] = storage;
           }, this);
         }, this);
+        [ 'file-storage' ].forEach(function (storageId) {
+          this.model.storage[storageId] = this.$[storageId];
+        }, this);
+        //this.model.storage[this.$['locale-icon'].storageId] = this.model;
       },
 
       onBadgeTap: function (e) {
