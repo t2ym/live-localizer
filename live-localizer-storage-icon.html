@@ -70,7 +70,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     </style>
     <paper-card id="card" class="download-link layout vertical">
-      <iron-icon class="storage-icon" icon="{{icon}}"></iron-icon>
+      <template is="dom-if" if="{{icon}}">
+        <iron-icon class="storage-icon" icon="{{icon}}"></iron-icon>
+      </template>
+      <template is="dom-if" if="{{image}}">
+        <iron-image class="storage-icon" src="{{image}}" alt="{{label}}" sizing="contain"></iron-image>
+      </template>
       <div class="flex"></div>
       <div class="file-name">{{label}}</div>
       <paper-ripple></paper-ripple>
@@ -91,8 +96,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       properties: {
         icon: {
-          type: String,
-          value: 'folder'
+          type: String
+        },
+
+        image: {
+          type: String
         },
 
         label: {
