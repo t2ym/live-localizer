@@ -3,6 +3,9 @@
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../neon-animation/animations/scale-down-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../neon-animation/animations/transform-animation.html">
 
 <dom-module id="drag-handle-mode">
   <template>
@@ -68,15 +71,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         z-index: 2;
         opacity: 0.75;
       }
-      .drop-target[drag-state=drag-hover] {
-        opacity: 0.25;
+      .drop-target[drag-state=drag-hover],
+      .drop-target[drag-state=dropped] {
         margin: 4px;
         border-color: darkblue;
         border-width: 4px;
         border-style: solid;
         border-radius: 12px;
       }
-
+      .drop-target[drag-state=drag-hover] {
+        opacity: 0.25;
+      }
+      .drop-target[drag-state=dropped] {
+        z-index: 0;
+        opacity: 1;
+      }
     </style>
   </template>
 </dom-module>
@@ -173,6 +182,24 @@ BehaviorsStore.DraggableBehavior = {
         this.dragDropGroupMembers[group] = this.dragDropGroupMembers[group] || new Array();
         this.dragDropGroupMembers[group].push(this);
       }, this);
+      this.animationConfig = {
+        'dropping': [{
+          name: 'scale-down-animation',
+          node: this,
+          transformOrigin: '50% 50%'
+        }],
+        'fadingin': [{
+          name: 'fade-in-animation',
+          node: this
+        }],
+        'releasing': [{
+          name: 'transform-animation',
+          node: this,
+          transformFrom: 'translate(0px,0px)',
+          transformTo: 'translate(0px,0px)'
+        }]
+      };
+      this.listen(this, 'neon-animation-finish', '_onDropAnimationFinish');
     }
   },
 
@@ -296,25 +323,29 @@ BehaviorsStore.DraggableBehavior = {
       case 'drag':
         this.x = Number(this.x) + Number(this.dx);
         this.y = Number(this.y) + Number(this.dy);
-        this.x = Number(this.x) - Number(this.dx);
-        this.y = Number(this.y) - Number(this.dy);
-        this.toggleClass('drag-target', false, this);
         if (this.dropTargets) {
           this.dropTargets.split(/[ ]{1,}/).forEach(function (targetGroup) {
             if (this.dragDropGroupMembers[targetGroup]) {
               this.dragDropGroupMembers[targetGroup].forEach(function (target) {
-                target.toggleClass('drop-target', false, target);
                 if (target.dragState === 'dropped') {
                   this.dropTarget = target;
-                  target.dragState = 'released';
                 }
               }, this);
             }
           }, this);
         }
         if (this.dropTarget) {
-          //console.log('drag-and-drop src = ', this, 'dest = ', this.dropTarget);
-          this.fire('drag-and-drop', { src: this, dest: this.dropTarget });
+          this.dragState = 'dropping';
+          this.cancelAnimation();
+          this.playAnimation('dropping', 'dropping');
+        }
+        else {
+          this.dragState = 'releasing';
+          this.cancelAnimation();
+          this.animationConfig.releasing[0].transformFrom = 'translate(' + this.dx + 'px,' + this.dy + 'px)';
+          this.x = 0;
+          this.y = 0;
+          this.playAnimation('releasing', 'releasing');
         }
         break;
       case 'position':
@@ -388,6 +419,30 @@ BehaviorsStore.DraggableBehavior = {
 
   getDragHandleMode: function (e) {
     return 'position';
+  },
+
+  _onDropAnimationFinish: function (e) {
+    console.log('_onDropAnimationFinish', e.detail);
+    if (e.detail === 'dropping' || e.detail === 'releasing') {
+      this.dragState = 'released';
+      this.toggleClass('drag-target', false, this);
+      this.x = 0;
+      this.y = 0;
+      if (e.detail === 'dropping') {
+        this.fire('drag-and-drop', { src: this, dest: this.dropTarget });
+        this.playAnimation('fadingin', 'fadingin');
+      }
+      if (this.dropTargets) {
+        this.dropTargets.split(/[ ]{1,}/).forEach(function (targetGroup) {
+          if (this.dragDropGroupMembers[targetGroup]) {
+            this.dragDropGroupMembers[targetGroup].forEach(function (target) {
+              target.toggleClass('drop-target', false, target);
+              target.dragState = 'released';
+            }, this);
+          }
+        }, this);
+      }
+    }
   }
 };
 </script>
