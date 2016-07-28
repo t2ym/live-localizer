@@ -35,13 +35,19 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         cursor: nwse-resize;
       }
       [drag-handle-mode=drag] {
-        cursor: pointer;
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
+        cursor: grab;
       }
       .drag-target {
-        cursor: pointer;
+        cursor: -moz-grab;
+        cursor: -webkit-grab;
+        cursor: grab;
       }
       .drag-target[drag-state=dragging] {
-        cursor: no-drop;
+        cursor: -moz-grabbing;
+        cursor: -webkit-grabbing;
+        cursor: grabbing;
       }
       .drop-target {
         cursor: copy;
@@ -57,11 +63,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
       .drag-target {
         z-index: 1;
-        opacity: 0.75;
       }
       .drop-target {
         z-index: 2;
         opacity: 0.75;
+      }
+      .drop-target[drag-state=drag-hover] {
+        opacity: 0.25;
+        margin: 4px;
+        border-color: darkblue;
+        border-width: 4px;
+        border-style: solid;
+        border-radius: 12px;
       }
     </style>
   </template>
