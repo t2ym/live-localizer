@@ -70,7 +70,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="flex"></div>
           </div>
           <live-localizer-locale-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"
-            tooltips='[ "Not implemented yet", "Not implemented yet" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-locale-icon>
+            tooltips='[ "Drag to Save", "Drag to Save" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-locale-icon>
           <content select=".storage.browser"></content>
           <div>browser storage icons</div>
         </div>
@@ -84,7 +84,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           </div>
           <live-localizer-local-file-storage id="file-storage" model="{{model}}"></live-localizer-local-file-storage>
           <content select=".storage.device"></content>
-          <div>device storage icons</div>
+          <!--<div>device storage icons</div>-->
         </div>
       </div>
     </div>
@@ -114,7 +114,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         [ 'file-storage' ].forEach(function (storageId) {
           this.model.storage[storageId] = this.$[storageId];
         }, this);
-        //this.model.storage[this.$['locale-icon'].storageId] = this.model;
       },
 
       onBadgeTap: function (e) {
@@ -125,6 +124,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       onDragAndDrop: function (e) {
         console.log('drag-and-drop event ', e.detail.src, e.detail.dest);
         e.stopPropagation();
+        var op;
+        var storage;
+        var arg;
+        if (e.detail.src === this.$['locale-icon']) {
+          op = 'save';
+          storage = e.detail.dest.storage;
+          arg = e.detail.src.file;
+        }
+        if (e.detail.dest === this.$['locale-icon']) {
+          op = 'load';
+          storage = e.detail.src.storage;
+          arg = e;
+        }
+        if (op && storage) {
+          storage[op](arg);
+        }
       }
 
     });

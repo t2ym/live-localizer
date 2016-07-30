@@ -65,8 +65,40 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         opacity: 0.35;
       }
       .file-name {
+        position: relative;
         text-align: center;
         display: block;
+        left: -125%;
+        width: 350%;
+      }
+      paper-fab.badge {
+        position: relative;
+        font-size: 9pt;
+        padding: 1px;
+        top: -84px;
+        left: 60px;
+        width: 32px;
+        height: 32px;
+      }
+      paper-fab.badge:not(.selected) {
+        color: black;
+        opacity: 0.35;
+      }
+      paper-fab.badge.blue {
+        visibility: visible;
+        background-color: blue;
+      }
+      paper-fab.badge.orangered {
+        visibility: visible;
+        background-color: orangered;
+      }
+      paper-fab.badge.yellow {
+        visibility: visible;
+        color: slategrey;
+        background-color: yellow;
+      }
+      paper-fab.badge {
+        visibility: hidden;
       }
     </style>
     <paper-card id="card" class="download-link layout vertical">
@@ -78,9 +110,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       </template>
       <div class="flex"></div>
       <div class="file-name">{{label}}</div>
+      <div class="flex"></div>
       <paper-ripple></paper-ripple>
     </paper-card>
+    <paper-fab id="badge" mini class="badge yellow" label="{{badgeLabel}}"></paper-fab>
     <paper-tooltip for="card" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
+    <paper-tooltip for="badge" offset="-4">{{badgeTooltip}}</paper-tooltip>
   </template>
   <script>
   (function () {
@@ -108,11 +143,26 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           value: ''
         },
 
+        badgeLabel: {
+          type: String,
+          value: ''
+        },
+
+        badgeColor: {
+          type: String,
+          value: ''
+        },
+
         tooltips: {
           type: Array,
           value: function () {
             return [ 'Not implemented yet', 'Not implemented yet' ];
           }
+        },
+
+        badgeTooltip: {
+          type: String,
+          value: ''
         },
 
         selected: {
@@ -130,6 +180,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           type: Object
         }
       },
+
+      observers: [
+        'updateBadge(badgeLabel,badgeColor)'
+      ],
 
       ready: function () {
         this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
@@ -154,6 +208,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       selectedChanged: function (value) {
         this.toggleClass('selected', this.selected, this.$.card);
         this.toggleClass('selected', this.selected, this.$.badge);
+      },
+
+      updateBadge: function (badgeLabel, badgeColor) {
+        console.log('updateBadge ' + badgeLabel, badgeColor);
+        if (!badgeLabel) {
+          badgeColor = '';
+        }
+
+        [ 'blue', 'orangered', 'yellow' ].forEach(function (color) {
+          if (color === badgeColor) {
+            this.$.badge.classList.add(color);
+          }
+          else {
+            this.$.badge.classList.remove(color);
+          }
+        }, this);
       },
 
       tooltip: function (selected, tooltips) {

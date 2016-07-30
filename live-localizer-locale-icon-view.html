@@ -58,7 +58,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         var icon = Polymer.dom(e).localTarget;
         var file = icon.file;
         if (icon.selected) {
-          this.model.storage['file-storage'].saveToLocalFile(file);
+          this.model.storage['file-storage'].save(file);
         }
         else {
           this.model.html.lang = file.locale;
@@ -72,11 +72,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       onDrop: function (e) {
         console.log('onDrop');
-        var files = e.dataTransfer.files;
-
-        this.model.storage['file-storage'].processFiles(files);
-
         e.preventDefault();
+        this.model.storage['file-storage'].selected = true;
+        this.model.storage['file-storage'].load(e);
       },
 
       onDropAreaMouseenter: function (e) {

@@ -190,7 +190,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       onFileLoad: function (e) {
-        this.model.storage['file-storage'].loadFile();
+        this.model.storage['file-storage'].updateFiles();
+        this.model.storage['file-storage'].selected = true;
+        this.model.storage['file-storage'].load(e);
       },
 
       onIronResize: function (e) {

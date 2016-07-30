@@ -12,17 +12,26 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
 
 <link rel="import" href="live-localizer-storage-icon.html">
 <link rel="import" href="draggable-behavior.html">
 
 <dom-module id="live-localizer-local-file-storage">
   <template>
+    <style include="iron-flex"></style>
     <style include="drag-handle-mode"></style>
     <style include="drag-field"></style>
     <style>
       :host {
         display: inline-block;
+        --paper-checkbox-unchecked-color: var(--live-localizer-color);
+        --paper-checkbox-checked-color: var(--live-localizer-color);
+        --paper-checkbox-label-color:var(--live-localizer-color);
+        --paper-checkbox-label-checked-color: var(--live-localizer-color);
+      }
+      .control-panel {
+        padding: 12px;
       }
       .hidden-anchor {
         display: none;
@@ -31,16 +40,27 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         display: none;
       }
     </style>
-    <live-localizer-storage-icon
-      id="file-storage-icon"
-      selected="{{selected}}"
-      icon="{{icon}}"
-      label="{{label}}"
-      on-tap=""
-      drag-handle-mode="drag"
-      drag-drop-groups="save-targets"
-      drop-targets="load-targets"
-      model="{{model}}"></live-localizer-storage-icon>
+    <div id="droparea" class="droparea layout horizontal">
+      <live-localizer-storage-icon
+        id="file-storage-icon"
+        selected="{{selected}}"
+        icon="{{icon}}"
+        label="{{label}}"
+        badge-label="{{badgeLabel}}"
+        badge-color="{{badgeColor}}"
+        badge-tooltip="Discarded Units"
+        on-tap="onTap"
+        drag-handle-mode="drag"
+        drag-drop-groups="save-targets"
+        drop-targets="load-targets"
+        tooltips='[ "Drag to Load", "Select XLIFF" ]'
+        model="{{model}}"></live-localizer-storage-icon>
+      <div class="control-panel layout vertical">
+        <paper-checkbox class="control-panel-item" checked="{{prefix}}">Save with Timestamp</paper-checkbox>
+        <div class="flex"></div>
+      </div>
+    </div>
+    <paper-tooltip id="droptooltip" for="droparea" offset="-1" manual-mode>Drag and drop XLIFF to select</paper-tooltip>
     <a id="anchor" class="hidden-anchor" target="_blank"></a>
     <input id="fileLoad" type="file" class="hidden-input">
   </template>
@@ -64,21 +84,63 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
         selected: {
           type: Boolean,
-          value: true,
+          value: false,
           reflectToAttribute: true
         },
 
         model: {
           type: Object
+        },
+
+        files: {
+          type: Array,
+          value: function () { return []; },
+          notify: true
+        },
+
+        prefix: {
+          type: Boolean,
+          value: false
         }
       },
 
+      observers: [
+        'updateStats(files.splices)',
+        'getLabel(selected,files.splices)'
+      ],
+
       listeners: {
-        'fileLoad.change': 'onFileChange',
+        'droparea.dragover': 'onDragOver',
+        'droparea.drop': 'onDrop',
+        'droparea.mouseenter': 'onDropAreaMouseenter',
+        'fileLoad.change': 'onFileChange'
       },
 
       ready: function () {
         this.$['file-storage-icon'].storage = this;
+      },
+
+      onTap: function (e) {
+        this.load(e);
+      },
+
+      onDragOver: function (e) {
+        console.log('onDragOver');
+        e.preventDefault();
+      },
+
+      onDrop: function (e) {
+        console.log('onDrop');
+        e.preventDefault();
+        this.selected = false;
+        this.load(e);
+      },
+
+      onDropAreaMouseenter: function (e) {
+        this.$.droptooltip.show();
+        setTimeout(function () {
+          this.$.droptooltip.hide();
+        }.bind(this), 3000);
       },
 
       loadFile: function () {
@@ -87,14 +149,105 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       onFileChange: function (e) {
         console.log('onFileChange');
-        var files = e.target.files;
-
-        this.processFiles(files);
-
         e.preventDefault();
+        this.updateFiles(this.selected, e.target.files);
+        if (e.target.files.length === 0) {
+          this.selected = false;
+        }
+        this.load(e);
       },
 
-      processFiles: function (files) {
+      getLabel: function () {
+        if (this.selected && this.files && this.files.length > 0) {
+          this.label = this.files[0].name;
+        }
+        else {
+          this.label = 'Local File';
+        }
+      },
+
+      load: function (event) {
+        var files;
+        var noload = false;
+        switch (event.type) {
+        case 'change':
+          if (event.target.files && event.target.files.length > 0) {
+            files = event.target.files;
+            if (!this.selected) {
+              noload = true;
+              this.selected = true;
+            }
+          }
+          break;
+        case 'drop':
+          if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+            files = event.dataTransfer.files;
+            this.updateFiles(this.selected, files, true);
+            if (!this.selected) {
+              noload = true;
+              this.selected = true;
+            }
+          }
+          break;
+        case 'tap':
+          if (this.files && this.files.length > 0 &&
+              event.target !== this.$['file-storage-icon']) {
+            files = this.files;
+            if (!this.selected) {
+              noload = true;
+              this.selected = true;
+            }
+          }
+          else {
+            this.updateFiles(this.selected);
+            if (event.target === this.$['file-storage-icon']) {
+              this.selected = false;
+            }
+            this.loadFile();
+          }
+          break;
+        case 'drag-and-drop':
+          if (this.files && this.files.length > 0) {
+            files = this.files;
+            if (!this.selected) {
+              noload = true;
+              this.selected = true;
+            }
+          }
+          else {
+            // should not happen
+            this.selected = false;
+            this.loadFile();
+          }
+          break;
+        default:
+          break;
+        }
+        if (files) {
+          this.processFiles(files, noload, function (file, output, stats) {
+            file.stats = stats;
+            this.updateStats();
+          }.bind(this));
+          if (!noload) {
+            this.selected = false;
+          }
+        }
+      },
+
+      updateFiles: function (selected, files, clear) {
+        if (!files || clear) {
+          this.$.fileLoad.value = '';
+        }
+        while (this.shift('files')) {}
+        if (files) {
+          for (var i = 0; i < files.length; i++) {
+            this.push('files', files[i]);
+          }
+        }
+        this.selected = !!selected;
+      },
+
+      processFiles: function (files, noload, callback) {
         for (var i = 0; i < files.length; i++) {
           var f = files[i];
           console.log('f.name:' + f.name + 'f.type:' + f.type + 'f.size:' + (f.size / 1000) + ' KB ');
@@ -110,8 +263,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 console.log('processFiles: incorrect locale');
               }
               if (locale && this.model.masterBundles[locale] && this.model.masterBundles[locale].bundle) {
-                this.model.parseXliff(e.target.result, { bundle: this.model.masterBundles[locale] }, function (output) {
-                  this.model.updateLocale(locale);
+                this.model.parseXliff(e.target.result, {
+                  bundle: noload 
+                    ? deepcopy(this.model.masterBundles[locale])
+                    : this.model.masterBundles[locale]
+                }, function (output, stats) {
+                  if (!noload) {
+                    this.model.updateLocale(locale);
+                  }
+                  if (callback) {
+                    callback(f, output, stats);
+                  }
                 }.bind(this));
               }
               var file;
@@ -121,26 +283,52 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   file.text = e.target.result;
                 }
               }
+              if (!noload) {
+                this.updateFiles();
+              }
             }.bind(this);
           }.bind(this))(f);
           reader.readAsText(f);
         }
       },
 
-      saveToLocalFile: function (file) {
+      updateStats: function () {
+        console.log('updateStats');
+        var badgeColorDiscarded = '';
+        var stats = {};
+        if (this.files && this.files.length > 0 && this.files[0].stats) {
+          stats = this.files[0].stats.json.total;
+          if (stats.discarded > 0) {
+            badgeColorDiscarded = 'yellow';
+          }
+        }
+
+        this.badgeLabel = '' + (stats.discarded > 0 ? stats.discarded : '');
+        this.badgeColor = badgeColorDiscarded;
+      },
+
+      save: function (file) {
         file.text = null;
         this.model.setXliff(file, function (result) {
           if (result && result.text) {
             var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
             var blob = new Blob([result.text], { type: type });
+            blob.name = this.prefix 
+                          ? (new Date()).toISOString().replace(/[.][0-9]*Z$/g, '').replace(/[-T:.]/g, '') + '-' + result.name
+                          : result.name;
             if (window.navigator.msSaveOrOpenBlob) {
-              window.navigator.msSaveOrOpenBlob(blob, result.name);
+              window.navigator.msSaveOrOpenBlob(blob, blob.name);
             }
             else {
-              this.$.anchor.download = result.name;
+              this.$.anchor.download = blob.name;
               this.$.anchor.href = URL.createObjectURL(blob);
               this.$.anchor.click();
             }
+            this.updateFiles(true, [ blob ], true);
+            this.processFiles(this.files, true, function (file, output, stats) {
+              file.stats = stats;
+              this.updateStats();
+            }.bind(this));
           }
         }.bind(this));
       }
