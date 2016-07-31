@@ -237,6 +237,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       processFiles: function (files, noload, callback) {
+        var it = this;
         for (var i = 0; i < files.length; i++) {
           var f = files[i];
           console.log('f.name:' + f.name + 'f.type:' + f.type + 'f.size:' + (f.size / 1000) + ' KB ');
@@ -245,38 +246,38 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             return function(e) {
               var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
               var locale = '';
-              if (match && match[1] !== this.defaultLang) {
+              if (match && match[1] !== it.defaultLang) {
                 locale = match[1];
               }
               else {
                 console.log('processFiles: incorrect locale');
               }
-              if (locale && this.model.masterBundles[locale] && this.model.masterBundles[locale].bundle) {
-                this.model.parseXliff(e.target.result, {
+              if (locale && it.model.masterBundles[locale] && it.model.masterBundles[locale].bundle) {
+                it.model.parseXliff(e.target.result, {
                   bundle: noload 
-                    ? deepcopy(this.model.masterBundles[locale])
-                    : this.model.masterBundles[locale]
+                    ? deepcopy(it.model.masterBundles[locale])
+                    : it.model.masterBundles[locale]
                 }, function (output, stats) {
                   if (!noload) {
-                    this.model.updateLocale(locale);
+                    it.model.updateLocale(locale);
                   }
                   if (callback) {
                     callback(f, output, stats);
                   }
-                }.bind(this));
+                });
               }
               var file;
-              for (var i = 0; i < this.model.filelist.length; i++) {
-                if (this.model.filelist[i].locale === locale) {
-                  file = this.model.filelist[i];
+              for (var i = 0; i < it.model.filelist.length; i++) {
+                if (it.model.filelist[i].locale === locale) {
+                  file = it.model.filelist[i];
                   file.text = e.target.result;
                 }
               }
               if (!noload) {
-                this.updateFiles();
+                it.updateFiles();
               }
-            }.bind(this);
-          }.bind(this))(f);
+            };
+          })(f);
           reader.readAsText(f);
         }
       },
@@ -297,29 +298,30 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       save: function (file) {
+        var it = this;
         file.text = null;
-        this.model.setXliff(file, function (result) {
+        it.model.setXliff(file, function (result) {
           if (result && result.text) {
             var type = /constructor/i.test(HTMLElement) ? 'text/plain' : 'application/x-xliff+xml';
             var blob = new Blob([result.text], { type: type });
-            blob.name = this.prefix 
+            blob.name = it.prefix 
                           ? (new Date()).toISOString().replace(/[.][0-9]*Z$/g, '').replace(/[-T:.]/g, '') + '-' + result.name
                           : result.name;
             if (window.navigator.msSaveOrOpenBlob) {
               window.navigator.msSaveOrOpenBlob(blob, blob.name);
             }
             else {
-              this.$.anchor.download = blob.name;
-              this.$.anchor.href = URL.createObjectURL(blob);
-              this.$.anchor.click();
+              it.$.anchor.download = blob.name;
+              it.$.anchor.href = URL.createObjectURL(blob);
+              it.$.anchor.click();
             }
-            this.updateFiles(true, [ blob ], true);
-            this.processFiles(this.files, true, function (file, output, stats) {
+            it.updateFiles(true, [ blob ], true);
+            it.processFiles(it.files, true, function (file, output, stats) {
               file.stats = stats;
-              this.updateStats();
-            }.bind(this));
+              it.updateStats();
+            });
           }
-        }.bind(this));
+        });
       }
 
     });
