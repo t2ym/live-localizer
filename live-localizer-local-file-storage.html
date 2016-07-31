@@ -107,7 +107,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       observers: [
         'updateStats(files.splices)',
-        'getLabel(selected,files.splices)'
+        'updateLabel(selected,files.splices)'
       ],
 
       listeners: {
@@ -158,7 +158,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.load(e);
       },
 
-      getLabel: function () {
+      updateLabel: function () {
         if (this.selected && this.files && this.files.length > 0) {
           this.label = this.files[0].name;
         }
