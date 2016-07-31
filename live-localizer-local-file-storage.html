@@ -25,10 +25,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <style>
       :host {
         display: inline-block;
-        --paper-checkbox-unchecked-color: var(--live-localizer-color);
-        --paper-checkbox-checked-color: var(--live-localizer-color);
-        --paper-checkbox-label-color:var(--live-localizer-color);
-        --paper-checkbox-label-checked-color: var(--live-localizer-color);
+        --live-localizer-default-checkbox-color: dimgrey;
+        --paper-checkbox-unchecked-color: var(--live-localizer-color,--live-localizer-default-checkbox-color);
+        --paper-checkbox-checked-color: var(--live-localizer-color,--live-localizer-default-checkbox-color);
+        --paper-checkbox-label-color:var(--live-localizer-color,--live-localizer-default-checkbox-color);
+        --paper-checkbox-label-checked-color: var(--live-localizer-color,--live-localizer-default-checkbox-color);
       }
       .control-panel {
         padding: 12px;
