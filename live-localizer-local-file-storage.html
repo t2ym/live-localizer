@@ -174,30 +174,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         case 'change':
           if (event.target.files && event.target.files.length > 0) {
             files = event.target.files;
-            if (!this.selected) {
-              noload = true;
-              this.selected = true;
-            }
           }
           break;
         case 'drop':
           if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
             files = event.dataTransfer.files;
             this.updateFiles(this.selected, files, true);
-            if (!this.selected) {
-              noload = true;
-              this.selected = true;
-            }
           }
           break;
         case 'tap':
           if (this.files && this.files.length > 0 &&
               event.target !== this.$['file-storage-icon']) {
             files = this.files;
-            if (!this.selected) {
-              noload = true;
-              this.selected = true;
-            }
           }
           else {
             this.updateFiles(this.selected);
@@ -210,10 +198,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         case 'drag-and-drop':
           if (this.files && this.files.length > 0) {
             files = this.files;
-            if (!this.selected) {
-              noload = true;
-              this.selected = true;
-            }
           }
           else {
             // should not happen
@@ -225,6 +209,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           break;
         }
         if (files) {
+          if (!this.selected) {
+            noload = true;
+            this.selected = true;
+          }
           this.processFiles(files, noload, function (file, output, stats) {
             file.stats = stats;
             this.updateStats();
