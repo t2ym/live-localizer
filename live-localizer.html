@@ -47,9 +47,6 @@ Live Localizer widget for Polymer i18n-behavior
 
       is: 'live-localizer',
 
-      behaviors: [
-      ],
-
       properties: {
         opened: {
           type: Boolean,
@@ -92,12 +89,12 @@ Live Localizer widget for Polymer i18n-behavior
 
       _fabTapped: function (e) {
         this.opened = true;
-        console.log('fab tapped');
+        //console.log('fab tapped');
       },
 
       _dialogClosed: function (e) {
         this.opened = false;
-        console.log('dialog closed');
+        //console.log('dialog closed');
       }
     });
   </script>

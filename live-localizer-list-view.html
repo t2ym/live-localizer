@@ -81,7 +81,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       onHtmlLangMutation: function (e) {
-        console.log('onHtmlLangMutation ', this.model.html.lang);
+        //console.log('onHtmlLangMutation ', this.model.html.lang);
         var locale = this.model.getNormalizedLocale(this.model.html.lang);
         var selected = this.$.list.selection.selected();
         var selectedLocale = '';

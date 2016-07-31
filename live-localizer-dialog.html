@@ -176,7 +176,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           //console.log(thisStyle.left, thisStyle.top, thisStyle.width, thisStyle.height);
           //console.log(originStyle.left, originStyle.top, originStyle.width, originStyle.height);
         }
-        console.log('transformOrigin = ' + transformOrigin);
+        //console.log('transformOrigin = ' + transformOrigin);
         this.animationConfig = {
           'entry': [{
             name: 'scale-up-animation',
@@ -217,7 +217,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           this._dragHandleMode = 'none';
         }
-        console.log('drag-handle-mode = ' + this._dragHandleMode);
+        //console.log('drag-handle-mode = ' + this._dragHandleMode);
       },
 
       _renderOpened: function() {
@@ -252,7 +252,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       _adjustHeight: function (e) {
         if (this.$.content) {
           this.$.content.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px';
-          console.log('_adjustHeight ' + this.$.content.style.height);
+          //console.log('_adjustHeight ' + this.$.content.style.height);
         }
       },
 

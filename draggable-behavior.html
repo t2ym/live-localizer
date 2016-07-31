@@ -422,7 +422,7 @@ BehaviorsStore.DraggableBehavior = {
   },
 
   _onDropAnimationFinish: function (e) {
-    console.log('_onDropAnimationFinish', e.detail);
+    //console.log('_onDropAnimationFinish', e.detail);
     if (e.detail === 'dropping' || e.detail === 'releasing') {
       this.dragState = 'released';
       this.toggleClass('drag-target', false, this);
