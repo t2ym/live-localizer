@@ -97,7 +97,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         },
 
         model: {
-          type: Object
+          type: Object,
+          notify: true
         },
 
         file: {
@@ -128,6 +129,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       observers: [
+        'modelReady(model)',
         'updateStats(file)',
         'updateLabel(file)',
         'checkAutoLoad(file,autoLoad)',
@@ -143,18 +145,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       attached: function () {
-        if (this.model) {
+        this.isAttached = true;
+      },
+
+      modelReady: function (model) {
+        if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
           this.model.addEventListener('bundle-set-fetched', this.onBundleSetFetchedBindThis);
           this.model.addEventListener('load-xliff', this.onLoadXliffBindThis);
+          this.storage = new Dexie('LiveLocalizer' + this.model.startUrl);
+          this.storage.version(1).stores({
+            files: '&locale',
+            settings: '&name'
+          });
+          this.initializeSettings();
+          this.isModelReady = true;
         }
-        this.storage = new Dexie('LiveLocalizer' + this.model.startUrl);
-        this.storage.version(1).stores({
-          files: '&locale',
-          settings: '&name'
-        });
-        this.isAttached = true;
-        this.initializeSettings();
       },
 
       detached: function () {

@@ -265,11 +265,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         },
 
         model: {
-          type: Object
+          type: Object,
+          notify: true
         }
       },
 
       observers: [
+        'modelReady(model)',
         'updateSelected(file,model)',
         'updateTasks(file.tasks)'
       ],
@@ -278,9 +280,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
       },
 
-      attached: function () {
-        if (this.model) {
+      modelReady: function (model) {
+        if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.isModelReady = true;
         }
       },
 

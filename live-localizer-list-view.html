@@ -47,7 +47,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       properties: {
         model: {
-          type: Object
+          type: Object,
+          notify: true
         },
 
         listItems: {
@@ -55,16 +56,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      observers: [
+        'modelReady(model)'
+      ],
+
       listeners: {
         'list.selected-items-changed': 'onListSelection'
       },
 
-      attached: function () {
-        this.setUpNumberRenderer();
-        this.onListAddedBindThis = this.onListAdded.bind(this);
-        this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
-        this.model.addEventListener('list-item-added', this.onListAddedBindThis);
-        this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+      modelReady: function (model) {
+        if (model && !this.isModelReady) {
+          this.onListAddedBindThis = this.onListAdded.bind(this);
+          this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
+          this.model.addEventListener('list-item-added', this.onListAddedBindThis);
+          this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.isModelReady = true;
+        }
       },
 
       detached: function () {
@@ -119,6 +126,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       onListAdded: function (e) {
         if (e.detail && e.detail.locale) {
+          if (!this.isNumberRendererReady) {
+            this.setUpNumberRenderer();
+            this.isNumberRendererReady = true;
+          }
           if (this.isSelected(e.detail.locale)) {
             this.$.list.selection.select(e.detail.index);
           }
