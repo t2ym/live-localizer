@@ -80,8 +80,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
 
       parseXliff: function (xliff, options, callback) {
+        var it = this;
         var xliffConv = new XliffConv();
-        xliffConv.parseXliff(xliff, options, callback);
+        xliffConv.parseXliff(xliff, options, function (output, stats) {
+          callback(output, stats);
+          for (var locale in it.masterBundles) {
+            if (locale && locale !== it.defaultLang &&
+                it.masterBundles[locale] && it.masterBundles[locale].bundle) {
+              if (output === it.masterBundles[locale]) {
+                console.log('load-xliff', locale);
+                it.fire('load-xliff', { locale: locale });
+              }
+            }
+          }
+        });
       },
 
       updateLocale: function (locale) {
@@ -89,7 +101,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.html.setAttribute('lang', '');
         setTimeout(function () {
           this.html.setAttribute('lang', locale);
-          this.fetch();
         }.bind(this), 1000);
       },
 
@@ -178,6 +189,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           console.log('fetched bundles', result);
           it.fetchingFilelist = null;
           it.lang = '';
+          it.fire('bundle-set-fetched', result);
         });
       },
 

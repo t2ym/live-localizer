@@ -246,7 +246,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             return function(e) {
               var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
               var locale = '';
-              if (match && match[1] !== it.defaultLang) {
+              if (match && match[1] !== it.model.defaultLang) {
                 locale = match[1];
               }
               else {
