@@ -101,6 +101,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.html.setAttribute('lang', '');
         setTimeout(function () {
           this.html.setAttribute('lang', locale);
+          this.fetch();
         }.bind(this), 1000);
       },
 
