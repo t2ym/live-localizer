@@ -280,16 +280,27 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
       },
 
+      attached: function () {
+        if (this.model) {
+          this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.isModelReady = true;
+        }
+      },
+
       modelReady: function (model) {
         if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
           this.isModelReady = true;
+        }
+        if (!model) {
+          this.isModelReady = false;
         }
       },
 
       detached: function () {
         if (this.model) {
           this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.isModelReady = false;
         }
       },
 
