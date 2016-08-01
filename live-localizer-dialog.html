@@ -82,6 +82,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       div.title-pad {
         width: 48px;
       }
+      paper-icon-button#fullscreen.fullscreen {
+        display: none;
+      }
+      paper-icon-button#fullscreen-exit:not(.fullscreen) {
+        display: none;
+      }
     </style>
     <div id="handle" class="layout vertical handle">
       <div class="top-handle layout horizontal">
@@ -96,7 +102,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="titlebar layout horizontal">
               <div class="title-pad"></div>
               <div class="flex title" drag-handle-mode="position">[[dialogTitle]]</div>
-              <paper-icon-button id="fullscreen" class="icon-button" icon="[[_fullscreenButtonType(fullscreen)]]" drag-handle-mode="none"></paper-icon-button>
+              <paper-icon-button id="fullscreen" class="icon-button" icon="fullscreen" drag-handle-mode="none"></paper-icon-button>
+              <paper-icon-button id="fullscreen-exit" class="icon-button" icon="fullscreen-exit" drag-handle-mode="none"></paper-icon-button>
               <paper-icon-button id="close" class="icon-button" icon="close" drag-handle-mode="none"></paper-icon-button>
             </div>
             <div id="content" class="dialog-content" drag-handle-mode="none"><content></content></div>
@@ -149,11 +156,16 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      observers: [
+        'setFullscreen(fullscreen)'
+      ],
+
       listeners: {
         'neon-animation-finish': '_onNeonAnimationFinish',
         'handle.mouseover': '_onMouseover',
         'close.tap': '_onCloseButton',
         'fullscreen.tap': '_onFullscreenButton',
+        'fullscreen-exit.tap': '_onFullscreenButton',
         'height-changed': '_adjustHeight'
       },
 
@@ -191,8 +203,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         };
       },
 
-      _fullscreenButtonType: function (fullscreen) {
-        return fullscreen ? 'fullscreen-exit' : 'fullscreen';
+      setFullscreen: function (fullscreen) {
+        this.toggleClass('fullscreen', fullscreen, this.$.fullscreen);
+        this.toggleClass('fullscreen', fullscreen, this.$['fullscreen-exit']);
       },
 
       resetPosition: function () {
