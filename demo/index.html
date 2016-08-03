@@ -59,6 +59,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <my-app></my-app>
 
-  <live-localizer></live-localizer>
+  <live-localizer>
+    <!--
+      Firebase storage for Live Localizer
+
+      Minimum ad-hoc security rules for Firebase storage (to be updated for role-based security and user management):
+
+      // Each user can access one's own data only.
+      {
+        "rules": {
+          "users": {
+            "$uid": {
+              ".read": "$uid === auth.uid",
+              ".write": "$uid === auth.uid"
+            }
+          }
+        }
+      }
+    -->
+    <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
+      auth-provider="google"
+      auth-domain="live-localizer-demo.firebaseapp.com"
+      database-url="https://live-localizer-demo.firebaseio.com"
+      api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+    </live-localizer-firebase-storage>
+  </live-localizer>
 </body>
 </html>

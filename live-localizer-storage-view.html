@@ -16,6 +16,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="live-localizer-locale-icon.html">
 <link rel="import" href="live-localizer-local-file-storage.html">
 <link rel="import" href="live-localizer-browser-storage.html">
+<link rel="import" href="live-localizer-firebase-storage.html">
 
 <dom-module id="live-localizer-storage-view">
   <template>
@@ -60,7 +61,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="flex"></div>
           </div>
           <content select=".storage.cloud"></content>
-          <div>cloud storage icons</div>
         </div>
       </div>
       <div id="browser" class="storage-group">
@@ -74,7 +74,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             tooltips='[ "Drag to Save", "Drag to Save" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-locale-icon>
           <live-localizer-browser-storage id="browser-storage" model="{{model}}"></live-localizer-browser-storage>
           <content select=".storage.browser"></content>
-          <!-- <div>browser storage icons</div> -->
         </div>
       </div>
       <div id="device" class="storage-group">

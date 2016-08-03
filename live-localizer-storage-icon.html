@@ -100,6 +100,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       paper-fab.badge {
         visibility: hidden;
       }
+      paper-tooltip.card-tooltip {
+        position: absolute;
+        text-align: center;
+        width: 100%;
+      }
     </style>
     <paper-card id="card" class="download-link layout vertical">
       <template is="dom-if" if="{{icon}}">
@@ -114,7 +119,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       <paper-ripple></paper-ripple>
     </paper-card>
     <paper-fab id="badge" mini class="badge yellow" label="{{badgeLabel}}"></paper-fab>
-    <paper-tooltip for="card" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
+    <paper-tooltip for="card" class="card-tooltip" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
     <paper-tooltip for="badge" offset="-4">{{badgeTooltip}}</paper-tooltip>
   </template>
   <script>
@@ -170,6 +175,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           value: false,
           reflectToAttribute: true,
           observer: 'selectedChanged'
+        },
+
+        boundDragHandleMode: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         },
 
         model: {
@@ -245,11 +256,16 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       getDragHandleMode: function (e) {
         var mode;
-        if (this.selected) {
-          mode = 'drag';
+        if (this.boundDragHandleMode) {
+          mode = this.dragHandleMode;
         }
         else {
-          mode = 'none';
+          if (this.selected) {
+            mode = 'drag';
+          }
+          else {
+            mode = 'none';
+          }
         }
         return mode;
       }
