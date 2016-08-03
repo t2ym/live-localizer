@@ -390,7 +390,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             case 'twitter':
             case 'github':
             case 'facebook':
-              this.$.auth.signInWithRedirect(this.authProvider);
+              this.$.auth.signInWithPopup(this.authProvider);
               break;
             case 'anonymous':
               this.$.auth.signInAnonymously();
