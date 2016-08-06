@@ -16,6 +16,7 @@ var i18nPreprocess = require('gulp-i18n-preprocess');
 var i18nLeverage = require('gulp-i18n-leverage');
 var XliffConv = require('xliff-conv');
 var i18nAddLocales = require('gulp-i18n-add-locales');
+var runSequence = require('run-sequence');
 
 // Global object to store localizable attributes repository
 var attributesRepository = {};
@@ -166,7 +167,11 @@ var feedback = gulpif([ '**/bundle.json', '**/locales/*.json', '**/*.json', '**/
 
 var config = {
   // list of target locales to add
-  locales: gutil.env.targets ? gutil.env.targets.split(/ /) : []
+  locales: gutil.env.targets ? gutil.env.targets.split(/ /) : [],
+  // firebase token
+  firebase_token: gutil.env.token || '',
+  // firebase project name
+  firebase_project: gutil.env.project || 'live-localizer-demo'
 }
 
 // Gulp task to add locales to I18N-ready elements and pages
@@ -182,8 +187,91 @@ gulp.task('locales', function() {
     .pipe(debug({ title: 'Add locales:'}))
 });
 
-gulp.task('default', () => {
-  // process source files in the project
+var xmldom = require('xmldom');
+var fs = require('fs');
+var exec = require('child_process').exec;
+
+gulp.task('fetch-xliff', function (callback) {
+  var parser = new (xmldom.DOMParser)();
+  var fetchedFiles = {};
+  var assignments;
+
+  try {
+    // read list of uid's of assigned translators from the file in JavaScript array
+    assignments = require('./assigned-translators.json');
+  }
+  catch (e) {
+    // if no list is provided, all the users including anonymous ones are regarded as assigned.
+    assignments = [];
+  }
+
+  // firebase command has to be in the path or run through npm script
+  exec('firebase database:get /users ' +
+        (config.firebase_token ? '--token "'+ config.firebase_token + '"' : '') +
+        ' --project "' + config.firebase_project + '"', function (err, stdout, stderr) {
+    if (!err) {
+      var users = JSON.parse(stdout);
+      var user;
+      var locale;
+      gutil.log(gutil.colors.yellow('By All Users:'));
+      for (user in users) {
+        for (locale in users[user].files) {
+          var file = users[user].files[locale];
+          if (file && file.stats && file.stats.xliff && file.stats.xliff.file && file.stats.xliff.file.date) {
+            file.date = file.stats.xliff.file.date;
+          }
+          else {
+            var dom = parser.parseFromString(file.text, 'application/xml');
+            var fileTag = dom.getElementsByTagName('file')[0];
+            if (fileTag) {
+              var date = fileTag.getAttribute('date');
+              if (date) {
+                file.date = date;
+              }
+            }
+          }
+          file.date = file.date || '';
+          gutil.log(gutil.colors.grey(user + '.files.' + file.locale + ' date: ' + file.date));
+          file.user = user;
+          fetchedFiles[locale] = fetchedFiles[locale] || [];
+          if (assignments.length > 0) {
+            if (assignments.indexOf(file.user) >= 0) {
+              fetchedFiles[locale].push(file);
+            }
+          }
+          else {
+            fetchedFiles[locale].push(file);
+          }
+        }
+      }
+      if (assignments.length > 0) {
+        gutil.log(gutil.colors.yellow('By Assigned Users in reverse chronological order:'));
+      }
+      else {
+        gutil.log(gutil.colors.yellow('By All Users in reverse chronological order:'));
+      }
+      for (locale in fetchedFiles) {
+        fetchedFiles[locale].sort(function (fileA, fileB) {
+          return -fileA.date.localeCompare(fileB.date, 'en');
+        });
+        fetchedFiles[locale].forEach(function (file, index) {
+          if (index === 0) {
+            fs.writeFileSync(path.join(process.cwd(), 'xliff', file.name), file.text);
+          }
+          gutil.log(gutil.colors[index === 0 ? 'green' : 'grey']('files[' + locale + '][' + index + '] ' +
+            'user: ' + file.user + ' date: ' + file.date) +
+            (index === 0 ? gutil.colors.yellow(' <= selected') : ''));
+        });
+      }
+    }
+    else {
+      gutil.log(gutil.colors.red(stderr));
+    }
+    callback(err);
+  });
+});
+
+gulp.task('i18n', () => {
   return gulp.src([ '**/*.html', '**/*.json', '**/xliff/*.xlf', '!.tmp/**' ], { base: '.' })
     // I18N processes
     .pipe(scan)
@@ -195,7 +283,9 @@ gulp.task('default', () => {
     .pipe(leverage)
     .pipe(exportXliff)
     .pipe(feedback)
-    .pipe(debug({ title: title }))
+    .pipe(debug({ title: title }));
+});
 
-  return sources;
+gulp.task('default', (cb) => {
+  runSequence('fetch-xliff', 'i18n', cb);
 });

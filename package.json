@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "wct && if [ \"${TRAVIS_BRANCH}\" != \"\" ]; then coveralls <./test/coverage-report/lcov.info; fi",
-    "clean": "rm -rvf ./test/coverage-report"
+    "clean": "rm -rvf ./test/coverage-report",
+    "demo": "cd demo && gulp"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,8 @@
   },
   "homepage": "https://github.com/t2ym/live-localizer#readme",
   "devDependencies": {
+    "firebase": "^3.2.1",
+    "firebase-tools": "^3.0.6",
     "gulp": "^3.9.1",
     "gulp-debug": "^2.1.2",
     "gulp-grep-contents": "0.0.1",
@@ -43,8 +46,10 @@
     "gulp-sort": "^2.0.0",
     "gulp-util": "^3.0.7",
     "json-stringify-safe": "^5.0.1",
+    "run-sequence": "^1.2.2",
     "strip-bom": "^3.0.0",
     "through2": "^2.0.1",
-    "xliff-conv": "^1.0.6"
+    "xliff-conv": "^1.0.7",
+    "xmldom": "^0.1.22"
   }
 }
