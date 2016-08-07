@@ -171,8 +171,14 @@ var config = {
   // firebase token
   firebase_token: gutil.env.token || '',
   // firebase project name
-  firebase_project: gutil.env.project || 'live-localizer-demo'
-}
+  firebase_project: gutil.env.project || 'live-localizer-demo',
+  // firebase URL
+  database_url: gutil.env.database || 'https://live-localizer-demo.firebaseio.com',
+  // path to firebase service account JSON
+  service_account: gutil.env.service_account || '../../live-localizer-demo-service-account.json', // must be out of the web root
+  // command to execute on XLIFF changes
+  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo'
+};
 
 // Gulp task to add locales to I18N-ready elements and pages
 // Usage: gulp locales --targets="{space separated list of target locales}"
@@ -269,6 +275,119 @@ gulp.task('fetch-xliff', function (callback) {
     }
     callback(err);
   });
+});
+
+var firebase = require('firebase');
+
+/*
+  watch-xliff task to watch changes on XLIFF files in Firebase
+  and trigger a script like 'npm run demo' to rebuild the project.
+  The build can be deployed immediately for the translators
+  to reload the app with updated strings on live-localizer.
+
+  Requirements:
+    - Firebase database URL
+    - JSON file with service account credentials outside of the web path
+    - npm script to run whenever XLIFF changes are detected
+    - auth.uid === 'xliff-watcher' is used for watching the database.
+        Firebase security rules for 'xliff-watcher' to read all the users object:
+          {
+            "rules": {
+              "users": {
+                ".read": "auth.uid === 'xliff-watcher'",
+                "$uid": {
+                  ".read": "$uid === auth.uid",
+                  ".write": "$uid === auth.uid"
+                }
+              }
+            }
+          }
+
+  Command Line:
+
+    Start Watching:
+
+      gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
+        --service_account ../../live-localizer-demo-service-account.json \
+        --on_xliff_change 'npm run demo' \
+        >../../logfile.txt 2>&1 &
+      tail -f ../../logfile.txt
+
+    Stop Watching:
+
+      gulp unwatch-xliff
+
+  Note: Newly added XLIFF files can be watched with Firebase's 'child_changed' event as well
+        since settings objects for the user has been added when the XLIFFs are added.
+
+*/
+gulp.task('watch-xliff', function (callback) {
+  var detectedChanges = 0;
+  gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Watching changes on Firebase...'));
+  gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.cyan('gulp unwatch-xliff') + gutil.colors.yellow(' to stop the task'));
+  firebase.initializeApp({
+    databaseURL: config.database_url,
+    serviceAccount: config.service_account, // must be out of the web root
+    databaseAuthVariableOverride: {
+      uid: 'xliff-watcher'
+    }
+  });
+  var db = firebase.database();
+  var ref = db.ref('/users');
+  ref.on('child_changed', function onChildChanged () {
+    detectedChanges++;
+    gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Change detected on Firebase'));
+    if (detectedChanges === 1) {
+      gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Executing: ') + config.on_xliff_change);
+      exec(config.on_xliff_change, function (err, stdout, stderr) {
+        if (!err) {
+          gutil.log(stdout);
+          gutil.log(gutil.colors.green('watch-xliff: ') +
+                    gutil.colors.yellow('The task on the XLIFF changes has finished. Continuing to watch changes on Firebase...'));
+        }
+        else {
+          gutil.log(stderr);
+          gutil.log(gutil.colors.green('watch-xliff: ') +
+                    gutil.colors.red('The task on the XLIFF changes has errors. ') +
+                    gutil.colors.yellow('Continuing to watch changes on Firebase...'));
+        }
+        if (detectedChanges > 1) {
+          // Further changes during the build
+          detectedChanges = 0;
+          onChildChanged(); // process the remaining changes successively
+        }
+        else {
+          detectedChanges = 0;
+        }
+      });
+    }
+  });
+  var quitFilePath = path.join(process.cwd(), 'xliff', 'watch-xliff');
+  fs.writeFileSync(quitFilePath, (new Date()).toISOString());
+  fs.watch(quitFilePath, function (eventType, filename) {
+    try {
+      fs.statSync(quitFilePath);
+    }
+    catch (e) {
+      callback();
+      db.goOffline();
+      gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('stop watching xliff'));
+      process.exit(); // Since Firebase persists, the process has to exit to terminate the task.
+    }
+  });
+});
+
+gulp.task('unwatch-xliff', function (callback) {
+  var quitFilePath = path.join(process.cwd(), 'xliff', 'watch-xliff');
+  try {
+    gutil.log(gutil.colors.green('unwatch-xliff: ') + gutil.colors.yellow('stop watching xliff'));
+    fs.statSync(quitFilePath);
+    fs.unlinkSync(quitFilePath);
+  }
+  catch (e) {
+    gutil.log(gutil.colors.green('unwatch-xliff: ') + gutil.colors.yellow('cannot find watch-xliff task'));
+  }
+  callback();
 });
 
 gulp.task('i18n', () => {
