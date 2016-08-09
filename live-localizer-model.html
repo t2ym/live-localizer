@@ -7,6 +7,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../i18n-behavior/i18n-controller-behavior.html">
 <script src="../xliff-conv/xliff-conv.js"></script>
 
+<!--
+
+## Live Localizer model
+
+`<live-localizer-model>` element is contained by `<live-localizer-panel>` and
+provides Live Localizer panel elements with the interface to the i18n-behavior variable manipulations.
+
+@group I18nBehavior
+@element live-localizer-model
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-model">
   <template>
     <style>
@@ -32,27 +43,43 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ],
 
       properties: {
+
+        /**
+         * list of files
+         */
         filelist: {
           type: Array,
           value: function () { return []; },
           notify: true
         },
 
+        /**
+         * list of stats items
+         */
         listItems: {
           type: Array,
           value: function () { return []; },
           notify: true
         },
 
+        /**
+         * map of storage elements
+         */
         storage: {
           type: Object,
           value: function () { return {}; }
         },
 
+        /**
+         * default bundle object from bundle.json
+         */
         defaultBundle: {
           type: Object
         },
 
+        /**
+         * list of non-default locales
+         */
         bundleLocales: {
           type: Array
         }
@@ -66,16 +93,31 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'default-bundle-fetched': 'onDefaultBundleFetched'
       },
 
+      /**
+       * attached callback
+       */
       attached: function () {
         setTimeout(function () {
           this.fetch();
         }.bind(this), 1000);
       },
 
+      /**
+       * start fetching bundle.json, followed by non-default bundle JSONs
+       */
       fetch: function () {
         this.$.ajax.generateRequest();
       },
 
+      /**
+       * parse XLIFF and load the contents into JSON
+       *
+       * `load-xliff` event is fired on load
+       *
+       * @param {string} xliff XLIFF content
+       * @param {Object} options { bundle: bundle } to set target JSON object
+       * @param {Function} callback Callback on finish with XliffConv.parseXliff callback arguments
+       */
       parseXliff: function (xliff, options, callback) {
         var it = this;
         var xliffConv = new XliffConv();
@@ -93,6 +135,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
       },
 
+      /**
+       * update the locale of the app
+       *
+       * @param {string} locale the target locale to switch
+       */
       updateLocale: function (locale) {
         console.log('updateLocale ' + locale);
         this.html.setAttribute('lang', '');
@@ -102,17 +149,38 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }.bind(this), 1000);
       },
 
+      /**
+       * `response` event handler for fetching bundle.json
+       *
+       * Fire `default-bundle-fetched` event
+       *
+       * @param {Object} event The `response` event
+       */
       handleBundleResponse: function (event) {
         this.defaultBundle = event.detail.response;
         this.fire('default-bundle-fetched', { success: true });
         return false;
       },
 
+      /**
+       * `error` event handler for fetching bundle.json
+       *
+       * Fire `default-bundle-fetched` event
+       *
+       * @param {Object} event The `error` event
+       */
       handleBundleError: function (event) {
         this.fire('default-bundle-fetched', { success: false });
         return false;
       },
 
+      /**
+       * `default-bundle-fetched` event handler
+       *
+       * Trigger fetching non-defult bundle JSONs
+       *
+       * @param {Object} event The `default-bundle-fetched` event
+       */
       onDefaultBundleFetched: function (event) {
         console.log('onDefaultBundleFetched', event.detail);
         if (event.detail.success) {
@@ -123,6 +191,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return false;
       },
 
+      /**
+       * get the list of locales
+       *
+       * @return {Array} list of locales
+       */
       getLocaleList: function () {
         var locales = [];
         if (this.defaultBundle) {
@@ -140,6 +213,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return locales;
       },
 
+      /**
+       * fetch non-default bundle JSONs
+       *
+       * @return {Promise} Promise for the list of fetched bundles
+       */
       fetchBundleSet: function () {
         var it = this;
         it.bundleLocales = it.getLocaleList();
@@ -191,6 +269,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
       },
 
+      /**
+       * convert JSON to XLIFF
+       *
+       * Output `file` object:
+       * ```
+       * {
+       *   name: 'bundle.{locale}.xlf',
+       *   text: '{XLIFF in string}',
+       *   stats: stats object,
+       *   locale: '{locale}'
+       * }
+       *
+       * @param {Object} file file.locale to specify the locale of the target bundle
+       * @param {Function} callback Callback funtion with file argument
+       */
       setXliff: function (file, callback) {
         if (this.defaultLang) {
           var xliffConv = new XliffConv();
@@ -224,6 +317,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * splices event handler for filelist
+       *
+       * Update listItems with new statistics
+       *
+       * @param {Object} changeRecord splices object
+       */
       fileAddedOrRemoved: function (changeRecord) {
         var it = this;
         if (changeRecord && changeRecord.indexSplices) {
@@ -270,7 +370,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 });
               })
               .then(function (value) {
-                //console.log('added ', value);
                 resolve(splice);
               });
             });
@@ -281,6 +380,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * check if the target locale is currently selected
+       *
+       * @param {string} locale the target locale
+       * @return {Boolean} true if the target locale is selected
+       */
       isSelected: function (locale) {
         var lang;
         var fallbackLanguages = this._enumerateFallbackLanguages(this.html.lang);
@@ -299,6 +404,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                (!lang && locale === this.defaultLang);
       },
 
+      /**
+       * get the currently selected file
+       *
+       * @return {Object} the currently selected file
+       */
       selectedFile: function () {
         var lang;
         var fallbackLanguages = this._enumerateFallbackLanguages(this.html.lang);
@@ -323,10 +433,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return null;
       },
 
+      /**
+       * get the normalized locale name
+       *
+       * @return {string} the normalized locale name
+       */
       getNormalizedLocale: function (locale) {
         return this._enumerateFallbackLanguages(locale).shift();
       },
 
+      /**
+       * <html lang> attribute mutation observer
+       *
+       * Override I18nBehavior._handleHtmlLangChange and fire `html-lang-mutation` events
+       *
+       * @param {Array} mutations list of Mutation objects
+       */
       _handleHtmlLangChange: function (mutations) {
         mutations.forEach(function(mutation) {
           switch (mutation.type) {
@@ -341,6 +463,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }, this);
       },
 
+      /**
+       * async map for Array
+       *
+       * Note: The original Array is replaced. No new Array is generated.
+       *
+       * @return {Promise} mapped array
+       */
       map: function (array, fn, assign) {
         assign = assign || function (value, index, array) {
           array[index] = value;
