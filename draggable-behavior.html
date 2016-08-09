@@ -7,6 +7,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="../neon-animation/animations/transform-animation.html">
 
+<!--
+Styles for drag handles of draggable objects
+-->
 <dom-module id="drag-handle-mode">
   <template>
     <style>
@@ -58,6 +61,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     </style>
   </template>
 </dom-module>
+
+<!--
+Styles for a field of draggable objects
+-->
 <dom-module id="drag-field">
   <template>
     <style>
@@ -103,54 +110,123 @@ window.BehaviorsStore = window.BehavirosStore || {};
  */
 BehaviorsStore.DraggableBehavior = {
   properties: {
+    /**
+     * x coordinate value of the target element in pixels
+     */
     x: {
       type: Number,
       value: 0
     },
+
+    /**
+     * y coordinate value of the target element in pixels
+     */
     y: {
       type: Number,
       value: 0
     },
+
+    /**
+     * width of the target element in pixels
+     */
     width: {
       type: Number,
       value: 0
     },
+
+    /**
+     * height of the target element in pixels
+     */
     height: {
       type: Number,
       value: 0
     },
+
+    /**
+     * differential x coordinate value of the target element in dragging in pixels
+     */
     dx: {
       type: Number,
       value: 0
     },
+
+    /**
+     * differential y coordinate value of the target element in dragging in pixels
+     */
     dy: {
       type: Number,
       value: 0
     },
+
+    /**
+     * state of dragging and dropping
+     *
+     * | state | description |
+     * |:------|:------------|
+     * | released | The object is released |
+     * | dragged | The object has just been dragged |
+     * | dragging | The object is being dragged |
+     * | dropped | Another dragging object is dropped at the object |
+     * | dropping | The object is dropping onto the target object |
+     * | releasing | The object is being released after dropping |
+     */
     dragState: {
       type: String,
       value: 'released',
       reflectToAttribute: true
     },
+
+    /**
+     * operational mode of the drag handle
+     *
+     * | mode | description |
+     * |:-----|:------------|
+     * | position | move the object |
+     * | drag | drag the object |
+     * | upper-left | resize the object by dragging the upper-left corner |
+     * | upper | resize the object by dragging the upper edge |
+     * | upper-right | resize the object by dragging the upper-right corner |
+     * | middle-left | resize the object by dragging the left edge |
+     * | middle-right | resize the object by dragging the right edge |
+     * | lower-left | resize the object by dragging the lower-left corner |
+     * | lower | resize the object by dragging the lower edge |
+     * | lower-right | resize the object by dragging the lower-right corner |
+     */
     dragHandleMode: {
       type: String,
       value: 'position',
       reflectToAttribute: true
     },
+
+    /**
+     * true if the object is fullscreen
+     */
     fullscreen: {
       type: Boolean,
       value: false,
       reflectToAttribute: true
     },
+
+    /**
+     * true if the object is resizable
+     */
     resizable: {
       type: Boolean,
       value: false,
       reflectToAttribute: true
     },
+
+    /**
+     * Space separated list of names for drag and drop groups for the object
+     */
     dragDropGroups: {
       type: String,
       reflectToAttribute: true
     },
+
+    /**
+     * Space separated list of names of drag and drop groups for drop targets of the object
+     */
     dropTargets: {
       type: String,
       reflectToAttribute: true
@@ -173,9 +249,18 @@ BehaviorsStore.DraggableBehavior = {
     'mouseout': 'onMouseOver'
   },
 
-  // shared property
+  /**
+   * Store drag and drop group definitions
+   *
+   * Note: This object is shared among all the objects with DraggableBehavior
+   */
   dragDropGroupMembers: {},
 
+  /**
+   * ready callback
+   *
+   * Initialize drag and drop group definitions and animationConfig
+   */
   ready: function () {
     if (this.dragDropGroups) {
       this.dragDropGroups.split(/[ ]{1,}/).forEach(function (group) {
@@ -203,6 +288,11 @@ BehaviorsStore.DraggableBehavior = {
     }
   },
 
+  /**
+   * attached callback
+   *
+   * Initialize `resize` event handler for `window` object
+   */
   attached: function () {
     this._onWindowResize = function (e) {
       if (this.fullscreen && this.resizable) {
@@ -214,24 +304,49 @@ BehaviorsStore.DraggableBehavior = {
     window.addEventListener('resize', this._onWindowResize);
   },
 
+  /**
+   * detached callback
+   *
+   * Uninitialize `resize` event handler for `window` object
+   */
   detached: function () {
     window.removeEventListener('resize', this._onWindowResize);
   },
 
+  /**
+   * observer of x and fullscreen properties
+   *
+   * Update the `left` style
+   */
   _onXChange: function (x, fullscreen) {
     this.style.left = (fullscreen ? 0 : x) + 'px';
   },
 
+  /**
+   * observer of y and fullscreen properties
+   *
+   * Update the `top` style
+   */
   _onYChange: function (y, fullscreen) {
     this.style.top = (fullscreen ? 0 : y) + 'px';
   },
 
+  /**
+   * observer of width and fullscreen properties
+   *
+   * Update the `width` style
+   */
   _onWidthChange: function (width, fullscreen) {
     if (this.resizable) {
       this.style.width = fullscreen ? '100%' : width + 'px';
     }
   },
 
+  /**
+   * observer of height and fullscreen properties
+   *
+   * Update the `height` style
+   */
   _onHeightChange: function (height, fullscreen) {
     if (this.resizable) {
       this.style.height = (fullscreen ? window.innerHeight : height) + 'px';
@@ -239,6 +354,11 @@ BehaviorsStore.DraggableBehavior = {
     }
   },
 
+  /**
+   * `track` event handler
+   *
+   * Handle drag and drop events and update the styles (size and position) and the state of the object
+   */
   _handleTrack: function (e) {
     switch (e.detail.state) {
     case 'start':
@@ -395,9 +515,13 @@ BehaviorsStore.DraggableBehavior = {
       this.dragHandleMode = this.getDragHandleMode(e);
       break;
     }
-    //console.log('x = ', this.x, ' y = ', this.y, ' left = ', this.style.left, ' top = ', this.style.top, ' width = ', this.style.width, ' height = ', this.style.height, ' dx = ', this.dx, ' dy = ', this.dy);
   },
 
+  /**
+   * `mouseover` event handler
+   *
+   * Update `this.dragState` of drop targets
+   */
   onMouseOver: function (e) {
     if (this.classList.contains('drop-target')) {
       switch (e.type) {
@@ -414,13 +538,20 @@ BehaviorsStore.DraggableBehavior = {
         break;
       }
     }
-    //console.log(this.is, e.type, this.dragState);
   },
 
+  /**
+   * return the default operational mode 'position' of drag handles
+   */
   getDragHandleMode: function (e) {
     return 'position';
   },
 
+  /**
+   * 'neon-animation-finish' event handler
+   *
+   * Handle dropping animations and fire `drag-and-drop` event
+   */
   _onDropAnimationFinish: function (e) {
     //console.log('_onDropAnimationFinish', e.detail);
     if (e.detail === 'dropping' || e.detail === 'releasing') {
