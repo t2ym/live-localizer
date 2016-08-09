@@ -10,10 +10,50 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="live-localizer-panel.html">
 
 <!--
-`live-localizer`
-Live Localizer widget for Polymer i18n-behavior
 
-@demo demo/index.html 
+## Live Localizer widget for Polymer i18n-behavior
+
+`<live-localizer>` element is a wrapper for live-localizer sub-components and handles opened status of the widget.
+
+```html
+<body>
+  ...
+  <live-localizer>
+    ... Live Localizer storage elements ...
+  </live-localizer>
+</body>
+```
+
+### Classes for the storage elements
+
+| Storage Type | Class |
+|:-------------|:------|
+| Cloud Storage        | class="storage cloud" |
+| Browser Storage      | class="storage browser" |
+| Local Device Storage | class="storage device" |
+
+### Example:
+```html
+<body>
+  ...
+  <live-localizer>
+    <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
+      auth-provider="google"
+      auth-domain="live-localizer-demo.firebaseapp.com"
+      database-url="https://live-localizer-demo.firebaseio.com"
+      api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+    </live-localizer-firebase-storage>
+  </live-localizer>
+</body>
+```
+
+### Notes:
+- The `<live-localizer>` element is a singleton element and should be attached as the last direct child of the `<body>` element of the top HTML.
+- `<live-localizer-local-file-storage>` and `<live-localizer-browser-storage>` are pre-attached and need no explicit attachments in the light DOM.
+
+@group I18nBehavior
+@element live-localizer
+@demo demo/index.html
 -->
 <dom-module id="live-localizer">
   <template>
@@ -21,17 +61,19 @@ Live Localizer widget for Polymer i18n-behavior
       :host {
         display: fixed;
 
+        /* Specify fonts to mask the styles of the target app */
         font-family: 'Roboto', 'Noto', sans-serif;
         line-height: normal;
 
+        --live-localizer-color: dimgrey;
+        --live-localizer-background-color: lightgrey;
+        --live-localizer-panel-background-color: whitesmoke;
+
         --live-localizer-dialog-content-div: {
-          background-color: whitesmoke;
-          color: dimgrey;
+          background-color: var(--live-localizer-panel-background-color);
+          color: var(--live-localizer-color);
           box-shadow: 1px 1px 1px rgba(0,0,0,0.4) inset;
         }
-
-        --live-localizer-background-color: lightgrey;
-        --live-localizer-color: dimgrey;
       }
     </style>
     <live-localizer-fab id="fab" on-tap="_fabTapped"></live-localizer-fab>
@@ -48,6 +90,9 @@ Live Localizer widget for Polymer i18n-behavior
       is: 'live-localizer',
 
       properties: {
+        /**
+         * Opened status of Live Localizer widget - `true` if opened
+         */
         opened: {
           type: Boolean,
           value: false,
@@ -55,6 +100,11 @@ Live Localizer widget for Polymer i18n-behavior
         }
       },
 
+      /**
+       * Attached callback
+       *
+       * Initialize `this.fab`, `this.dialog`, and `this.opened`
+       */
       attached: function () {
         if (!this.fab) {
           this.fab = this.$.fab;
@@ -67,6 +117,13 @@ Live Localizer widget for Polymer i18n-behavior
         }
       },
 
+      /**
+       * Observer of `this.opened` changes
+       *
+       * Open or close Live Localizer widget according to the new value of `this.opened`
+       *
+       * @param {boolean} opened new value
+       */
       _openedChanged: function (opened) {
         if (opened) {
           if (this.fab) {
@@ -87,14 +144,28 @@ Live Localizer widget for Polymer i18n-behavior
         }
       },
 
+      /**
+       * Tap event handler for `<live-localizer-fab>`
+       *
+       * Open Live Localizer widget
+       *
+       * @param {Object} e The tap event
+       */
       _fabTapped: function (e) {
         this.opened = true;
-        //console.log('fab tapped');
+        e.stopPropagation();
       },
 
+      /**
+       * `iron-overlay-closed` event handler for `<live-localizer-dialog>`
+       *
+       * Close Live Localizer widget
+       *
+       * @param {Object} e The `iron-overlay-closed` event
+       */
       _dialogClosed: function (e) {
         this.opened = false;
-        //console.log('dialog closed');
+        e.stopPropagation();
       }
     });
   </script>
