@@ -1,4 +1,3 @@
-[![Bower](https://img.shields.io/bower/v/live-localizer.svg)](https://customelements.io/t2ym/live-localizer/)
 # Live Localizer
 
 Live Localizer widget for Polymer [i18n-behavior](https://github.com/t2ym/i18n-behavior) (work in progress)
