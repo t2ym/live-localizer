@@ -63,6 +63,10 @@ Attach at the end of the main body element.
 <body>
   ...
   <live-localizer>
+    <!--
+      Firebase Cloud Storage configuration with the example parameters for Live Localizer demo app:
+      For each target app, a dedicated Firebase project has to be configured.
+    -->
     <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
       auth-provider="google"
       auth-domain="live-localizer-demo.firebaseapp.com"
