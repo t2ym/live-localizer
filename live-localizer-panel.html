@@ -17,6 +17,26 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="live-localizer-list-view.html">
 <link rel="import" href="live-localizer-storage-view.html">
 
+<!--
+
+## Live Localizer panel
+
+`<live-localizer-panel>` element is contained by `<live-localizer-dialog>` and 
+shows the toolbar and the selected view of the panel contents.
+
+The element also contains the model element `<live-localizer-model>`, which does not have a view.
+
+### Views:
+| view |
+|:-----|
+| `<live-localizer-locale-icon-view>` |
+| `<live-localizer-list-view>` |
+| `<live-localizer-storage-view>` |
+
+@group I18nBehavior
+@element live-localizer-panel
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-panel">
   <template>
     <style include="iron-flex"></style>
@@ -127,20 +147,41 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ],
 
       properties: {
+
+        /**
+         * name of the currently selected view
+         *
+         * View names:
+         *
+         * | name | view |
+         * |:-----|:-----|
+         * | iconview | `<live-localizer-locale-icon-view>` |
+         * | listview | `<live-localizer-list-view>` |
+         * | storageview | `<live-localizer-storage-view>` |
+         */
         panel: {
           type: String,
           value: 'iconview',
           observer: 'onPanelChanged'
         },
 
+        /**
+         * list of files bound to the model
+         */
         filelist: {
           type: Array
         },
 
+        /**
+         * list of stats items bound to the model
+         */
         listItems: {
           type: Array
         },
 
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
         model: {
           type: Object
         }
@@ -153,16 +194,31 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'locales.tap': 'onLocales'
       },
 
+      /**
+       * ready callback
+       *
+       * Initialize `this.model` with `this.$.model`
+       */
       ready: function () {
         this.model = this.$.model;
       },
 
+      /**
+       * attached callback
+       *
+       * Initialize `iron-resize` event handler
+       */
       attached: function () {
         if (this._parentResizable) {
           this._parentResizable.addEventListener('height-changed', this.onIronResize.bind(this));
         }
       },
 
+      /**
+       * observer of `this.panel` property
+       *
+       * Switch the view
+       */
       onPanelChanged: function (panel) {
         var viewSelectors = Polymer.dom(this.root).querySelectorAll('.view-selector');
         viewSelectors.forEach(function (viewSelector) {
@@ -181,26 +237,44 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return false;
       },
 
+      /**
+       * `tap` event handler of view selector buttons
+       *
+       * Update `this.panel`
+       */
       onSelectView: function (e) {
         var panel = Polymer.dom(e).localTarget;
         this.panel = panel.getAttribute('name');
       },
 
+      /**
+       * `tap` event handler of the locales button
+       */
       onLocales: function (e) {
         this.model.fetch();
       },
 
+      /**
+       * `tap` event handler of the load button
+       */
       onFileLoad: function (e) {
         this.model.storage['file-storage'].updateFiles();
         this.model.storage['file-storage'].selected = true;
         this.model.storage['file-storage'].load(e);
       },
 
+      /**
+       * `iron-resize` event handler
+       */
       onIronResize: function (e) {
         this.$.panelarea.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px';
-        //console.log('onIronResize ' + this.$.panelarea.style.height);
       },
 
+      /**
+       * `tap` event handler of badges on the locale icons
+       *
+       * Switch the locale and the panel to the list view
+       */
       onBadgeTap: function (e) {
         e.stopPropagation();
         this.model.html.lang = e.detail.locale;
