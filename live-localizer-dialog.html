@@ -13,6 +13,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../neon-animation/animations/scale-down-animation.html">
 <link rel="import" href="draggable-behavior.html">
 
+<!--
+
+## Draggable and resizable dialog for Live Localizer widget
+
+`<live-localizer-dialog>` element provides the Live Localizer content with a draggable and resizable dialog frame.
+
+```html
+  <live-localizer-dialog>
+    <live-localizer-panel><content></content></live-localizer-panel>
+  </live-localizer-dialog>
+```
+
+@group I18nBehavior
+@element live-localizer-dialog
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-dialog">
   <template>
     <style include="iron-flex"></style>
@@ -132,24 +148,43 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ],
 
       properties: {
+        /**
+         * Configurations for entry and exit animations
+         *
+         * Note: Initialized by `computeAnimationConfig()`
+         */
         animationConfig: {
           type: Object
         },
 
+        /**
+         * Origin element for entry and exit animations
+         *
+         * Note: Must be initialized as the live-localizer-fab element
+         */
         originElement: {
           type: Object
         },
-        
+
+        /**
+         * For IronOverlayBehaviorImpl
+         */
         noCancelOnEscKey: {
           type: Boolean,
           value: true
         },
 
+        /**
+         * For IronOverlayBehaviorImpl
+         */
         noCancelOnOutsideClick: {
           type: Boolean,
           value: true
         },
 
+        /**
+         * Title for the dialog
+         */
         dialogTitle: {
           type: String,
           value: 'Live Localizer'
@@ -169,10 +204,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'height-changed': '_adjustHeight'
       },
 
+      /**
+       * ready callback
+       *
+       * Initialize `this.resizable = true` for `DraggableBahavior`
+       */
       ready: function () {
         this.resizable = true;
       },
 
+      /**
+       * Initialize `this.animationConfig` to set the fab icon as the transformOrigin
+       */
       computeAnimationConfig: function () {
         var transformOrigin = '50% 50%';
         var originX, originY, originStyle, thisStyle;
@@ -185,10 +228,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             (originStyle.height === 'auto' ? 28 : Number(originStyle.height.replace(/px$/, '')) / 2);
           transformOrigin = ((100 * (originX - Number(thisStyle.left.replace(/px$/, ''))) / Number(thisStyle.width.replace(/px$/, '')))) + '% ' +
                             ((100 * (originY - Number(thisStyle.top.replace(/px$/, ''))) / Number(thisStyle.height.replace(/px$/, '')))) + '%';
-          //console.log(thisStyle.left, thisStyle.top, thisStyle.width, thisStyle.height);
-          //console.log(originStyle.left, originStyle.top, originStyle.width, originStyle.height);
         }
-        //console.log('transformOrigin = ' + transformOrigin);
         this.animationConfig = {
           'entry': [{
             name: 'scale-up-animation',
@@ -203,11 +243,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         };
       },
 
+      /**
+       * Observer of `fullscreen` status
+       *
+       * Set or reset `fullscreen` class for fullscreen and fullscreen-exit icons
+       */
       setFullscreen: function (fullscreen) {
         this.toggleClass('fullscreen', fullscreen, this.$.fullscreen);
         this.toggleClass('fullscreen', fullscreen, this.$['fullscreen-exit']);
       },
 
+      /**
+       * Initialize the size and the position at the center of the container app window
+       *
+       * Note:
+       * - Do nothing once the element is shown
+       */
       resetPosition: function () {
         if (!this.shown) {
           var fullWidth = window.innerWidth;
@@ -219,10 +270,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * Return the current drag-handle-mode as DraggableBehavior
+       *
+       * Override the method in DraggableBehavior
+       */
       getDragHandleMode: function (e) {
         return this._dragHandleMode;
       },
 
+      /**
+       * `mouseover` event handler
+       *
+       * Update this._dragHandleMode according to the `drag-handle-mode` attribute
+       */
       _onMouseover: function (e) {
         if (e.target.hasAttribute('drag-handle-mode')) {
           this._dragHandleMode = e.target.getAttribute('drag-handle-mode');
@@ -230,9 +291,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         else {
           this._dragHandleMode = 'none';
         }
-        //console.log('drag-handle-mode = ' + this._dragHandleMode);
       },
 
+      /**
+       * Play animation at open (Live Localizer is opened)
+       */
       _renderOpened: function() {
         this.cancelAnimation();
         this.computeAnimationConfig();
@@ -240,12 +303,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.shown = true;
       },
 
+      /**
+       * Play animation at close (Live Localizer is closed)
+       */
       _renderClosed: function() {
         this.cancelAnimation();
         this.computeAnimationConfig();
         this.playAnimation('exit');
       },
 
+      /**
+       * `neon-animation-finish` event handler
+       */
       _onNeonAnimationFinish: function() {
         if (this.opened) {
           this._finishRenderOpened();
@@ -254,18 +323,28 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `tap` event handler for the close button
+       */
       _onCloseButton: function (e) {
         this.close();
       },
 
+      /**
+       * `tap` event handler for the fullscreen/fullscreen-exit buttons
+       */
       _onFullscreenButton: function (e) {
         this.fullscreen = !this.fullscreen;
       },
 
+      /**
+       * 'height-changed' event handler for the dialog
+       *
+       * Adjust the height of the panel content
+       */
       _adjustHeight: function (e) {
         if (this.$.content) {
           this.$.content.style.height = (Number(getComputedStyle(this).height.replace(/px$/,'')) - 32) + 'px';
-          //console.log('_adjustHeight ' + this.$.content.style.height);
         }
       },
 
