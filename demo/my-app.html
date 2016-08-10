@@ -126,6 +126,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ],
 
       _routePageChanged: function(page) {
+        if (page === 'index.html') {
+          page = '';
+        }
         this.page = page || 'view1';
       },
 
