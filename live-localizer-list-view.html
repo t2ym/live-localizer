@@ -5,6 +5,16 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../vaadin-core-elements/vaadin-core-elements.html">
 
+<!--
+
+## live-localizer-list-view
+
+`<live-localizer-list-view>` element shows the list of statistics for the locales as a table
+
+@group I18nBehavior
+@element live-localizer-list-view
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-list-view">
   <template>
     <style>
@@ -46,11 +56,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       is: 'live-localizer-list-view',
 
       properties: {
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
         model: {
           type: Object,
           notify: true
         },
 
+        /**
+         * list of stats items bound to the `listItems` property of the `<live-localizer-model>` element
+         */
         listItems: {
           type: Array
         }
@@ -64,6 +80,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'list.selected-items-changed': 'onListSelection'
       },
 
+      /**
+       * observer of `this.model`
+       *
+       * Initialize `html-lang-mutation` and `list-item-added` event listeners for `this.model`
+       *
+       * @param {Object} model `<live-localizer-model>` object
+       */
       modelReady: function (model) {
         if (model && !this.isModelReady) {
           this.onListAddedBindThis = this.onListAdded.bind(this);
@@ -74,21 +97,40 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * detached callback
+       *
+       * Uninitialize `html-lang-mutation` and `list-item-added` event listeners for `this.model`
+       */
       detached: function () {
         this.model.removeEventListener('list-item-added', this.onListAddedBindThis);
         this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
       },
 
+      /**
+       * true if the locale is currently selected
+       *
+       * @param {String} locale The target locale
+       */
       isSelected: function (locale) {
         return this.model.isSelected(locale);
       },
 
+      /**
+       * Refresh the table
+       */
       refresh: function () {
         this.$.list.refreshItems();
       },
 
+      /**
+       * `html-lang-mutation` event handler for `this.model`
+       *
+       * Update the selection of the table according to the current locale of the app
+       *
+       * @param {Object} e `html-lang-mutation` event
+       */
       onHtmlLangMutation: function (e) {
-        //console.log('onHtmlLangMutation ', this.model.html.lang);
         var locale = this.model.getNormalizedLocale(this.model.html.lang);
         var selected = this.$.list.selection.selected();
         var selectedLocale = '';
@@ -107,6 +149,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         e.stopPropagation();
       },
 
+      /**
+       * set up the renderer for numbers in the table
+       *
+       * The numbers are shown in right-aligned and in comma-formatted.
+       */
       setUpNumberRenderer: function () {
         for (var i = 2; i <= 6; i++) {
           this.$.list.columns[i].renderer = function(cell) {
@@ -115,6 +162,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `selected-items-changed` event handler for the table
+       *
+       * Update the locale of the app according to the selected item in the table
+       */
       onListSelection: function (e) {
         var selected = this.$.list.selection.selected();
         if (selected.length > 0 &&
@@ -124,6 +176,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `list-item-added` event handler for `this.model`
+       *
+       * Update the selection status according to the current locale of the app
+       */
       onListAdded: function (e) {
         if (e.detail && e.detail.locale) {
           if (!this.isNumberRendererReady) {
