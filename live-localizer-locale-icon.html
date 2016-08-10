@@ -14,6 +14,24 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="../paper-fab/paper-fab.html">
 <link rel="import" href="draggable-behavior.html">
 
+<!--
+
+## live-localizer-locale-icon
+
+`<live-localizer-locale-icon>` element shows an iconized flag for the locale specified in `file.locale`.
+
+The element is used in `<live-localizer-locale-icon-view>` and `<live-localizer-storage-view>`.
+It is draggable and droppable in `<live-localizer-storage-view>`.
+
+It shows a badge and a tooltip if necessary.
+
+Note:
+- If the locale does not contain a country code, the flag icon is selected in a best-effort manner.
+
+@group I18nBehavior
+@element live-localizer-locale-icon
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-locale-icon">
   <template>
     <style>
@@ -217,6 +235,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       'zu': 'ZA'
     };
 
+    /**
+     * Convert locale to country code
+     *
+     * Note:
+     * - If the target locale does not contain a country code, the converted country code
+     *   should be suitable but may not be strictly accurate as a language cannot strictly
+     *   be mapped to a specific country.
+     *
+     * @param {string} locale locale to convert
+     * @return {string} converted country code
+     */
     function locale2country (locale) {
       var match = locale.match(/^(.*)-([A-Z][A-Z])$/);
       if (match) {
@@ -240,10 +269,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ],
 
       properties: {
+
+        /**
+         * File object
+         *
+         * `file.locale` - locale to show
+         * `file.tasks` - number of taskes to show in the badge; 0 to hide the badge
+         */
         file: {
           type: Object
         },
 
+        /**
+         * true if the icon is selected
+         *
+         * The icon is shown dimly by its opacity when it is not selected.
+         */
         selected: {
           type: Boolean,
           value: false,
@@ -251,12 +292,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           observer: 'selectedChanged'
         },
 
+        /**
+         * `follow-selected` attribute to follow the currently selected locale of the app
+         */
         followSelected: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
         },
 
+        /**
+         * List of tooltips for selected and unselected status, respectively
+         */
         tooltips: {
           type: Array,
           value: function () {
@@ -264,6 +311,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           }
         },
 
+        /**
+         * `<live-localizer-model>` object
+         */
         model: {
           type: Object,
           notify: true
@@ -276,10 +326,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'updateTasks(file.tasks)'
       ],
 
+      /**
+       * ready callback
+       *
+       * Initialize `this.onHtmlLangMutationBindThis`
+       */
       ready: function () {
         this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
       },
 
+      /**
+       * attached callback
+       *
+       * Initialize `html-lang-mutation` event listener for `this.model`
+       */
       attached: function () {
         if (this.model) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
@@ -287,6 +347,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * observer of `this.model`
+       *
+       * Initialize `html-lang-mutation` event listener for `this.model`
+       *
+       * @param {Object} model `<live-localizer-model>` object
+       */
       modelReady: function (model) {
         if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
@@ -297,6 +364,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * detached callback
+       *
+       * Uninitialize `html-lang-mutation` event listener for `this.model`
+       */
       detached: function () {
         if (this.model) {
           this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
@@ -304,6 +376,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `html-lang-mutation` event listener
+       *
+       * If `follow-selected`, replace the `file` object with the selected one
+       */
       onHtmlLangMutation: function (e) {
         if (this.followSelected) {
           var tmpFile = this.model.selectedFile();
@@ -317,17 +394,38 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return false;
       },
 
+      /**
+       * observer of `file` and `model`
+       *
+       * Update `selected` value according to `file` and `model`
+       *
+       * @param {Object} file File object
+       * @param {Object} model `<live-localizer-model>` object
+       */
       updateSelected: function (file, model) {
         this.selected = model.isSelected(file.locale);
       },
 
+      /**
+       * observer of `selected`
+       *
+       * Update classes for set dimness in unselected status
+       *
+       * @param {Boolean} value the new value for `selected`
+       */
       selectedChanged: function (value) {
         this.toggleClass('selected', this.selected, this.$.card);
         this.toggleClass('selected', this.selected, this.$.badge);
       },
 
+      /**
+       * observer of `file.tasks`
+       *
+       * Update the badge color and its visibility
+       *
+       * @param {Number} tasks `file.task`
+       */
       updateTasks: function (tasks) {
-        //console.log('updateTasks ' + this.file.locale, this.file.tasks);
         var badgeColor = '';
         if (tasks > 0) {
           badgeColor = 'orangered';
@@ -344,11 +442,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }, this);
       },
 
+      /**
+       * `tap` event handler for the badge
+       *
+       * Fire `badge-tap` event with the locale as a parameter
+       */
       onBadgeTap: function (e) {
         e.stopPropagation();
         this.fire('badge-tap', { locale: this.file.locale });
       },
 
+      /**
+       * get the flag image URL for the locale
+       *
+       * @param {string} locale the target locale
+       * @return {string} URL to the flag image from the `region-flags` package
+       */
       flag: function (locale) {
         var flag;
         if (locale) {
@@ -364,6 +473,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * get a tooltip message for the current selected status
+       *
+       * @param {Boolean} selected selected status
+       * @param {Array} tooltips `this.tooltips`
+       * @return {String} tooltip
+       */
       tooltip: function (selected, tooltips) {
         if (tooltips) {
           if (selected) {
@@ -378,6 +494,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * Return the current drag-handle-mode as DraggableBehavior
+       *
+       * The icon is draggable if it is selected and follow-selected
+       *
+       * Override the method in DraggableBehavior
+       */
       getDragHandleMode: function (e) {
         var mode;
         if (this.selected && this.followSelected) {
