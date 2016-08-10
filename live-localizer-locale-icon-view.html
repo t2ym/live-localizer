@@ -7,6 +7,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
 <link rel="import" href="live-localizer-locale-icon.html">
 
+<!--
+
+## live-localizer-locale-icon-view
+
+`<live-localizer-locale-icon-view>` element shows the list of `<live-localizer-locale-icon>` icons in the icon view.
+
+- The locale of the app can be switched by clicking an unselected icon.
+- XLIFF for the locale of the clicked selected icon can be downloaded as a local file.
+- XLIFF file can be loaded by dragging and dropping the file from the file manager of the platform OS.
+
+@group I18nBehavior
+@element live-localizer-locale-icon-view
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-locale-icon-view">
   <template>
     <style include="iron-flex"></style>
@@ -39,10 +53,16 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       is: 'live-localizer-locale-icon-view',
 
       properties: {
+        /**
+         * list of files bound to the `filelist` property of the `<live-localizer-model>` element
+         */
         filelist: {
           type: Array
         },
 
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
         model: {
           type: Object
         }
@@ -54,6 +74,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'droparea.mouseenter': 'onDropAreaMouseenter'
       },
 
+      /**
+       * `tap` event handler of the icons
+       *
+       * - Save the XLIFF file if it is selected
+       * - Switch the current locale if it is not selected
+       *
+       * Note:
+       * - Saving is performed via `save()` method of the registered `file-storage` in the model
+       *
+       * @param {Object} e `tap` event from the tapped icon
+       */
       onLocaleIconTap: function (e) {
         var icon = Polymer.dom(e).localTarget;
         var file = icon.file;
@@ -65,18 +96,31 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `dragover` event handler for the drop area
+       *
+       * Prevent the default action so that the dragged file can be dropped.
+       */
       onDragOver: function (e) {
-        //console.log('onDragOver');
         e.preventDefault();
       },
 
+      /**
+       * `drop` event handler for the drop area
+       *
+       * Load the dropped file via `load()` method of the registered `file-storage` in the model
+       */
       onDrop: function (e) {
-        console.log('onDrop');
         e.preventDefault();
         this.model.storage['file-storage'].selected = true;
         this.model.storage['file-storage'].load(e);
       },
 
+      /**
+       * `mouseenter` event handler for the drop area
+       *
+       * Show the tooltip for the drop area
+       */
       onDropAreaMouseenter: function (e) {
         this.$.droptooltip.show();
         setTimeout(function () {
@@ -84,6 +128,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }.bind(this), 3000);
       },
 
+      /**
+       * `badge-tap` event handler for `<live-localizer-locale-icon>` icons
+       *
+       * Stop propagation and fire `locale-badge-tap` event with the locale parameter
+       */
       onBadgeTap: function (e) {
         e.stopPropagation();
         this.fire('locale-badge-tap', { locale: e.detail.locale });
