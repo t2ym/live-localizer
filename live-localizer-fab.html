@@ -104,20 +104,50 @@ This draggable floating fab icon is shown at the bottom-left corner of the windo
        */
       attached: function () {
         this.resetPosition();
+        this.resetPositionBindThis = this.resetPosition.bind(this);
+        window.addEventListener('resize', this.resetPositionBindThis);
+      },
+
+      /**
+       * Detached callback
+       *
+       * Uninitialize `resize` event handler
+       */
+      detached: function () {
+        window.removeEventHandler('resize', this.resetPositionBindThis);
       },
 
       /**
        * Initialize the position at the bottom-left corner of the container app
        *
        * Note:
-       * - Do nothing once the element is shown
+       * - Do nothing once the element position is reset
        */
       resetPosition: function () {
-        if (!this.shown) {
-          var fullWidth = window.innerWidth;
-          var fullHeight = window.innerHeight;
-          this.x = 56;
-          this.y = fullHeight - 56 - 56;
+        var fullWidth = window.innerWidth;
+        var fullHeight = window.innerHeight;
+        var iconWidth = 56;
+        var iconHeight = 56
+        if (!this.reset) {
+          if (fullWidth > 0 && fullHeight > 0) {
+            this.x = iconWidth;
+            this.y = fullHeight - iconHeight - iconHeight;
+            this.reset = true;
+          }
+        }
+        else {
+          if (this.x < 0) {
+            this.x = 0;
+          }
+          else if (this.x > fullWidth - iconWidth) {
+            this.x = fullWidth - iconWidth;
+          }
+          if (this.y < 0) {
+            this.y = 0;
+          }
+          else if (this.y > fullHeight - iconHeight) {
+            this.y = fullHeight - iconHeight;
+          }
         }
       },
 
