@@ -17,6 +17,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="live-localizer-storage-icon.html">
 <link rel="import" href="draggable-behavior.html">
 
+<!--
+
+## live-localizer-local-file-storage
+
+`<live-localizer-local-file-storage>` element shows the storage icon and its controls for local file storage.
+The element handles save and load operations of XLIFF on local file storage.
+
+@group I18nBehavior
+@element live-localizer-local-file-storage
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-local-file-storage">
   <template>
     <style include="iron-flex"></style>
@@ -73,32 +84,54 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       is: 'live-localizer-local-file-storage',
 
       properties: {
+        /**
+         * name of icon for `<live-localizer-storage-icon>`
+         */
         icon: {
           type: String,
           value: 'folder'
         },
 
+        /**
+         * label of icon for `<live-localizer-storage-icon>`
+         */
         label: {
           type: String,
           value: 'Local File'
         },
 
+        /**
+         * true if selected
+         */
         selected: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
         },
 
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
         model: {
           type: Object
         },
 
+        /**
+         * list of files
+         *
+         * Note:
+         * - Only 1 file is stored in a normal usage.
+         * - Multiple files are stored when multiple files are dropped in the drop area.
+         */
         files: {
           type: Array,
           value: function () { return []; },
           notify: true
         },
 
+        /**
+         * true if XLIFF file name is prefixed with timestamp on saving
+         */
         prefix: {
           type: Boolean,
           value: false
@@ -117,26 +150,49 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'fileLoad.change': 'onFileChange'
       },
 
+      /**
+       * ready callback
+       *
+       * Initialize `storage` property for file-storage-icon
+       */
       ready: function () {
         this.$['file-storage-icon'].storage = this;
       },
 
+      /**
+       * `tap` event handler of the storage icon
+       *
+       * Load a file
+       */
       onTap: function (e) {
         this.load(e);
       },
 
+      /**
+       * `dragover` event handler for the drop area
+       *
+       * Prevent the default action to enable dropping of files
+       */
       onDragOver: function (e) {
-        //console.log('onDragOver');
         e.preventDefault();
       },
 
+      /**
+       * `drop` event handler for the drop area
+       *
+       * Load a file
+       */
       onDrop: function (e) {
-        console.log('onDrop');
         e.preventDefault();
         this.selected = false;
         this.load(e);
       },
 
+      /**
+       * `mouseenter` event handler for the drop area
+       *
+       * Show the tooptip for the drop area for 3 seconds
+       */
       onDropAreaMouseenter: function (e) {
         this.$.droptooltip.show();
         setTimeout(function () {
@@ -144,12 +200,19 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }.bind(this), 3000);
       },
 
+      /**
+       * trigger `click` event on the hidden input element for loading files
+       */
       loadFile: function () {
         this.$.fileLoad.click();
       },
 
+      /**
+       * `change` event handler for the hidden input element for loading files
+       *
+       * Update `files` property by the updated list of the files in the hidden input element
+       */
       onFileChange: function (e) {
-        console.log('onFileChange');
         e.preventDefault();
         this.updateFiles(this.selected, e.target.files);
         if (e.target.files.length === 0) {
@@ -158,6 +221,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.load(e);
       },
 
+      /**
+       * update `label` of the icon according to the `selected` status and the `files`
+       *
+       * 'Local File' is shown if unselected
+       */
       updateLabel: function () {
         if (this.selected && this.files && this.files.length > 0) {
           this.label = this.files[0].name;
@@ -167,6 +235,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * load XLIFF according to the triggering event
+       *
+       * Events and Operations:
+       * | event | origin | operation |
+       * |:------|:-------|:----------|
+       * | `change` | `<input type="file">` | load the file |
+       * | `drop` | `<div id="droparea">` | load the file if selected |
+       * | `tap` | `<live-localizer-storage-icon>` | open file selection dialog |
+       * | `tap` | upload icon on panel toolbar | open file selection dialog |
+       * | `drag-and-drop` | `<live-localizer-storage-view>` | load the file |
+       *
+       * @param {Event} event the triggering event
+       */
       load: function (event) {
         var files;
         var noload = false;
@@ -223,6 +305,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * update `this.files` and `this.selected`
+       *
+       * @param {Boolean} selected the new selected status
+       * @param {Array} files the files
+       * @param {Boolean} clear true if the hidden input files should be cleared
+       */
       updateFiles: function (selected, files, clear) {
         if (!files || clear) {
           this.$.fileLoad.value = '';
@@ -236,6 +325,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.selected = !!selected;
       },
 
+      /**
+       * process files
+       *
+       * @param {Array} files the target files
+       * @param {Boolean} noload true if no loading to the running app
+       * @param {Function} callback callback function called with `file`, `outputs`, `stats`
+       */
       processFiles: function (files, noload, callback) {
         var it = this;
         for (var i = 0; i < files.length; i++) {
@@ -282,8 +378,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * update statistics badge
+       *
+       * yellow badge if any translation units are to be discarded on loading
+       */
       updateStats: function () {
-        //console.log('updateStats');
         var badgeColorDiscarded = '';
         var stats = {};
         if (this.files && this.files.length > 0 && this.files[0].stats) {
@@ -297,6 +397,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.badgeColor = badgeColorDiscarded;
       },
 
+      /**
+       * save XLIFF as a local file
+       *
+       * Timestamp is prefixed to the local XLIFF file name if `this.prefix` is true
+       *
+       * Notes:
+       * - Only `file.locale` is used in the process
+       * - On Safari, the XLIFF content is opened in a blank tab as a plain/text file due to the Safari limitation
+       * - On Edge and IE, native API is used for saving the XLIFF file
+       *
+       * @param {Object} file the target file to save to a local file
+       */
       save: function (file) {
         var it = this;
         file.text = null;
