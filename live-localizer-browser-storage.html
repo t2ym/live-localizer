@@ -19,6 +19,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <link rel="import" href="draggable-behavior.html">
 <link rel="import" href="import-dexie.html">
 
+<!--
+
+## live-localizer-browser-storage
+
+`<live-localizer-browser-storage>` element shows the storage icon and its controls for the browser storage.
+The element handles save and load operations of XLIFF on the browser storage backed by IndexedDB.
+
+@group I18nBehavior
+@element live-localizer-browser-storage
+@demo demo/index.html
+-->
 <dom-module id="live-localizer-browser-storage">
   <template>
     <style include="iron-flex"></style>
@@ -74,49 +85,79 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       is: 'live-localizer-browser-storage',
 
       properties: {
+        /**
+         * name of icon for `<live-localizer-storage-icon>`
+         */
         icon: {
           type: String,
           value: 'device:storage'
         },
 
+        /**
+         * label of icon for `<live-localizer-storage-icon>`
+         */
         label: {
           type: String,
           value: 'Browser Storage'
         },
 
+        /**
+         * true if selected
+         *
+         * Note:
+         * - If a file is stored, it is selected.
+         */
         selected: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
         },
 
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
         model: {
           type: Object,
           notify: true
         },
 
+        /**
+         * the file object sync'ed with IndexedDB
+         */
         file: {
           type: Object,
           notify: true
         },
 
+        /**
+         * true if auto saving on loading XLIFF to the running app is enabled
+         */
         autoSave: {
           type: Boolean,
           value: true,
           notify: true
         },
 
+        /**
+         * true if auto loading on the page loading is enabled
+         */
         autoLoad: {
           type: Boolean,
           value: true,
           notify: true
         },
 
+        /**
+         * store status of auto loading to avoid multiple auto-loading
+         */
         autoLoadStatus: {
           type: Object,
           value: function () { return {}; }
         },
 
+        /**
+         * tooltip for the storage
+         */
         tooltip: {
           type: String
         }
@@ -131,6 +172,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'updateAutoLoadSetting(autoLoad)'
       ],
 
+      /**
+       * ready callback
+       */
       ready: function () {
         this.$['browser-storage-icon'].storage = this;
         this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
@@ -138,10 +182,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.onLoadXliffBindThis = this.onLoadXliff.bind(this);
       },
 
+      /**
+       * attached callback
+       */
       attached: function () {
         this.isAttached = true;
       },
 
+      /**
+       * observer of `this.model`
+       *
+       * Initialize event handlers and IndexedDB
+       */
       modelReady: function (model) {
         if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
@@ -157,6 +209,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * detached callback
+       */
       detached: function () {
         if (this.model) {
           this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
@@ -165,30 +220,45 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * observer of `autoSave`
+       *
+       * Update the `autoSave` setting in IndexedDB
+       */
       updateAutoSaveSetting: function (autoSave) {
         if (this.isAttached && this.isAutoSaveInitialized) {
           this.storage.settings.put({ name: 'autoSave', value: autoSave })
             .then(function () {
-              console.log('store autoSave = ' + autoSave);
+              //console.log('store autoSave = ' + autoSave);
             })
             .catch(function (error) {
-              console.log('error in autoSave = ' + autoSave, error);
+              //console.log('error in autoSave = ' + autoSave, error);
             });
         }
       },
 
+      /**
+       * observer of `autoLoad`
+       *
+       * Update the `autoLoad` setting in IndexedDB
+       */
       updateAutoLoadSetting: function (autoLoad) {
         if (this.isAttached && this.isAutoLoadInitialized) {
           this.storage.settings.put({ name: 'autoLoad', value: autoLoad })
             .then(function () {
-              console.log('store autoLoad = ' + autoLoad);
+              //console.log('store autoLoad = ' + autoLoad);
             })
             .catch(function (error) {
-              console.log('error in autoLoad = ' + autoLoad, error);
+              //console.log('error in autoLoad = ' + autoLoad, error);
             });
         }
       },
 
+      /**
+       * initialize `autoSave` and `autoLoad` settings in IndexedDB
+       *
+       * @return {Promise}
+       */
       initializeSettings: function () {
         var it = this;
         return new Promise(function (resolve, reject) {
@@ -217,13 +287,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                     { name: 'autoLoad', value: it.autoLoad }
                   ])
                   .then(function () {
-                    console.log('store autoSave = ' + it.autoSave);
+                    //console.log('store autoSave = ' + it.autoSave);
                     it.isAutoSaveInitialized = true;
                     it.isAutoLoadInitialized = true;
                     resolve();
                   })
                   .catch(function (error) {
-                    console.log('error in autoSave = ' + it.autoSave, error);
+                    //console.log('error in autoSave = ' + it.autoSave, error);
                     it.isAutoSaveInitialized = true;
                     it.isAutoLoadInitialized = true;
                     resolve();
@@ -233,6 +303,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
       },
 
+      /**
+       * `html-lang-mutation` event handler
+       *
+       * Load the file for the updated locale into `this.file`
+       */
       onHtmlLangMutation: function (e) {
         var file = this.model.selectedFile();
         var noload = true;
@@ -256,6 +331,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return false;
       },
 
+      /**
+       * `bundle-set-fetched` event handler
+       *
+       * Trigger checking on auto-loading
+       */
       onBundleSetFetched: function (e) {
         if (!this.autoLoadStatus.bundleSetFetched) {
           this.autoLoadStatus.bundleSetFetched = true;
@@ -263,19 +343,35 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * `load-xliff` event handler
+       *
+       * Auto-save the file if `autoSave` is enabled
+       */
       onLoadXliff: function (e) {
         var locale = e.detail.locale;
         if (this.autoSave) {
-          console.log('auto save', locale);
           this.save({ locale: locale });
         }
         return false;
       },
 
+      /**
+       * `tap` event handler of the icon
+       *
+       * Hand the event to `load()` but do nothing in `load()` for now.
+       */
       onTap: function (e) {
         this.load(e);
       },
 
+      /**
+       * observer of `file`
+       *
+       * Update label of the icon
+       *
+       * @param {Object} file
+       */
       updateLabel: function (file) {
         if (file) {
           this.label = file.name;
@@ -285,15 +381,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           this.label = 'Browser Storage';
           this.selected = false;
         }
-        //console.log('updateLabel ', this.label);
       },
 
+      /**
+       * observer of `file` and `autoLoad`
+       *
+       * Check `autoLoad` status and trigger loading of XLIFF
+       *
+       * @param {Object} file
+       * @param {Boolean} autoLoad 
+       */
       checkAutoLoad: function (file, autoLoad) {
         if (autoLoad && file && file.locale &&
             file.locale !== this.model.defaultLang && 
             this.autoLoadStatus.bundleSetFetched &&
             !this.autoLoadStatus[file.locale]) {
-          console.log('auto load', file.locale);
           this.tooltip = (this.autoSave ? 'Loaded and then Saved XLIFF for ' : 'Loaded XLIFF for ') + file.locale;
           this.autoLoadStatus[file.locale] = true;
           this.loadFile(file)
@@ -309,6 +411,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * load XLIFF according to the triggering event
+       *
+       * Events and Operations:
+       * | event | origin | operation |
+       * |:------|:-------|:----------|
+       * | `tap` | `<live-localizer-storage-icon>` | no operation |
+       * | `drag-and-drop` | `<live-localizer-storage-view>` | load the file |
+       *
+       * @param {Event} event the triggering event
+       */
       load: function (event) {
         var file;
         switch (event.type) {
@@ -335,9 +448,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
 
+      /**
+       * load the file
+       *
+       * @param {Object} file the target file
+       * @param {Boolean} noload true if no loading to the running app
+       * @param {Boolean} nofetch true if no fetching from IndexedDB
+       * @param {Promise} Promise to resolve to the file
+       */
       loadFile: function (file, noload, nofetch) {
         var it = this;
-        console.log('loadFile ', file ? file.locale : null, noload, nofetch);
+        //console.log('loadFile ', file ? file.locale : null, noload, nofetch);
         if (!file) {
           file = it.model.selectedFile();
         }
@@ -409,8 +530,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
       },
 
+      /**
+       * update the badge label and the color according to the file's statistics
+       */
       updateStats: function () {
-        //console.log('updateStats');
         var badgeColorDiscarded = '';
         var stats = {};
         if (this.file && this.file.stats) {
@@ -424,6 +547,15 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         this.badgeColor = badgeColorDiscarded;
       },
 
+      /**
+       * save XLIFF to IndexedDB
+       *
+       * Notes:
+       * - Only `file.locale` is used in the process
+       *
+       * @param {Object} file the target file to save to IndexedDB
+       * @return {Promise}
+       */
       save: function (file) {
         var it = this;
         file.text = null;
@@ -434,7 +566,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 .then(function (file) {
                   it.storage.files.put(file)
                     .then(function (f) {
-                      console.log('put done', f);
                       it.file = file;
                       if (!it.tooltip) {
                         it.tooltip = 'Saved XLIFF for ' + file.locale;
@@ -446,7 +577,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                       }, 3000);
                     })
                     .catch(function (e) {
-                      console.log('put error', e);
                       it.file = null;
                     });
                 });
