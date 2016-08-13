@@ -40,6 +40,7 @@ Sequential description of the animated screenshot above:
 - Download XLIFF from Cloud Storage (Firebase)
 - Show translation statistics in list view
 - Detect changes on Cloud Storage (Firebase) to trigger a new build
+- Detect changes and load Local XLIFF 
 
 ## Install
 
@@ -121,6 +122,28 @@ See `gulp fetch-xliff` and `gulp watch-xliff` tasks in `demo/gulpfile.js`
 
 - `firebase login:ci` token from `firebase-tools` is required for `gulp fetch-xliff` task
 - Service account credentials' JSON is required for `gulp watch-xliff` task
+
+## Local XLIFF Watcher (Optional)
+
+Local XLIFF changes can be watched via local HTTP server at http://localhost:8887/UPLOADED_XLIFF_FILE
+
+Check "Watch and Load XLIFF" in the local file storage control panel to start watching the local XLIFF file
+
+### HTTP Server for Local XLIFF Watcher Setup
+
+- Install [NodeJS](https://nodejs.org/) on the local host of the translator
+- Install the local HTTP server npm package
+```
+npm install -g http-server
+```
+- Set the XLIFF folder as the current directry
+```
+cd FOLDER_TO_CONTAIN_XLIFF
+```
+- Start local HTTP server at http://localhost:8887
+```
+http-server -a localhost -p 8887 --cors=If-Modified-Since
+```
 
 ## TODOs
 

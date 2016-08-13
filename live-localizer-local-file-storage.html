@@ -45,6 +45,9 @@ The element handles save and load operations of XLIFF on local file storage.
       .control-panel {
         padding: 12px;
       }
+      .control-panel-item {
+        margin-bottom: 4px;
+      }
       .hidden-anchor {
         display: none;
       }
@@ -69,10 +72,12 @@ The element handles save and load operations of XLIFF on local file storage.
         model="{{model}}"></live-localizer-storage-icon>
       <div class="control-panel layout vertical">
         <paper-checkbox class="control-panel-item" checked="{{prefix}}">Save with Timestamp</paper-checkbox>
+        <paper-checkbox class="control-panel-item" checked="{{watch}}">Watch and Load XLIFF</paper-checkbox>
         <div class="flex"></div>
       </div>
     </div>
     <paper-tooltip id="droptooltip" for="droparea" offset="-1" manual-mode>Drag and drop XLIFF to select</paper-tooltip>
+    <paper-tooltip id="tooltip" for="droparea" offset="-40" manual-mode>{{tooltip}}</paper-tooltip>
     <a id="anchor" class="hidden-anchor" target="_blank"></a>
     <input id="fileLoad" type="file" class="hidden-input">
   </template>
@@ -135,12 +140,45 @@ The element handles save and load operations of XLIFF on local file storage.
         prefix: {
           type: Boolean,
           value: false
+        },
+
+        /**
+         * true if local XLIFF file at http://localhost:{{watchPort}}/{{files.0.name}} has to be watched
+         */
+        watch: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * true if local XLIFF file at http://localhost:{{watchPort}}/{{files.0.name}} is being watched
+         */
+        watching: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * watch port number for localhost
+         */
+        watchPort: {
+          type: Number,
+          value: 8887
+        },
+
+        /**
+         * tooltip
+         */
+        tooltip: {
+          type: String,
+          value: ''
         }
       },
 
       observers: [
         'updateStats(files.splices)',
-        'updateLabel(selected,files.splices)'
+        'updateLabel(selected,files.splices)',
+        'updateWatcher(selected,watch,watchPort)'
       ],
 
       listeners: {
@@ -157,6 +195,7 @@ The element handles save and load operations of XLIFF on local file storage.
        */
       ready: function () {
         this.$['file-storage-icon'].storage = this;
+        this.watcherBindThis = this.watcher.bind(this);
       },
 
       /**
@@ -331,8 +370,9 @@ The element handles save and load operations of XLIFF on local file storage.
        * @param {Array} files the target files
        * @param {Boolean} noload true if no loading to the running app
        * @param {Function} callback callback function called with `file`, `outputs`, `stats`
+       * @param {Boolean} noclear true if files are not cleared after loading
        */
-      processFiles: function (files, noload, callback) {
+      processFiles: function (files, noload, callback, noclear) {
         var it = this;
         for (var i = 0; i < files.length; i++) {
           var f = files[i];
@@ -369,7 +409,7 @@ The element handles save and load operations of XLIFF on local file storage.
                   file.text = e.target.result;
                 }
               }
-              if (!noload) {
+              if (!noload && !noclear) {
                 it.updateFiles();
               }
             };
@@ -395,6 +435,120 @@ The element handles save and load operations of XLIFF on local file storage.
 
         this.badgeLabel = '' + (stats.discarded > 0 ? stats.discarded : '');
         this.badgeColor = badgeColorDiscarded;
+      },
+
+      /**
+       * observer of `selected`, `watch`, and `watchPort`
+       *
+       * update local file watcher
+       *
+       * @param {Boolean} selected
+       * @param {Boolean} watch
+       * @param {Number} watchPort
+       */
+      updateWatcher: function (selected, watch, watchPort)
+      {
+        console.log('updateWatcher ', selected, watch, watchPort, this.files[0] ? this.files[0].name : '');
+        if (selected && watch) {
+        }
+        else {
+          if (this.watching) {
+            if (this.xhr) {
+              this.xhr.removeEventListener('load', this.watcherBindThis);
+              this.xhr.removeEventListener('error', this.watcherBindThis);
+              this.lastModified = undefined;
+            }
+            if (typeof this.timeoutID === 'number') {
+              clearTimeout(this.timeoutID);
+              this.timeoutID = undefined;
+            }
+            this.xhr = undefined;
+            this.watching = false;
+          }
+        }
+        if (selected && watch) {
+          if (!this.xhr) {
+            this.xhr = new XMLHttpRequest();
+            this.xhr.addEventListener('load', this.watcherBindThis);
+            this.xhr.addEventListener('error', this.watcherBindThis);
+          }
+          this.lastModified = undefined;
+          this.watcher({ type: 'start' });
+          this.watching = true;
+        }
+      },
+
+      /**
+       * 'load' and 'error' event handler for this.xhr
+       *
+       * local file watcher via http://localhost:{{watchPort}}/{{files.0.name}}
+       *
+       * How to start the watcher in the translator's local host:
+       * ```
+       * npm install -g http-server # if not installed
+       * cd FOLDER_FOR_UPLOADED_XLIFF
+       * http-server -a localhost -p 8887 --cors=If-Modified-Since
+       * ```
+       *
+       * @param {Event} e XMLHttpRequest event
+       */
+      watcher: function (e) {
+        var timeout = 5000;
+        switch (e.type) {
+        case 'load':
+          if (this.xhr.responseText) {
+            if (this.lastModified) {
+              this.files[0].text = this.xhr.responseText;
+              this.tooltip = 'Detected Change in ' + this.url;
+            }
+            else {
+              this.tooltip = 'Watching ' + this.url;
+            }
+            /* Load the file */
+            this.processFiles(this.files, false, function (file, output, stats) {
+              file.stats = stats;
+              this.updateStats();
+            }.bind(this), true);
+            this.lastModified = this.xhr.getResponseHeader('Last-Modified');
+          }
+          else if (this.xhr.status === 404) {
+            this.tooltip = 'File Not Found for ' + this.url;
+          }
+          else {
+            this.tooltip = '';
+            timeout = 1000;
+          }
+          break;
+        case 'error':
+          this.tooltip = 'Error in watching ' + this.url +
+                        '  Be sure to launch HTTP server at http://localhost:' + this.watchPort +
+                        ' with the uploaded XLIFF in the HTTP root folder';
+          timeout = 10000;
+          break;
+        case 'start':
+          timeout = 0;
+          break;
+        default:
+          break;
+        }
+
+        if (this.tooltip) {
+          this.$.tooltip.show();
+          setTimeout(function () {
+            this.$.tooltip.hide();
+          }.bind(this), timeout);
+        }
+
+        this.timeoutID = setTimeout(function () {
+          this.url = 'http://localhost:' + this.watchPort + '/' + this.files[0].name;
+          this.xhr.open('GET', this.url);
+          if (this.lastModified) {
+            this.xhr.setRequestHeader('If-Modified-Since', this.lastModified);
+          }
+          this.xhr.send();
+        }.bind(this), timeout);
+
+        return false;
       },
 
       /**
