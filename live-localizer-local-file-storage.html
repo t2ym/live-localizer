@@ -494,20 +494,21 @@ The element handles save and load operations of XLIFF on local file storage.
        */
       watcher: function (e) {
         var timeout = 5000;
+        var blob;
         switch (e.type) {
         case 'load':
           if (this.xhr.responseText) {
             if (this.lastModified) {
-              this.files[0].text = this.xhr.responseText;
+              blob = new Blob([this.xhr.responseText], { type: 'application/x-xliff+xml' });
+              blob.name = this.files[0].name;
+              this.files[0] = blob;
               this.tooltip = 'Detected Change in ' + this.url;
             }
             else {
               this.tooltip = 'Watching ' + this.url;
             }
             /* Load the file */
-            var blob = new Blob([this.files[0].text], { type: 'application/x-xliff+xml' });
-            blob.name = this.files[0].name;
-            this.processFiles([ blob ], false, function (file, output, stats) {
+            this.processFiles(this.files, false, function (file, output, stats) {
               file.stats = stats;
               this.updateStats();
             }.bind(this), true);
