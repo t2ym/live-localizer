@@ -340,7 +340,7 @@ The element handles save and load operations of XLIFF on local file storage.
           var reader = new FileReader();
           reader.onload = (function(f) {
             return function(e) {
-              var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.]xlf$/);
+              var match = f.name.match(/.*[.]([a-zA-Z0-9-]*)[.](xlf|xliff)$/);
               var locale = '';
               if (match && match[1] !== it.model.defaultLang) {
                 locale = match[1];
