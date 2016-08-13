@@ -136,7 +136,7 @@ Check "Watch and Load XLIFF" in the local file storage control panel to start wa
 ```
 npm install -g http-server
 ```
-- Set the XLIFF folder as the current directry
+- Set the XLIFF folder as the current directory
 ```
 cd FOLDER_TO_CONTAIN_XLIFF
 ```
