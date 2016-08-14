@@ -142,7 +142,7 @@ cd FOLDER_TO_CONTAIN_XLIFF
 ```
 - Start local HTTP server at http://localhost:8887
 ```
-http-server -a localhost -p 8887 --cors=If-Modified-Since
+http-server -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
 ```
 
 ## TODOs

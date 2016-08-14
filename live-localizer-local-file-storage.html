@@ -487,7 +487,7 @@ The element handles save and load operations of XLIFF on local file storage.
        * ```
        * npm install -g http-server # if not installed
        * cd FOLDER_FOR_UPLOADED_XLIFF
-       * http-server -a localhost -p 8887 --cors=If-Modified-Since
+       * http-server -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
        * ```
        *
        * @param {Event} e XMLHttpRequest event
