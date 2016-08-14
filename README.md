@@ -132,7 +132,7 @@ Check "Watch and Load XLIFF" in the local file storage control panel to start wa
 ### HTTP Server for Local XLIFF Watcher Setup
 
 - Install [NodeJS](https://nodejs.org/) on the local host of the translator
-- Install the local HTTP server npm package
+- Install [the local HTTP server npm package](https://www.npmjs.com/package/http-server)
 ```
 npm install -g http-server
 ```
