@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xliff PUBLIC "-//XLIFF//DTD XLIFF//EN" "http://www.oasis-open.org/committees/xliff/documents/xliff.dtd">
 <xliff version="1.0">
-  <file xml:space="default" source-language="en" target-language="es" datatype="plaintext" original="messages" date="2016-07-11T11:14:05Z" product-name="messages">
+  <file xml:space="default" source-language="en" target-language="es" datatype="plaintext" original="messages" date="2016-08-14T08:58:49Z" product-name="messages">
     <header>
-      <tool tool-id="xliff-conv" tool-name="xliff-conv" tool-version="1.0.3"/>
+      <tool tool-id="xliff-conv" tool-name="xliff-conv" tool-version="1.0.7"/>
     </header>
     <body>
       <trans-unit id="my-app.app-drawer-layout_3:app-drawer:app-toolbar">
@@ -35,8 +35,8 @@
         <target state="needs-translation">es View One</target>
       </trans-unit>
       <trans-unit id="my-view1.div_1:p_2">
-        <source>Ut labores minimum atomorum pro. Laudem tibique ut has. </source>
-        <target state="new">es Ut labores minimum atomorum pro. Laudem tibique ut has. </target>
+        <source>Ut labores minimum atomorum pro. Laudem tibique ut has.</source>
+        <target state="needs-translation">Ut labores minimum atomorum pro. Laudem tibique ut has.</target>
       </trans-unit>
       <trans-unit id="my-view1.div_1:p_3">
         <source>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</source>
