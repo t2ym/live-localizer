@@ -389,18 +389,27 @@ The element handles save and load operations of XLIFF on local file storage.
                 console.log('processFiles: incorrect locale');
               }
               if (locale && it.model.masterBundles[locale] && it.model.masterBundles[locale].bundle) {
-                it.model.parseXliff(e.target.result, {
-                  bundle: noload 
+                try {
+                  it.model.parseXliff(e.target.result, {
+                    bundle: noload 
+                      ? deepcopy(it.model.masterBundles[locale])
+                      : it.model.masterBundles[locale]
+                  }, function (output, stats) {
+                    if (!noload) {
+                      it.model.updateLocale(locale);
+                    }
+                    if (callback) {
+                      callback(f, output, stats);
+                    }
+                  });
+                }
+                catch (e) {
+                  console.log(e);
+                  callback(f, noload
                     ? deepcopy(it.model.masterBundles[locale])
-                    : it.model.masterBundles[locale]
-                }, function (output, stats) {
-                  if (!noload) {
-                    it.model.updateLocale(locale);
-                  }
-                  if (callback) {
-                    callback(f, output, stats);
-                  }
-                });
+                    : it.model.masterBundles[locale],
+                    null);
+                }
               }
               var file;
               for (var i = 0; i < it.model.filelist.length; i++) {
@@ -426,14 +435,20 @@ The element handles save and load operations of XLIFF on local file storage.
       updateStats: function () {
         var badgeColorDiscarded = '';
         var stats = {};
-        if (this.files && this.files.length > 0 && this.files[0].stats) {
-          stats = this.files[0].stats.json.total;
-          if (stats.discarded > 0) {
-            badgeColorDiscarded = 'yellow';
+        if (this.files && this.files.length > 0) {
+          if (this.files[0].stats) {
+            stats = this.files[0].stats.json.total;
+            if (stats.discarded > 0) {
+              badgeColorDiscarded = 'yellow';
+            }
+            this.badgeLabel = '' + (stats.discarded > 0 ? stats.discarded : '');
+          }
+          else {
+            badgeColorDiscarded = 'orangered';
+            this.badgeLabel = 'Err';
           }
         }
 
-        this.badgeLabel = '' + (stats.discarded > 0 ? stats.discarded : '');
         this.badgeColor = badgeColorDiscarded;
       },
 
@@ -499,10 +514,16 @@ The element handles save and load operations of XLIFF on local file storage.
         case 'load':
           if (this.xhr.responseText) {
             if (this.lastModified) {
-              blob = new Blob([this.xhr.responseText], { type: 'application/x-xliff+xml' });
-              blob.name = this.files[0].name;
-              this.files[0] = blob;
-              this.tooltip = 'Detected Change in ' + this.url;
+              if (this.xhr.responseText.match(/<\/xliff>\s*$/g)) {
+                blob = new Blob([this.xhr.responseText], { type: 'application/x-xliff+xml' });
+                blob.name = this.files[0].name;
+                this.files[0] = blob;
+                this.tooltip = 'Detected Change in ' + this.url;                
+              }
+              else {
+                this.tooltip = 'Incomplete XLIFF found at ' + this.url;
+                break;
+              }
             }
             else {
               this.tooltip = 'Watching ' + this.url;
