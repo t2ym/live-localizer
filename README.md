@@ -136,18 +136,15 @@ Check "Watch and Load XLIFF" in the local file storage control panel to start wa
 ```
 npm install -g http-server
 ```
-- Set the XLIFF folder as the current directory
+- Start local HTTP server at http://localhost:8887 with the root folder containing the XLIFF file
 ```
-cd FOLDER_TO_CONTAIN_XLIFF
-```
-- Start local HTTP server at http://localhost:8887
-```
-http-server -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
+http-server FOLDER_TO_CONTAIN_XLIFF -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
 ```
 
 #### Notes:
 - The XLIFF folder should contain only the target XLIFF file(s) for the project for security.
 - The HTTP server is accessible only from the localhost and disallows directory listing.
+- If the XLIFF file name is prefixed with an unpredictable string, it can serve as a kind of "password" to block malicious access from other local HTTP clients.
 
 ## TODOs
 
