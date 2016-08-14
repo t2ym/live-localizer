@@ -145,7 +145,7 @@ cd FOLDER_TO_CONTAIN_XLIFF
 http-server -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
 ```
 
-Note:
+#### Notes:
 - The XLIFF folder should contain only the target XLIFF file(s) for the project for security.
 - The HTTP server is accessible only from the localhost and disallows directory listing.
 
