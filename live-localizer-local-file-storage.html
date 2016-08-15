@@ -564,7 +564,7 @@ The element handles save and load operations of XLIFF on local file storage.
         }
 
         this.timeoutID = setTimeout(function () {
-          this.url = 'http://localhost:' + this.watchPort + '/' + this.files[0].name;
+          this.url = window.location.protocol + '//localhost:' + this.watchPort + '/' + this.files[0].name;
           this.xhr.open('GET', this.url);
           if (this.lastModified) {
             this.xhr.setRequestHeader('If-Modified-Since', this.lastModified);
