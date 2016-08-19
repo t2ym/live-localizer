@@ -159,8 +159,9 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
           }
           this.async(function () {
             this.html.setAttribute('lang', locale);
+            this.fetch();
             var intervalID = setInterval(function () {
-              if (this.masterBundles[file.locale + ext]) {
+              if (file && file.locale && this.masterBundles[file.locale + ext]) {
                 if (Date.now() - this.masterBundles[file.locale + ext].bundle >= 1000) {
                   delete this.masterBundles[file.locale + ext];
                   clearInterval(intervalID);
