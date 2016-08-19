@@ -141,12 +141,37 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        * @param {string} locale the target locale to switch
        */
       updateLocale: function (locale) {
-        console.log('updateLocale ' + locale);
-        this.html.setAttribute('lang', '');
-        setTimeout(function () {
+        //console.log('updateLocale ' + locale);
+        var file = this.selectedFile();
+        var ext = '-x-transitional';
+        if ((!file && this.html.getAttribute('lang') !== locale) ||
+            (file && file.locale !== locale)) {
           this.html.setAttribute('lang', locale);
-          this.fetch();
-        }.bind(this), 1000);
+        }
+        else {
+          if (file && file.locale) {
+            this.masterBundles[file.locale + ext] = deepcopy(this.masterBundles[file.locale]);
+            this.masterBundles[file.locale + ext].bundle = Date.now();
+            this.html.setAttribute('lang', file.locale + ext);
+          }
+          else {
+            this.html.setAttribute('lang', this.defaultLang);
+          }
+          this.async(function () {
+            this.html.setAttribute('lang', locale);
+            var intervalID = setInterval(function () {
+              if (this.masterBundles[file.locale + ext]) {
+                if (Date.now() - this.masterBundles[file.locale + ext].bundle >= 1000) {
+                  delete this.masterBundles[file.locale + ext];
+                  clearInterval(intervalID);
+                }
+              }
+              else {
+                clearInterval(intervalID);
+              }
+            }.bind(this), 100);
+          }, 1);
+        }
       },
 
       /**
