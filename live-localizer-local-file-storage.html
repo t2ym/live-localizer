@@ -72,7 +72,7 @@ The element handles save and load operations of XLIFF on local file storage.
         model="{{model}}"></live-localizer-storage-icon>
       <div class="control-panel layout vertical">
         <paper-checkbox class="control-panel-item" checked="{{prefix}}">Save with Timestamp</paper-checkbox>
-        <paper-checkbox class="control-panel-item" checked="{{watch}}">Watch and Load XLIFF</paper-checkbox>
+        <paper-checkbox class="control-panel-item" checked="{{watcherEnabled}}">Watch and Load XLIFF</paper-checkbox>
         <div class="flex"></div>
       </div>
     </div>
@@ -145,7 +145,7 @@ The element handles save and load operations of XLIFF on local file storage.
         /**
          * true if local XLIFF file at http://localhost:{{watchPort}}/{{files.0.name}} has to be watched
          */
-        watch: {
+        watcherEnabled: {
           type: Boolean,
           value: false
         },
@@ -178,7 +178,7 @@ The element handles save and load operations of XLIFF on local file storage.
       observers: [
         'updateStats(files.splices)',
         'updateLabel(selected,files.splices)',
-        'updateWatcher(selected,watch,watchPort)'
+        'updateWatcher(selected,watcherEnabled,watchPort)'
       ],
 
       listeners: {
@@ -458,13 +458,13 @@ The element handles save and load operations of XLIFF on local file storage.
        * update local file watcher
        *
        * @param {Boolean} selected
-       * @param {Boolean} watch
+       * @param {Boolean} watcherEnabled
        * @param {Number} watchPort
        */
-      updateWatcher: function (selected, watch, watchPort)
+      updateWatcher: function (selected, watcherEnabled, watchPort)
       {
-        console.log('updateWatcher ', selected, watch, watchPort, this.files[0] ? this.files[0].name : '');
-        if (selected && watch) {
+        console.log('updateWatcher ', selected, watcherEnabled, watchPort, this.files[0] ? this.files[0].name : '');
+        if (selected && watcherEnabled) {
         }
         else {
           if (this.watching) {
@@ -481,7 +481,7 @@ The element handles save and load operations of XLIFF on local file storage.
             this.watching = false;
           }
         }
-        if (selected && watch) {
+        if (selected && watcherEnabled) {
           if (!this.xhr) {
             this.xhr = new XMLHttpRequest();
             this.xhr.addEventListener('load', this.watcherBindThis);
