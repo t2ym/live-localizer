@@ -1,9 +1,10 @@
 {
   "name": "live-localizer",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "authors": [
     "Tetsuya Mori <t2y3141592@gmail.com>"
   ],
+  "license": "BSD-2-Clause",
   "description": "Live Localizer widget for Polymer i18n-behavior",
   "main": "live-localizer.html",
   "keywords": [
