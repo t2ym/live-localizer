@@ -70,6 +70,9 @@ The element also contains the model element `<live-localizer-model>`, which does
         display: inline-flex;
         height: 31px;
       }
+      .toolbar-item.red {
+        color: orangered;
+      }
       .view-selector {
         border-style: solid;
         border-top-width: 1px;
@@ -111,6 +114,14 @@ The element also contains the model element `<live-localizer-model>`, which does
       div.toolbar-pad {
         width: 8px;
       }
+      paper-tooltip.updated-tooltip {
+        --paper-tooltip-background: yellow;
+        --paper-tooltip-opacity: 0.9;
+        --paper-tooltip-text-color: orangered;
+        --paper-tooltip: {
+          font-size: 16px;
+        }
+      }
     </style>
     <div id="toolbar" class="panel-toolbar layout horizontal">
       <div class="flex toolbar-item"></div>
@@ -124,8 +135,14 @@ The element also contains the model element `<live-localizer-model>`, which does
       <div class="toolbar-pad toolbar-item"></div>
       <paper-icon-button id="load" class="toolbar-item" icon="file-upload"></paper-icon-button>
       <paper-tooltip for="load" offset="0">Load XLIFF</paper-tooltip>
-      <paper-icon-button id="locales" class="toolbar-item" icon="language"></paper-icon-button>
-      <paper-tooltip for="locales" offset="0">Reload Locales</paper-tooltip>
+      <template is="dom-if" if="{{!serverUpdated}}">
+        <paper-icon-button id="locales" class="toolbar-item" icon="language" on-tap="onLocales"></paper-icon-button>
+        <paper-tooltip for="locales" offset="0" position="left">Check Updates on Locales</paper-tooltip>
+      </template>
+      <template is="dom-if" if="{{serverUpdated}}">
+        <paper-icon-button id="reload" class="toolbar-item red" icon="refresh" on-tap="onReload"></paper-icon-button>
+        <paper-tooltip for="reload" offset="0" position="left">Reload App</paper-tooltip>
+      </template>
       <div class="toolbar-pad toolbar-item"></div>
     </div>
     <div id="panelarea" class="panelarea">
@@ -135,7 +152,8 @@ The element also contains the model element `<live-localizer-model>`, which does
         <live-localizer-storage-view name="storageview" class="panel" id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"><content></content></live-localizer-storage-view>
       </iron-pages>
     </div>
-    <live-localizer-model id="model" filelist="{{filelist}}" list-items="{{listItems}}"></live-localizer-model>
+    <paper-tooltip id="updated" class="updated-tooltip" for="panelarea" offset="-40" manual-mode>App has been updated at server</paper-tooltip>
+    <live-localizer-model id="model" filelist="{{filelist}}" list-items="{{listItems}}" server-updated="{{serverUpdated}}"></live-localizer-model>
   </template>
   <script>
     Polymer({
@@ -180,6 +198,14 @@ The element also contains the model element `<live-localizer-model>`, which does
         },
 
         /**
+         * true if the server build has been updated
+         */
+        serverUpdated: {
+          type: Boolean,
+          observer: 'onServerUpdated'
+        },
+
+        /**
          * the model object bound to the `<live-localizer-model>` element
          */
         model: {
@@ -190,8 +216,7 @@ The element also contains the model element `<live-localizer-model>`, which does
 
       listeners: {
         'load.tap': 'onFileLoad',
-        'iron-resize': 'onIronResize',
-        'locales.tap': 'onLocales'
+        'iron-resize': 'onIronResize'
       },
 
       /**
@@ -255,6 +280,13 @@ The element also contains the model element `<live-localizer-model>`, which does
       },
 
       /**
+       * `tap` event handler of the reload button
+       */
+      onReload: function (e) {
+        this.model.reload();
+      },
+
+      /**
        * `tap` event handler of the load button
        */
       onFileLoad: function (e) {
@@ -279,6 +311,15 @@ The element also contains the model element `<live-localizer-model>`, which does
         e.stopPropagation();
         this.model.html.lang = e.detail.locale;
         this.$['listview-button'].click();
+      },
+
+      /**
+       * observer of `serverUpdated` which is bound to `model.serverUpdated`
+       */
+      onServerUpdated: function (serverUpdated) {
+        if (serverUpdated) {
+          this.$.updated.show();
+        }
       }
 
     });

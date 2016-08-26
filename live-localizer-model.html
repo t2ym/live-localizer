@@ -82,6 +82,15 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
          */
         bundleLocales: {
           type: Array
+        },
+
+        /**
+         * true if the server has been updated
+         */
+        serverUpdated: {
+          type: Boolean,
+          value: false,
+          notify: true
         }
       },
 
@@ -90,7 +99,8 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
       ],
 
       listeners: {
-        'default-bundle-fetched': 'onDefaultBundleFetched'
+        'default-bundle-fetched': 'onDefaultBundleFetched',
+        'bundle-set-fetched': 'onBundleSetFetched'
       },
 
       /**
@@ -106,6 +116,9 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        * start fetching bundle.json, followed by non-default bundle JSONs
        */
       fetch: function () {
+        if (this.lastModified) {
+          this.$.ajax.headers['If-Modified-Since'] = this.lastModified;
+        }
         this.$.ajax.generateRequest();
       },
 
@@ -183,8 +196,16 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        * @param {Object} event The `response` event
        */
       handleBundleResponse: function (event) {
-        this.defaultBundle = event.detail.response;
-        this.fire('default-bundle-fetched', { success: true });
+        if (this.lastModified) {
+          // bundle.json has been updated on the server
+          this.serverUpdated = true;
+        }
+        else {
+          // initialize defaultBundle only once
+          this.defaultBundle = event.detail.response;
+          this.lastModified = event.detail.xhr.getResponseHeader('Last-Modified');
+        }
+        this.fire('default-bundle-fetched', { success: !this.serverUpdated });
         return false;
       },
 
@@ -196,7 +217,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        * @param {Object} event The `error` event
        */
       handleBundleError: function (event) {
-        this.fire('default-bundle-fetched', { success: false });
+        this.fire('default-bundle-fetched', { success: false }); // including 304 Not Modified
         return false;
       },
 
@@ -208,13 +229,40 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        * @param {Object} event The `default-bundle-fetched` event
        */
       onDefaultBundleFetched: function (event) {
-        console.log('onDefaultBundleFetched', event.detail);
+        //console.log('onDefaultBundleFetched', event.detail);
         if (event.detail.success) {
           if (!this.fetchingFilelist) {
             this.fetchBundleSet();
           }
         }
+        else {
+          if (!this.serverUpdated) {
+            this.scheduleFetch();
+          }
+        }
         return false;
+      },
+
+      /**
+       * `bundle-set-fetched` event handler
+       */
+      onBundleSetFetched: function (event) {
+        this.scheduleFetch();
+      },
+
+      /**
+       * schedule `fetch()` after 60sec
+       */
+      scheduleFetch: function () {
+        if (!this.scheduled) {
+          this.scheduled = true;
+          setTimeout(function () {
+            this.scheduled = false;
+            if (!this.serverUpdated) {
+              this.fetch();
+            }
+          }.bind(this), 60000);
+        }
       },
 
       /**
@@ -487,6 +535,15 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
             break;
           }
         }, this);
+      },
+
+      /**
+       * Reload the app at `startUrl`
+       */
+      reload: function () {
+        window.sessionStorage.setItem('live-localizer-reload-url', window.location.href); // interpreted by live-localizer.attach()
+        window.history.pushState({}, '', this.startUrl);
+        window.location.reload(true);
       },
 
       /**

@@ -78,6 +78,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           box-shadow: 1px 1px 1px rgba(0,0,0,0.4) inset;
         }
       }
+      a.hidden {
+        display: node;
+      }
     </style>
     <live-localizer-fab id="fab" on-tap="_fabTapped"></live-localizer-fab>
     <live-localizer-dialog 
@@ -85,6 +88,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       on-iron-overlay-closed="_dialogClosed">
       <live-localizer-panel><content></content></live-localizer-panel>
     </live-localizer-dialog>
+    <a id="hiddenLink" class="hidden"></a>
   </template>
 
   <script>
@@ -118,6 +122,15 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           this.dialog = this.$.dialog;
           this.dialog.originElement = this.fab;
         }
+        var reloadUrl = window.sessionStorage.getItem('live-localizer-reload-url');
+        if (reloadUrl) {
+          this.opened = true;
+          setTimeout(function () {
+            this.$.hiddenLink.href = reloadUrl;
+            this.$.hiddenLink.click();
+          }.bind(this), 1);
+        }
+        window.sessionStorage.removeItem('live-localizer-reload-url');
       },
 
       /**
