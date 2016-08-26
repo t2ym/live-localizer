@@ -501,13 +501,18 @@ Security rules:
       /**
        * `load-xliff` event handler
        *
-       * Auto-save the file if `autoSave` is enabled
+       * Auto-save the file if `autoSave` is enabled and `e.detail.stats.json.total.valueUpdated` is non-zero
        */
       onLoadXliff: function (e) {
         var locale = e.detail.locale;
+        var stats = e.detail.stats;
         if (this.autoSave) {
-          console.log('auto save', locale);
-          this.save({ locale: locale });
+          if (stats &&
+              stats.json &&
+              stats.json.total &&
+              stats.json.total.valueUpdated) {
+            this.save({ locale: locale });
+          }
         }
         return false;
       },

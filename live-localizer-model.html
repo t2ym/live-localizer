@@ -141,7 +141,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
                 it.masterBundles[locale] && it.masterBundles[locale].bundle) {
               if (output === it.masterBundles[locale]) {
                 console.log('load-xliff', locale);
-                it.fire('load-xliff', { locale: locale });
+                it.fire('load-xliff', { locale: locale, stats: stats });
               }
             }
           }
