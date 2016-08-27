@@ -501,7 +501,7 @@ Security rules:
       /**
        * `load-xliff` event handler
        *
-       * Auto-save the file if `autoSave` is enabled and `e.detail.stats.json.total.valueUpdated` is non-zero
+       * Auto-save the file if `autoSave` is enabled and `e.detail.stats.json.total.valueUpdated` and/or `todoUpdated` is non-zero
        */
       onLoadXliff: function (e) {
         var locale = e.detail.locale;
@@ -510,7 +510,7 @@ Security rules:
           if (stats &&
               stats.json &&
               stats.json.total &&
-              stats.json.total.valueUpdated) {
+              (stats.json.total.valueUpdated || stats.json.total.todoUpdated)) {
             this.save({ locale: locale });
           }
         }
