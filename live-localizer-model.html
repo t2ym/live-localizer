@@ -155,7 +155,8 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
        */
       updateLocale: function (locale) {
         //console.log('updateLocale ' + locale);
-        var file = this.selectedFile();
+        var option = {};
+        var file = this.selectedFile(option);
         var ext = '-x-transitional';
         if ((!file && this.html.getAttribute('lang') !== locale) ||
             (file && file.locale !== locale)) {
@@ -172,7 +173,12 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
           }
           this.async(function () {
             this.html.setAttribute('lang', locale);
-            this.fetchBundleSet();
+            if (typeof option.index === 'number') {
+              this.splice('filelist', option.index, 1, { locale: file.locale });
+            }
+            else {
+              this.fetchBundleSet();
+            }
             var intervalID = setInterval(function () {
               if (file && file.locale && this.masterBundles[file.locale + ext]) {
                 if (Date.now() - this.masterBundles[file.locale + ext].bundle >= 1000) {
@@ -481,11 +487,13 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
       /**
        * get the currently selected file
        *
+       * @param {Object} option output option.index for index in filelist
        * @return {Object} the currently selected file
        */
-      selectedFile: function () {
+      selectedFile: function (option) {
         var lang;
         var fallbackLanguages = this._enumerateFallbackLanguages(this.html.lang);
+        option = option || {};
         if (this.bundleLocales && this.filelist) {
           for (var i = 0; !lang && i < fallbackLanguages.length; i++) {
             for (var j = 0; !lang && j < this.bundleLocales.length; j++) {
@@ -497,9 +505,11 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
           }
           for (var k = 0; k < this.filelist.length; k++) {
             if (this.filelist[k].locale === lang) {
+              option.index = k;
               return this.filelist[k];
             }
             else if (!lang && this.filelist[k].locale === this.defaultLang) {
+              option.index = k;
               return this.filelist[k];
             }
           }
