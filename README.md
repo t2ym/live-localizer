@@ -239,6 +239,42 @@ http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 - The HTTP server is accessible only from the localhost and disallows directory listing.
 - If the XLIFF file name is prefixed with an unpredictable string, it can serve as a kind of "password" to block malicious access from other local HTTP clients.
 
+## Build
+
+### Bundle dependent components with `polymer-build` bundler
+
+With lazy loader `live-localizer-lazy.html`, `live-localizer-main.html` and its dependencies are lazily loaded.
+The dependent components can be bundled with `polymer-build` bundler as follows.
+
+#### `polymer.json` with bundled `live-localizer` dependencies
+```javascript
+{
+  "entrypoint": "index.html",
+  "shell": "src/my-app.html",
+  "fragments": [
+    "src/my-view1.html",
+    "src/my-view2.html",
+    "src/my-view3.html",
+    "src/my-view404.html",
+    "bower_components/live-localizer/live-localizer-main.html"
+  ],
+  "sourceGlobs": [
+    "src/**/*",
+    "images/**/*",
+    "locales/*",
+    "xliff/*",
+    "bundle.json",
+    "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+    "bower_components/intl/**/*",
+    "bower_components/region-flags/**/*"
+  ]
+}
+```
+
 ## TODOs
 
 - Code cleanup/optimization/refactoring
