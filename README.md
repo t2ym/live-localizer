@@ -244,9 +244,9 @@ http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 ### Bundle dependent components with `polymer-build` bundler
 
 With lazy loader `live-localizer-lazy.html`, `live-localizer-main.html` and its dependencies are lazily loaded.
-The dependent components can be bundled with `polymer-build` bundler as follows.
+The dependent components except for region flag images can be bundled with `polymer-build` bundler as follows.
 
-#### `polymer.json` with bundled `live-localizer` dependencies
+#### `polymer.json` with bundled `live-localizer` dependencies: applied to [`polymer init i18n-starter-kit`](https://github.com/t2ym/generator-polymer-init-i18n-starter-kit)
 ```javascript
 {
   "entrypoint": "index.html",
