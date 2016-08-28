@@ -2,7 +2,7 @@
 
 Live Localizer widget for Polymer [i18n-behavior](https://github.com/t2ym/i18n-behavior) (work in progress)
 
-[API Docs](https://t2ym.github.io/live-localizer/components/live-localizer/) and [Live Demo](https://t2ym.github.io/live-localizer/components/live-localizer/demo/) on GitHub Pages (Chrome recommended for now)
+[API Docs](https://t2ym.github.io/live-localizer/components/live-localizer/#live-localizer-main) and [Live Demo](https://t2ym.github.io/live-localizer/components/live-localizer/demo/) on GitHub Pages (Chrome recommended for now)
 
 ## Live Localizer applied to [the Shop App](https://www.polymer-project.org/1.0/toolbox/case-study)
 
