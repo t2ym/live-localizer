@@ -50,8 +50,14 @@ Sequential description of the animated screenshot above:
 
 ## Import
 
+### Static Loading
 ```html
   <link rel="import" href="path/to/bower_components/live-localizer.html">
+```
+
+### Lazy Loading
+```html
+  <link rel="import" href="path/to/bower_components/live-localizer-lazy.html">
 ```
 
 ## Apply
