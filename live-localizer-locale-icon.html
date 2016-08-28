@@ -465,7 +465,15 @@ Note:
         }
         if (flag) {
           var url = document.createElement('a');
-          url.href = this.resolveUrl('../region-flags/png/' + flag + '.png');
+          var pngRelPath = '../region-flags/png/';
+          if (this.resolveUrl(pngRelPath) === pngRelPath) {
+            // Fix #41: avoid bug in polymer-build bundler with corrupted assetpath
+            var top = document.querySelector('live-localizer');
+            url.href = top.resolveUrl(pngRelPath + flag + '.png');
+          }
+          else {
+            url.href = this.resolveUrl(pngRelPath + flag + '.png');
+          }
           return ('/' + url.pathname).replace(/^\/\//, '/');
         }
         else {
