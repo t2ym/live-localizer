@@ -91,6 +91,15 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
           type: Boolean,
           value: false,
           notify: true
+        },
+
+        /**
+         * alert message to show
+         */
+        modelAlert: {
+          type: String,
+          value: '',
+          notify: true
         }
       },
 
@@ -134,6 +143,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
       parseXliff: function (xliff, options, callback) {
         var it = this;
         var xliffConv = new XliffConv();
+        this.checkXliffConvVersion(xliffConv);
         xliffConv.parseXliff(xliff, options, function (output, stats) {
           callback(output, stats);
           for (var locale in it.masterBundles) {
@@ -368,6 +378,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
         if (this.defaultLang) {
           var xliffConv = new XliffConv();
           var locale = file.locale;
+          this.checkXliffConvVersion(xliffConv);
           if (locale) {
             (function (destLanguage) {
               var bundles = { '': this.defaultBundle };
@@ -555,6 +566,44 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
         window.history.pushState({}, '', this.startUrl);
         window.location.reload(true);
       },
+
+      /**
+       * check XliffConv version
+       *
+       * @param {Object} xliffConv xliffConv.toolVersion contain semver with 'a.b.c' format
+       * @return {Boolean} true if the version is satisfied
+       */
+      checkXliffConvVersion: function (xliffConv) {
+        if (xliffConv && xliffConv.toolVersion) {
+          if ([ (xliffConv.toolVersion + '.0.0').split(/[.]/).splice(0, 3).join('.'),
+                  this.expectedXliffConvVersion
+            ].map(function (semver) {
+              var n = 0;
+              return semver.split(/[.]/).map(function (str) {
+                return Number(str);
+              }).reduce(function (curr, prev) {
+                return curr * 1000 + prev;
+              }, 0);
+            }).reduce(function (curr, prev) {
+              return curr >= prev;
+            })
+          ) {
+            this.modelAlert = '';
+          }
+          else {
+            this.modelAlert = 'Incompatible xliff-conv ' + xliffConv.toolVersion + ' (' + this.expectedXliffConvVersion + ' expected)';
+          }
+        }
+        else {
+          this.modelAlert = 'Incompatible xliff-conv with no version information';
+        }
+        return !this.modelAlert;
+      },
+
+      /**
+       * expected xliff-conv version
+       */
+      expectedXliffConvVersion: '1.0.9',
 
       /**
        * async map for Array

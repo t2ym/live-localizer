@@ -153,7 +153,8 @@ The element also contains the model element `<live-localizer-model>`, which does
       </iron-pages>
     </div>
     <paper-tooltip id="updated" class="updated-tooltip" for="panelarea" offset="-40" manual-mode>App has been updated at server</paper-tooltip>
-    <live-localizer-model id="model" filelist="{{filelist}}" list-items="{{listItems}}" server-updated="{{serverUpdated}}"></live-localizer-model>
+    <paper-tooltip id="alert" class="updated-tooltip" for="panelarea" offset="-40">{{modelAlert}}</paper-tooltip>
+    <live-localizer-model id="model" filelist="{{filelist}}" list-items="{{listItems}}" server-updated="{{serverUpdated}}" model-alert="{{modelAlert}}"></live-localizer-model>
   </template>
   <script>
     Polymer({
@@ -203,6 +204,14 @@ The element also contains the model element `<live-localizer-model>`, which does
         serverUpdated: {
           type: Boolean,
           observer: 'onServerUpdated'
+        },
+
+        /**
+         * alert message from model
+         */
+        modelAlert: {
+          type: String,
+          observer: 'onModelAlert'
         },
 
         /**
@@ -319,6 +328,18 @@ The element also contains the model element `<live-localizer-model>`, which does
       onServerUpdated: function (serverUpdated) {
         if (serverUpdated) {
           this.$.updated.show();
+        }
+      },
+
+      /**
+       * observer of `modelAlert` which is bound to `model.modelAlert`
+       */
+      onModelAlert: function (modelAlert) {
+        if (modelAlert) {
+          this.$.alert.show();
+        }
+        else {
+          this.$.alert.hide();
         }
       }
 
