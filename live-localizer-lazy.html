@@ -1,0 +1,45 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+
+## Lazy Loader for '<live-localier-main>'
+
+@group I18nBehavior
+@element live-localizer
+@demo demo/index.html
+-->
+<dom-module id="live-localizer">
+  <template>
+    <live-localizer-main id="main" hidden><content></content></live-localizer-main>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'live-localizer',
+
+      /**
+       * Attached callback
+       *
+       * Load live-localizer
+       */
+      attached: function () {
+        if (this.$.main.is === 'live-localizer-main') {
+          this.$.main.removeAttribute('hidden');
+        }
+        else {
+          this.importHref(this.resolveUrl('live-localizer-main.html'), function (e) {
+            this.$.main.removeAttribute('hidden');
+          }.bind(this), function (e) {
+            console.error('Failed to load ' + e.target.href, e);
+          }, true);
+        }
+      }
+
+    });
+  </script>
+</dom-module>
