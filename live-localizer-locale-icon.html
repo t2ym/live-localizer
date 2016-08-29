@@ -466,8 +466,11 @@ Note:
         if (flag) {
           var url = document.createElement('a');
           var pngRelPath = '../region-flags/png/';
-          if (this.resolveUrl(pngRelPath) === pngRelPath) {
-            // Fix #41: avoid bug in polymer-build bundler with corrupted assetpath
+          var resolvedPngRelPath = this.resolveUrl(pngRelPath);
+          url.href = resolvedPngRelPath;
+          if (resolvedPngRelPath === pngRelPath ||
+              url.pathname === pngRelPath.substring(2)) {
+            // Fix #41 and #44: avoid bug in polymer-build bundler with corrupted assetpath
             var top = document.querySelector('live-localizer');
             url.href = top.resolveUrl(pngRelPath + flag + '.png');
           }
