@@ -1,6 +1,6 @@
 {
   "name": "live-localizer",
-  "version": "0.0.59",
+  "version": "0.0.60",
   "description": "Live Localizer widget for Polymer i18n-behavior",
   "main": "live-localizer.html",
   "directories": {
@@ -49,7 +49,7 @@
     "run-sequence": "^1.2.2",
     "strip-bom": "^3.0.0",
     "through2": "^2.0.1",
-    "xliff-conv": "^1.0.9",
+    "xliff-conv": "^1.0.10",
     "xmldom": "^0.1.22"
   }
 }
