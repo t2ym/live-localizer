@@ -229,7 +229,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
        * Uninitialize `resize` event handler
        */
       detached: function () {
-        window.removeEventHandler('resize', this.resetPositionBindThis);
+        window.removeEventListener('resize', this.resetPositionBindThis);
       },
 
       /**

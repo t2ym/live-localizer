@@ -114,7 +114,7 @@ This draggable floating fab icon is shown at the bottom-left corner of the windo
        * Uninitialize `resize` event handler
        */
       detached: function () {
-        window.removeEventHandler('resize', this.resetPositionBindThis);
+        window.removeEventListener('resize', this.resetPositionBindThis);
       },
 
       /**
