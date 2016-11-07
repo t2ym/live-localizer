@@ -1,0 +1,67 @@
+{
+  "plugins": {
+    "local": {
+      "browsers": [
+        "chrome"
+      ]
+    },
+    "sauce": {
+      "disabled": true,
+      "browsers": [
+        {
+          "browserName":  "chrome",
+          "platform":     "Windows 10",
+          "version":      ""
+        },
+        {
+          "browserName":  "firefox",
+          "platform":     "Windows 10",
+          "version":      ""
+        },
+        {
+          "browserName":  "microsoftedge",
+          "platform":     "Windows 10",
+          "version":      "13"
+        },
+        {
+          "browserName":  "internet explorer",
+          "platform":     "Windows 8.1",
+          "version":      "11"
+        },
+        {
+          "browserName":  "safari",
+          "platform":     "OS X 10.11",
+          "version":      "9"
+        }
+      ]
+    },
+    "istanbul": {
+      "dir": "test/coverage-report",
+      "reporters": ["text-summary", "lcov"],
+      "include": [
+        "**/draggable-behavior.html",
+        "**/firebase-storage-icons.html",
+        "**/import-dexie.html",
+        "**/live-localizer-browser-storage.html",
+        "**/live-localizer-dialog.html",
+        "**/live-localizer-fab.html",
+        "**/live-localizer-firebase-storage.html",
+        "**/live-localizer-lazy.html",
+        "**/live-localizer-list-view.html",
+        "**/live-localizer-local-file-storage.html",
+        "**/live-localizer-locale-icon-view.html",
+        "**/live-localizer-locale-icon.html",
+        "**/live-localizer-main.html",
+        "**/live-localizer-model.html",
+        "**/live-localizer-panel.html",
+        "**/live-localizer-storage-icon.html",
+        "**/live-localizer-storage-view.html",
+        "**/live-localizer.html"
+      ],
+      "exclude": [
+        "/bower_components/**/*",
+        "/test/**/*"
+      ]
+    }
+  }
+}
