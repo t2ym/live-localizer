@@ -45,12 +45,13 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
-    "web-component-tester": "^4.0.0",
+    "web-component-tester": "4.2.2",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
     "app-layout": "polymerelements/app-layout#0.9.1",
     "app-route": "polymerelements/app-route#^0.9.1",
     "iron-localstorage": "polymerelements/iron-localstorage#^1.0.0",
     "iron-media-query": "polymerelements/iron-media-query#^1.0.0",
-    "iron-selector": "polymerelements/iron-selector#^1.0.0"
+    "iron-selector": "polymerelements/iron-selector#^1.0.0",
+    "iron-test-helpers": "^1.2.5"
   }
 }
