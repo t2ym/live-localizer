@@ -11,26 +11,23 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-
-    <link rel="import" href="../live-localizer.html">
   </head>
   <body>
-
-    <test-fixture id="basic">
-      <template>
-        <live-localizer></live-localizer>
-      </template>
-    </test-fixture>
-
     <script>
-      suite('live-localizer', function() {
-
-        test('instantiating the element works', function() {
-          var element = fixture('basic');
-          assert.equal(element.is, 'live-localizer');
-        });
-
+      var hasShadow = Boolean(Element.prototype.createShadowRoot);
+      var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
+      var suites = [];
+      [ 'Shadow', '' ].forEach(function (dom) {
+        [ 'src' ].forEach(function (phase) {
+          [
+            'basic'
+          ].forEach(function (type) {
+            suites.push(phase + '/' + type + '-test.html' + (dom ? '?dom=' + dom : ''));
+          });
+        });        
       });
+      // Load and run all tests (.html, .js):
+      WCT.loadSuites(suites);
     </script>
   </body>
 </html>

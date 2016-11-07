@@ -1,0 +1,172 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+
+<!doctype html>
+<html lang="en" preferred>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>Live Localizer Basic Test</title>
+
+  <meta name="theme-color" content="#fff">
+
+  <script src="../../../web-component-tester/browser.js"></script>
+  <script>
+
+    // setup Polymer options
+    window.Polymer = {lazyRegister: true, dom: 'shadow'};
+
+    // load webcomponents polyfills
+    (function() {
+      if ('registerElement' in document
+          && 'import' in document.createElement('link')
+          && 'content' in document.createElement('template')) {
+        // browser has web components
+      } else {
+        // polyfill web components
+        var e = document.createElement('script');
+        e.src = '../../../webcomponentsjs/webcomponents-lite.min.js';
+        document.head.appendChild(e);
+      }
+    })();
+
+  </script>
+
+  <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="my-app.html">
+
+  <style>
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      background-color: #eee;
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <my-app></my-app>
+
+  <template is="dom-if" id="basic">
+    <live-localizer>
+      <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
+        auth-provider="google"
+        auth-domain="live-localizer-demo.firebaseapp.com"
+        database-url="https://live-localizer-demo.firebaseio.com"
+        api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+      </live-localizer-firebase-storage>
+    </live-localizer>
+  </template>
+
+  <script>
+  suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function() {
+    var container;
+    var element;
+    var main;
+    var fab;
+    var dialog;
+    var panel;
+    var model;
+    var iconView;
+    var listView;
+    var storageView;
+
+    suiteSetup(function (done) {
+      container = document.querySelector('template#basic');
+      container.addEventListener('dom-change', function onDomChange (event) {
+        container.removeEventListener('dom-change', onDomChange);
+        element = document.querySelector('live-localizer');
+        element.addEventListener('bundle-set-fetched', function onBundleSetFetched (event) {
+          element.removeEventListener('bundle-set-fetched', onBundleSetFetched);
+          main = Polymer.dom(element.root).querySelector('live-localizer-main');
+          fab = Polymer.dom(main.root).querySelector('live-localizer-fab');
+          dialog = Polymer.dom(main.root).querySelector('live-localizer-dialog');
+          panel = Polymer.dom(main.root).querySelector('live-localizer-panel');
+          model = Polymer.dom(panel.root).querySelector('live-localizer-model');
+          iconView = Polymer.dom(panel.root).querySelector('live-localizer-locale-icon-view');
+          listView = Polymer.dom(panel.root).querySelector('live-localizer-list-view');
+          storageView = Polymer.dom(panel.root).querySelector('live-localizer-storage-view');
+          done();
+        });
+      });
+      container.if = true;
+    });
+
+    suite('dialog', function() {
+
+      test('instantiate', function() {
+        // element existence
+        assert.isOk(element, 'live-localizer exists');
+        assert.isOk(main, 'live-localizer-main exists');
+        assert.isOk(fab, 'live-localizer-fab exists');
+        assert.isOk(dialog, 'live-localizer-dialog exists');
+        assert.isOk(panel, 'live-localizer-panel exists');
+        assert.isOk(model, 'live-localizer-model exists');
+        assert.isOk(iconView, 'live-localizer-locale-icon-view exists');
+        assert.isOk(listView, 'live-localizer-list-view exists');
+        assert.isOk(storageView, 'live-localizer-storage-view exists');
+        // elements are instantiated
+        assert.equal(element.is, 'live-localizer');
+        assert.equal(main.is, 'live-localizer-main');
+        assert.equal(fab.is, 'live-localizer-fab');
+        assert.equal(dialog.is, 'live-localizer-dialog');
+        assert.equal(panel.is, 'live-localizer-panel');
+        assert.equal(model.is, 'live-localizer-model');
+        assert.equal(iconView.is, 'live-localizer-locale-icon-view');
+        assert.equal(listView.is, 'live-localizer-list-view');
+        assert.equal(storageView.is, 'live-localizer-storage-view');
+        // dialog status
+        assert.isNotOk(dialog.opened, 'dialog is not opened');
+        assert.isOk(fab.opened, 'fab is opened');
+      });
+
+      test('open dialog', function(done) {
+        dialog.addEventListener('neon-animation-finish', function onNeonAnimationFinish (event) {
+          if (Polymer.dom(event).rootTarget === dialog) {
+            dialog.removeEventListener('neon-animation-finish', onNeonAnimationFinish);
+            assert.isOk(dialog.opened, 'dialog is opened');
+            assert.isNotOk(fab.opened, 'fab is not opened');
+            done();
+          }
+        });
+        MockInteractions.tap(fab);
+      });
+
+      test('close dialog', function(done) {
+        fab.addEventListener('neon-animation-finish', function onNeonAnimationFinish (event) {
+          if (Polymer.dom(event).rootTarget === fab) {
+            fab.removeEventListener('neon-animation-finish', onNeonAnimationFinish);
+            assert.isNotOk(dialog.opened, 'dialog is not opened');
+            assert.isOk(fab.opened, 'fab is opened');
+            done();
+          }
+        });
+        MockInteractions.tap(dialog.$.close);
+      });
+    });
+
+    suiteTeardown(function () {
+      container.if = false;
+    });
+
+  });
+  </script>
+</body>
+</html>
