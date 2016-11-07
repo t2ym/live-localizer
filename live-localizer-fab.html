@@ -139,13 +139,13 @@ This draggable floating fab icon is shown at the bottom-left corner of the windo
           if (this.x < 0) {
             this.x = 0;
           }
-          else if (this.x > fullWidth - iconWidth) {
+          if (this.x > fullWidth - iconWidth) {
             this.x = fullWidth - iconWidth;
           }
           if (this.y < 0) {
             this.y = 0;
           }
-          else if (this.y > fullHeight - iconHeight) {
+          if (this.y > fullHeight - iconHeight) {
             this.y = fullHeight - iconHeight;
           }
         }
