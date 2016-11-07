@@ -295,7 +295,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           if (this.x < 0) {
             this.x = 0;
           }
-          else if (this.x > fullWidth - this.width) {
+          if (this.x > fullWidth - this.width) {
             if (fullWidth > this.width) {
               this.x = fullWidth - this.width;
             }
@@ -307,7 +307,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           if (this.y < 0) {
             this.y = 0;
           }
-          else if (this.y > fullHeight - this.height) {
+          if (this.y > fullHeight - this.height) {
             if (fullHeight > this.height) {
               this.y = fullHeight - this.height;
             }
