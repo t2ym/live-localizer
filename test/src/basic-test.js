@@ -66,10 +66,10 @@ class Suite {
         if (step.operation || step.checkpoint) {
           test(step.name, async function() {
             if (step.operation) {
-              await step.operation.bind(self).apply();
+              await step.operation.apply(self);
             }
             if (step.checkpoint) {
-              await step.checkpoint.bind(self).apply();
+              await step.checkpoint.apply(self);
             }
           });
         }
