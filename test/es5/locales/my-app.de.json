@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "todo": [
+      {
+        "op": "add",
+        "path": "/app-drawer-layout_3:app-drawer:app-toolbar",
+        "value": "Menu"
+      },
+      {
+        "op": "add",
+        "path": "/app-drawer-layout_3:app-drawer:iron-selector_1:a",
+        "value": "View One"
+      },
+      {
+        "op": "add",
+        "path": "/app-drawer-layout_3:app-drawer:iron-selector_1:a_1",
+        "value": "View Two"
+      },
+      {
+        "op": "add",
+        "path": "/app-drawer-layout_3:app-drawer:iron-selector_1:a_2",
+        "value": "View Three"
+      },
+      {
+        "op": "add",
+        "path": "/app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1",
+        "value": "My App"
+      }
+    ]
+  },
+  "model": {},
+  "app-drawer-layout_3:app-drawer:app-toolbar": "de Menu",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a": "de View One",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a_1": "de View Two",
+  "app-drawer-layout_3:app-drawer:iron-selector_1:a_2": "de View Three",
+  "app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1": "de My App"
+}

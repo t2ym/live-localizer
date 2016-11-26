@@ -17,6 +17,7 @@ var i18nLeverage = require('gulp-i18n-leverage');
 var XliffConv = require('xliff-conv');
 var i18nAddLocales = require('gulp-i18n-add-locales');
 var runSequence = require('run-sequence');
+var babel = require('gulp-babel');
 
 // Global object to store localizable attributes repository
 var attributesRepository = {};
@@ -403,6 +404,38 @@ gulp.task('i18n', () => {
     .pipe(exportXliff)
     .pipe(feedback)
     .pipe(debug({ title: title }));
+});
+
+gulp.task('es5', () => {
+  return gulp.src([ 'src/**/*' ], { base: 'src' })
+    .pipe(gulpif('*-test.js', babel({
+      "presets": [ /*'es2015'*/ ],
+      "plugins": [
+        //'transform-async-to-generator',
+        'check-es2015-constants',
+        'transform-es2015-arrow-functions',
+        'transform-es2015-block-scoped-functions',
+        'transform-es2015-block-scoping',
+        'transform-es2015-classes',
+        'transform-es2015-computed-properties',
+        'transform-es2015-destructuring',
+        'transform-es2015-duplicate-keys',
+        'transform-es2015-for-of',
+        'transform-es2015-function-name',
+        'transform-es2015-literals',
+        //'transform-es2015-modules-commonjs',
+        'transform-es2015-object-super',
+        'transform-es2015-parameters',
+        'transform-es2015-shorthand-properties',
+        'transform-es2015-spread',
+        'transform-es2015-sticky-regex',
+        'transform-es2015-template-literals',
+        'transform-es2015-typeof-symbol',
+        'transform-es2015-unicode-regex',
+        'transform-regenerator'
+      ]
+    })))
+    .pipe(gulp.dest('es5'));
 });
 
 gulp.task('default', (cb) => {
