@@ -45,6 +45,7 @@ class Suite {
     while (proto.constructor.name && proto.constructor.name !== 'Object') {
       steps.unshift({
         name: this.uncamel(proto.constructor.name),
+        iteration: proto.hasOwnProperty('iteration') ? proto.iteration : undefined,
         operation: proto.hasOwnProperty('operation') ? proto.operation : undefined,
         checkpoint: proto.hasOwnProperty('checkpoint') ? proto.checkpoint: undefined
       });
@@ -63,14 +64,30 @@ class Suite {
 
       for (let step of self.scenario()) {
         if (step.operation || step.checkpoint) {
-          test(step.name, async function() {
-            if (step.operation) {
-              await step.operation.apply(self);
-            }
-            if (step.checkpoint) {
-              await step.checkpoint.apply(self);
-            }
-          });
+          if (step.iteration) {
+            suite(step.name + ' iterations', async function () {
+              for (let parameters of step.iteration.apply(self)) {
+                test(parameters.name ? parameters.name(parameters) : step.name, async function() {
+                  if (step.operation) {
+                    await step.operation.call(self, parameters);
+                  }
+                  if (step.checkpoint) {
+                    await step.checkpoint.call(self, parameters);
+                  }
+                });
+              }
+            });
+          }
+          else {
+            test(step.name, async function() {
+              if (step.operation) {
+                await step.operation.call(self);
+              }
+              if (step.checkpoint) {
+                await step.checkpoint.call(self);
+              }
+            });
+          }
         }
       }
 
@@ -151,12 +168,58 @@ class OpenDialogTest extends InstantiateTest {
     });
   }
 }
-// TODO: handle parameters
-class DragFabTest extends InstantiateTest {
-  async operation() {
+class DragDialogTest extends OpenDialogTest {
+  * iteration() {
+    let dx = 10;
+    let dy = 10;
+    yield *[
+      { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } },
+      { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } },
+      { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } },
+      { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } },
+      { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } },
+      { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } },
+      { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } },
+      { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } },
+      { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } },
+      { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }
+    ].map((parameters) => { parameters.name = (p) => 'drag dialog by ' + p.mode + ' handle'; return parameters });
+  }
+  async operation(parameters) {
     let self = this;
-    self.dx = 10;
-    self.dy = 10;
+    let handle = self.dialog.$.handle.querySelector(parameters.mode.match(/^[.]/) ? parameters.mode : '[drag-handle-mode=' + parameters.mode + ']');
+    self.origin = {};
+    [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
+      self.origin[prop] = self.dialog[prop];
+    });
+    handle.dispatchEvent(new MouseEvent('mouseover', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 0,
+      clientY: 0,
+      buttons: 1
+    }));
+    await self.forEvent(self.dialog, 'track', () => { MockInteractions.track(self.dialog, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
+  }
+  async checkpoint(parameters) {
+    for (let prop in parameters.expected) {
+      assert.equal(
+        this.dialog[prop],
+        this.origin[prop] + parameters.expected[prop],
+        'dialog is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+    }
+  }
+}
+class DragFabTest extends InstantiateTest {
+  * iteration() {
+    let dx = 10;
+    let dy = 10;
+    yield *[
+      { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }
+    ];
+  }
+  async operation(parameters) {
+    let self = this;
     self.origin = {};
     [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
       self.origin[prop] = self.fab[prop];
@@ -168,16 +231,14 @@ class DragFabTest extends InstantiateTest {
       clientY: 0,
       buttons: 1
     }));
-    await self.forEvent(self.fab, 'track', () => { MockInteractions.track(self.fab, self.dx, self.dy); }, (element, type, event) => event.detail.state === 'end');
+    await self.forEvent(self.fab, 'track', () => { MockInteractions.track(self.fab, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
   }
-  async checkpoint() {
-    let self = this;
-    self.expected = { x: self.dx, y: self.dy, width: 0, height: 0 };
-    for (let prop in self.expected) {
+  async checkpoint(parameters) {
+    for (let prop in parameters.expected) {
       assert.equal(
-        self.fab[prop],
-        self.origin[prop] + self.expected[prop],
-        'fab is dragged with ' + 'position' + ' handle by ' + self.expected[prop] + ' in ' + prop);
+        this.fab[prop],
+        this.origin[prop] + parameters.expected[prop],
+        'fab is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
     }
   }
 }
@@ -190,6 +251,8 @@ if (match) {
     switch (name) {
     case 'OpenDialogTest':
       return OpenDialogTest;
+    case 'DragDialogTest':
+      return DragDialogTest;
     case 'DragFabTest':
       return DragFabTest;
     default:
@@ -200,7 +263,7 @@ if (match) {
 else {
   // Driver
   testSuites = window.testSuites || {};
-  testSuites.basic = [ OpenDialogTest, DragFabTest ];
+  testSuites.basic = [ DragDialogTest, DragFabTest ];
 }
 suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function() {
   if (match) {
