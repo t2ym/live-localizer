@@ -38,20 +38,19 @@ class Suite {
     array.push(item);
     return array;
   }
-  get scenario() {
+  * scenario() {
     // trick to unveil overridden methods
-    let self = this;
-    let result = [];
+    let steps = [];
     let proto = Object.getPrototypeOf(this);
     while (proto.constructor.name && proto.constructor.name !== 'Object') {
-      result.unshift({
-        name: self.uncamel(proto.constructor.name),
+      steps.unshift({
+        name: this.uncamel(proto.constructor.name),
         operation: proto.hasOwnProperty('operation') ? proto.operation : undefined,
         checkpoint: proto.hasOwnProperty('checkpoint') ? proto.checkpoint: undefined
       });
       proto = Object.getPrototypeOf(proto);
     }
-    return result;
+    yield * steps;
   }
   async teardown() {
   }
@@ -62,7 +61,7 @@ class Suite {
         return self.setup();
       });
 
-      self.scenario.forEach(function (step) {
+      for (let step of self.scenario()) {
         if (step.operation || step.checkpoint) {
           test(step.name, async function() {
             if (step.operation) {
@@ -73,7 +72,7 @@ class Suite {
             }
           });
         }
-      });
+      }
 
       suiteTeardown(function () {
         return self.teardown();
