@@ -117,7 +117,7 @@ var Suite = function () {
                                       }
 
                                       _context3.next = 3;
-                                      return regeneratorRuntime.awrap(step.operation.bind(self).apply());
+                                      return regeneratorRuntime.awrap(step.operation.apply(self));
 
                                     case 3:
                                       if (!step.checkpoint) {
@@ -126,7 +126,7 @@ var Suite = function () {
                                       }
 
                                       _context3.next = 6;
-                                      return regeneratorRuntime.awrap(step.checkpoint.bind(self).apply());
+                                      return regeneratorRuntime.awrap(step.checkpoint.apply(self));
 
                                     case 6:
                                     case 'end':

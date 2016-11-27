@@ -18,6 +18,7 @@ var XliffConv = require('xliff-conv');
 var i18nAddLocales = require('gulp-i18n-add-locales');
 var runSequence = require('run-sequence');
 var babel = require('gulp-babel');
+var replace = require('gulp-replace');
 
 // Global object to store localizable attributes repository
 var attributesRepository = {};
@@ -408,6 +409,9 @@ gulp.task('i18n', () => {
 
 gulp.task('es5', () => {
   return gulp.src([ 'src/**/*' ], { base: 'src' })
+    .pipe(gulpif('*-test.html',
+      replace('<!-- <script src="..\/..\/node_modules\/babel-polyfill\/browser.js"><\/script> -->',
+              '<script src="..\/..\/node_modules\/babel-polyfill\/browser.js"><\/script>', 'g')))
     .pipe(gulpif('*-test.js', babel({
       "presets": [ /*'es2015'*/ ],
       "plugins": [
