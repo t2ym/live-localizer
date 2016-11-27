@@ -73,14 +73,44 @@ var Suite = function () {
       return array;
     }
   }, {
-    key: 'teardown',
-    value: function teardown() {
-      return regeneratorRuntime.async(function teardown$(_context2) {
+    key: 'scenario',
+    value: regeneratorRuntime.mark(function scenario() {
+      var steps, proto;
+      return regeneratorRuntime.wrap(function scenario$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
+              // trick to unveil overridden methods
+              steps = [];
+              proto = Object.getPrototypeOf(this);
+
+              while (proto.constructor.name && proto.constructor.name !== 'Object') {
+                steps.unshift({
+                  name: this.uncamel(proto.constructor.name),
+                  iteration: proto.hasOwnProperty('iteration') ? proto.iteration : undefined,
+                  operation: proto.hasOwnProperty('operation') ? proto.operation : undefined,
+                  checkpoint: proto.hasOwnProperty('checkpoint') ? proto.checkpoint : undefined
+                });
+                proto = Object.getPrototypeOf(proto);
+              }
+              return _context2.delegateYield(steps, 't0', 4);
+
+            case 4:
             case 'end':
               return _context2.stop();
+          }
+        }
+      }, scenario, this);
+    })
+  }, {
+    key: 'teardown',
+    value: function teardown() {
+      return regeneratorRuntime.async(function teardown$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+            case 'end':
+              return _context3.stop();
           }
         }
       }, null, this);
@@ -89,90 +119,211 @@ var Suite = function () {
     key: 'run',
     value: function run() {
       var self;
-      return regeneratorRuntime.async(function run$(_context5) {
+      return regeneratorRuntime.async(function run$(_context8) {
         while (1) {
-          switch (_context5.prev = _context5.next) {
+          switch (_context8.prev = _context8.next) {
             case 0:
               self = this;
 
-              suite(self.uncamel(self.constructor.name), function _callee2() {
-                return regeneratorRuntime.async(function _callee2$(_context4) {
+              suite(self.uncamel(self.constructor.name), function _callee4() {
+                var _loop, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, step;
+
+                return regeneratorRuntime.async(function _callee4$(_context7) {
                   while (1) {
-                    switch (_context4.prev = _context4.next) {
+                    switch (_context7.prev = _context7.next) {
                       case 0:
                         suiteSetup(function () {
                           return self.setup();
                         });
 
-                        self.scenario.forEach(function (step) {
+                        _loop = function _loop(step) {
                           if (step.operation || step.checkpoint) {
-                            test(step.name, function _callee() {
-                              return regeneratorRuntime.async(function _callee$(_context3) {
-                                while (1) {
-                                  switch (_context3.prev = _context3.next) {
-                                    case 0:
-                                      if (!step.operation) {
-                                        _context3.next = 3;
+                            if (step.iteration) {
+                              suite(step.name + ' iterations', function _callee2() {
+                                var _loop2, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, parameters;
+
+                                return regeneratorRuntime.async(function _callee2$(_context5) {
+                                  while (1) {
+                                    switch (_context5.prev = _context5.next) {
+                                      case 0:
+                                        _loop2 = function _loop2(parameters) {
+                                          test(parameters.name ? parameters.name(parameters) : step.name, function _callee() {
+                                            return regeneratorRuntime.async(function _callee$(_context4) {
+                                              while (1) {
+                                                switch (_context4.prev = _context4.next) {
+                                                  case 0:
+                                                    if (!step.operation) {
+                                                      _context4.next = 3;
+                                                      break;
+                                                    }
+
+                                                    _context4.next = 3;
+                                                    return regeneratorRuntime.awrap(step.operation.call(self, parameters));
+
+                                                  case 3:
+                                                    if (!step.checkpoint) {
+                                                      _context4.next = 6;
+                                                      break;
+                                                    }
+
+                                                    _context4.next = 6;
+                                                    return regeneratorRuntime.awrap(step.checkpoint.call(self, parameters));
+
+                                                  case 6:
+                                                  case 'end':
+                                                    return _context4.stop();
+                                                }
+                                              }
+                                            }, null, this);
+                                          });
+                                        };
+
+                                        _iteratorNormalCompletion2 = true;
+                                        _didIteratorError2 = false;
+                                        _iteratorError2 = undefined;
+                                        _context5.prev = 4;
+
+                                        for (_iterator2 = step.iteration.apply(self)[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                          parameters = _step2.value;
+
+                                          _loop2(parameters);
+                                        }
+                                        _context5.next = 12;
                                         break;
-                                      }
 
-                                      _context3.next = 3;
-                                      return regeneratorRuntime.awrap(step.operation.apply(self));
+                                      case 8:
+                                        _context5.prev = 8;
+                                        _context5.t0 = _context5['catch'](4);
+                                        _didIteratorError2 = true;
+                                        _iteratorError2 = _context5.t0;
 
-                                    case 3:
-                                      if (!step.checkpoint) {
-                                        _context3.next = 6;
-                                        break;
-                                      }
+                                      case 12:
+                                        _context5.prev = 12;
+                                        _context5.prev = 13;
 
-                                      _context3.next = 6;
-                                      return regeneratorRuntime.awrap(step.checkpoint.apply(self));
+                                        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                          _iterator2.return();
+                                        }
 
-                                    case 6:
-                                    case 'end':
-                                      return _context3.stop();
+                                      case 15:
+                                        _context5.prev = 15;
+
+                                        if (!_didIteratorError2) {
+                                          _context5.next = 18;
+                                          break;
+                                        }
+
+                                        throw _iteratorError2;
+
+                                      case 18:
+                                        return _context5.finish(15);
+
+                                      case 19:
+                                        return _context5.finish(12);
+
+                                      case 20:
+                                      case 'end':
+                                        return _context5.stop();
+                                    }
                                   }
-                                }
-                              }, null, this);
-                            });
-                          }
-                        });
+                                }, null, this, [[4, 8, 12, 20], [13,, 15, 19]]);
+                              });
+                            } else {
+                              test(step.name, function _callee3() {
+                                return regeneratorRuntime.async(function _callee3$(_context6) {
+                                  while (1) {
+                                    switch (_context6.prev = _context6.next) {
+                                      case 0:
+                                        if (!step.operation) {
+                                          _context6.next = 3;
+                                          break;
+                                        }
 
+                                        _context6.next = 3;
+                                        return regeneratorRuntime.awrap(step.operation.call(self));
+
+                                      case 3:
+                                        if (!step.checkpoint) {
+                                          _context6.next = 6;
+                                          break;
+                                        }
+
+                                        _context6.next = 6;
+                                        return regeneratorRuntime.awrap(step.checkpoint.call(self));
+
+                                      case 6:
+                                      case 'end':
+                                        return _context6.stop();
+                                    }
+                                  }
+                                }, null, this);
+                              });
+                            }
+                          }
+                        };
+
+                        _iteratorNormalCompletion = true;
+                        _didIteratorError = false;
+                        _iteratorError = undefined;
+                        _context7.prev = 5;
+                        for (_iterator = self.scenario()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                          step = _step.value;
+
+                          _loop(step);
+                        }
+
+                        _context7.next = 13;
+                        break;
+
+                      case 9:
+                        _context7.prev = 9;
+                        _context7.t0 = _context7['catch'](5);
+                        _didIteratorError = true;
+                        _iteratorError = _context7.t0;
+
+                      case 13:
+                        _context7.prev = 13;
+                        _context7.prev = 14;
+
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                          _iterator.return();
+                        }
+
+                      case 16:
+                        _context7.prev = 16;
+
+                        if (!_didIteratorError) {
+                          _context7.next = 19;
+                          break;
+                        }
+
+                        throw _iteratorError;
+
+                      case 19:
+                        return _context7.finish(16);
+
+                      case 20:
+                        return _context7.finish(13);
+
+                      case 21:
                         suiteTeardown(function () {
                           return self.teardown();
                         });
 
-                      case 3:
+                      case 22:
                       case 'end':
-                        return _context4.stop();
+                        return _context7.stop();
                     }
                   }
-                }, null, this);
+                }, null, this, [[5, 9, 13, 21], [14,, 16, 20]]);
               });
 
             case 2:
             case 'end':
-              return _context5.stop();
+              return _context8.stop();
           }
         }
       }, null, this);
-    }
-  }, {
-    key: 'scenario',
-    get: function get() {
-      // trick to unveil overridden methods
-      var self = this;
-      var result = [];
-      var proto = Object.getPrototypeOf(this);
-      while (proto.constructor.name && proto.constructor.name !== 'Object') {
-        result.unshift({
-          name: self.uncamel(proto.constructor.name),
-          operation: proto.hasOwnProperty('operation') ? proto.operation : undefined,
-          checkpoint: proto.hasOwnProperty('checkpoint') ? proto.checkpoint : undefined
-        });
-        proto = Object.getPrototypeOf(proto);
-      }
-      return result;
     }
   }]);
 
@@ -193,11 +344,11 @@ var LiveLocalizerSuite = function (_Suite) {
 
     // TODO: Can setup be converted to operation?
     value: function setup() {
-      return regeneratorRuntime.async(function setup$(_context6) {
+      return regeneratorRuntime.async(function setup$(_context9) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context9.prev = _context9.next) {
             case 0:
-              _context6.next = 2;
+              _context9.next = 2;
               return regeneratorRuntime.awrap(_get(LiveLocalizerSuite.prototype.__proto__ || Object.getPrototypeOf(LiveLocalizerSuite.prototype), 'setup', this).call(this));
 
             case 2:
@@ -205,7 +356,7 @@ var LiveLocalizerSuite = function (_Suite) {
 
             case 3:
             case 'end':
-              return _context6.stop();
+              return _context9.stop();
           }
         }
       }, null, this);
@@ -214,23 +365,23 @@ var LiveLocalizerSuite = function (_Suite) {
     key: 'teardown',
     value: function teardown() {
       var self;
-      return regeneratorRuntime.async(function teardown$(_context7) {
+      return regeneratorRuntime.async(function teardown$(_context10) {
         while (1) {
-          switch (_context7.prev = _context7.next) {
+          switch (_context10.prev = _context10.next) {
             case 0:
               self = this;
-              _context7.next = 3;
+              _context10.next = 3;
               return regeneratorRuntime.awrap(_get(LiveLocalizerSuite.prototype.__proto__ || Object.getPrototypeOf(LiveLocalizerSuite.prototype), 'teardown', this).call(this));
 
             case 3:
-              _context7.next = 5;
+              _context10.next = 5;
               return regeneratorRuntime.awrap(self.forEvent(self.container, 'dom-change', function () {
                 self.container.if = false;
               }, true));
 
             case 5:
             case 'end':
-              return _context7.stop();
+              return _context10.stop();
           }
         }
       }, null, this);
@@ -258,19 +409,19 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
     key: 'operation',
     value: function operation() {
       var self;
-      return regeneratorRuntime.async(function operation$(_context8) {
+      return regeneratorRuntime.async(function operation$(_context11) {
         while (1) {
-          switch (_context8.prev = _context8.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
               self = this;
-              _context8.next = 3;
+              _context11.next = 3;
               return regeneratorRuntime.awrap(self.forEvent(self.container, 'dom-change', function () {
                 self.container.if = true;
               }, true));
 
             case 3:
               self.element = document.querySelector('live-localizer');
-              _context8.next = 6;
+              _context11.next = 6;
               return regeneratorRuntime.awrap(self.forEvent(self.element, 'bundle-set-fetched'));
 
             case 6:
@@ -285,7 +436,7 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
 
             case 14:
             case 'end':
-              return _context8.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -294,9 +445,9 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
     key: 'checkpoint',
     value: function checkpoint() {
       var self;
-      return regeneratorRuntime.async(function checkpoint$(_context9) {
+      return regeneratorRuntime.async(function checkpoint$(_context12) {
         while (1) {
-          switch (_context9.prev = _context9.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               self = this;
               // element existence
@@ -326,7 +477,7 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
 
             case 21:
             case 'end':
-              return _context9.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -349,19 +500,19 @@ var OpenDialogTest = function (_InstantiateTest) {
     key: 'operation',
     value: function operation() {
       var self;
-      return regeneratorRuntime.async(function operation$(_context10) {
+      return regeneratorRuntime.async(function operation$(_context13) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               self = this;
-              _context10.next = 3;
+              _context13.next = 3;
               return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'neon-animation-finish', function () {
                 MockInteractions.tap(self.fab);
               }, true));
 
             case 3:
             case 'end':
-              return _context10.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -370,9 +521,9 @@ var OpenDialogTest = function (_InstantiateTest) {
     key: 'checkpoint',
     value: function checkpoint() {
       var self;
-      return regeneratorRuntime.async(function checkpoint$(_context11) {
+      return regeneratorRuntime.async(function checkpoint$(_context14) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               self = this;
 
@@ -386,7 +537,7 @@ var OpenDialogTest = function (_InstantiateTest) {
 
             case 5:
             case 'end':
-              return _context11.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -395,8 +546,98 @@ var OpenDialogTest = function (_InstantiateTest) {
 
   return OpenDialogTest;
 }(InstantiateTest);
-// TODO: handle parameters
 
+var DragDialogTest = function (_OpenDialogTest) {
+  _inherits(DragDialogTest, _OpenDialogTest);
+
+  function DragDialogTest() {
+    _classCallCheck(this, DragDialogTest);
+
+    return _possibleConstructorReturn(this, (DragDialogTest.__proto__ || Object.getPrototypeOf(DragDialogTest)).apply(this, arguments));
+  }
+
+  _createClass(DragDialogTest, [{
+    key: 'iteration',
+    value: regeneratorRuntime.mark(function iteration() {
+      var dx, dy;
+      return regeneratorRuntime.wrap(function iteration$(_context15) {
+        while (1) {
+          switch (_context15.prev = _context15.next) {
+            case 0:
+              dx = 10;
+              dy = 10;
+              return _context15.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }, { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } }, { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } }, { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } }, { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } }, { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } }, { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } }, { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } }, { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } }, { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }].map(function (parameters) {
+                parameters.name = function (p) {
+                  return 'drag dialog by ' + p.mode + ' handle';
+                };return parameters;
+              }), 't0', 3);
+
+            case 3:
+            case 'end':
+              return _context15.stop();
+          }
+        }
+      }, iteration, this);
+    })
+  }, {
+    key: 'operation',
+    value: function operation(parameters) {
+      var self, handle;
+      return regeneratorRuntime.async(function operation$(_context16) {
+        while (1) {
+          switch (_context16.prev = _context16.next) {
+            case 0:
+              self = this;
+              handle = self.dialog.$.handle.querySelector(parameters.mode.match(/^[.]/) ? parameters.mode : '[drag-handle-mode=' + parameters.mode + ']');
+
+              self.origin = {};
+              ['x', 'y', 'width', 'height'].forEach(function (prop) {
+                self.origin[prop] = self.dialog[prop];
+              });
+              handle.dispatchEvent(new MouseEvent('mouseover', {
+                bubbles: true,
+                cancelable: true,
+                clientX: 0,
+                clientY: 0,
+                buttons: 1
+              }));
+              _context16.next = 7;
+              return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'track', function () {
+                MockInteractions.track(self.dialog, parameters.dx, parameters.dy);
+              }, function (element, type, event) {
+                return event.detail.state === 'end';
+              }));
+
+            case 7:
+            case 'end':
+              return _context16.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: 'checkpoint',
+    value: function checkpoint(parameters) {
+      var prop;
+      return regeneratorRuntime.async(function checkpoint$(_context17) {
+        while (1) {
+          switch (_context17.prev = _context17.next) {
+            case 0:
+              for (prop in parameters.expected) {
+                assert.equal(this.dialog[prop], this.origin[prop] + parameters.expected[prop], 'dialog is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+              }
+
+            case 1:
+            case 'end':
+              return _context17.stop();
+          }
+        }
+      }, null, this);
+    }
+  }]);
+
+  return DragDialogTest;
+}(OpenDialogTest);
 
 var DragFabTest = function (_InstantiateTest2) {
   _inherits(DragFabTest, _InstantiateTest2);
@@ -408,17 +649,34 @@ var DragFabTest = function (_InstantiateTest2) {
   }
 
   _createClass(DragFabTest, [{
-    key: 'operation',
-    value: function operation() {
-      var self;
-      return regeneratorRuntime.async(function operation$(_context12) {
+    key: 'iteration',
+    value: regeneratorRuntime.mark(function iteration() {
+      var dx, dy;
+      return regeneratorRuntime.wrap(function iteration$(_context18) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context18.prev = _context18.next) {
+            case 0:
+              dx = 10;
+              dy = 10;
+              return _context18.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }], 't0', 3);
+
+            case 3:
+            case 'end':
+              return _context18.stop();
+          }
+        }
+      }, iteration, this);
+    })
+  }, {
+    key: 'operation',
+    value: function operation(parameters) {
+      var self;
+      return regeneratorRuntime.async(function operation$(_context19) {
+        while (1) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               self = this;
 
-              self.dx = 10;
-              self.dy = 10;
               self.origin = {};
               ['x', 'y', 'width', 'height'].forEach(function (prop) {
                 self.origin[prop] = self.fab[prop];
@@ -430,38 +688,35 @@ var DragFabTest = function (_InstantiateTest2) {
                 clientY: 0,
                 buttons: 1
               }));
-              _context12.next = 8;
+              _context19.next = 6;
               return regeneratorRuntime.awrap(self.forEvent(self.fab, 'track', function () {
-                MockInteractions.track(self.fab, self.dx, self.dy);
+                MockInteractions.track(self.fab, parameters.dx, parameters.dy);
               }, function (element, type, event) {
                 return event.detail.state === 'end';
               }));
 
-            case 8:
+            case 6:
             case 'end':
-              return _context12.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
     }
   }, {
     key: 'checkpoint',
-    value: function checkpoint() {
-      var self, prop;
-      return regeneratorRuntime.async(function checkpoint$(_context13) {
+    value: function checkpoint(parameters) {
+      var prop;
+      return regeneratorRuntime.async(function checkpoint$(_context20) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
-              self = this;
-
-              self.expected = { x: self.dx, y: self.dy, width: 0, height: 0 };
-              for (prop in self.expected) {
-                assert.equal(self.fab[prop], self.origin[prop] + self.expected[prop], 'fab is dragged with ' + 'position' + ' handle by ' + self.expected[prop] + ' in ' + prop);
+              for (prop in parameters.expected) {
+                assert.equal(this.fab[prop], this.origin[prop] + parameters.expected[prop], 'fab is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
               }
 
-            case 3:
+            case 1:
             case 'end':
-              return _context13.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -481,6 +736,8 @@ if (match) {
     switch (name) {
       case 'OpenDialogTest':
         return OpenDialogTest;
+      case 'DragDialogTest':
+        return DragDialogTest;
       case 'DragFabTest':
         return DragFabTest;
       default:
@@ -490,7 +747,7 @@ if (match) {
 } else {
   // Driver
   testSuites = window.testSuites || {};
-  testSuites.basic = [OpenDialogTest, DragFabTest];
+  testSuites.basic = [DragDialogTest, DragFabTest];
 }
 suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function () {
   if (match) {
