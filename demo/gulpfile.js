@@ -177,7 +177,9 @@ var config = {
   // path to firebase service account JSON
   service_account: gutil.env.service_account || '../../live-localizer-demo-service-account.json', // must be out of the web root
   // command to execute on XLIFF changes
-  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo'
+  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo',
+  // maxBuffer for firebase command's stdout
+  maxBuffer: gutil.env.stdout_buffer || 64 // in MBytes
 };
 
 // Gulp task to add locales to I18N-ready elements and pages
@@ -214,7 +216,7 @@ gulp.task('fetch-xliff', function (callback) {
   // firebase command has to be in the path or run through npm script
   exec('firebase database:get /users ' +
         (config.firebase_token ? '--token "'+ config.firebase_token + '"' : '') +
-        ' --project "' + config.firebase_project + '"', function (err, stdout, stderr) {
+        ' --project "' + config.firebase_project + '"', { maxBuffer: config.maxBuffer * 1024 * 1024 }, function (err, stdout, stderr) {
     if (!err) {
       var users = JSON.parse(stdout);
       var user;
