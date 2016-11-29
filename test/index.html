@@ -21,10 +21,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       [ 'Shadow', 'Shady' ].forEach(function (dom) {
         [ 'src' ].forEach(function (phase) {
           [
-            'basic'
+            'basic', 'basic-lazy'
           ].forEach(function (type) {
             // TODO: handle reconnectable tests
-            testSuites[type].forEach(function (testSuite) {
+            testSuites[type.replace(/-lazy$/,'')].forEach(function (testSuite) {
               suites.push(phase + '/' + type + '-test.html' + '?dom=' + dom + '&TestSuites=' + testSuite.name);
             });
           });

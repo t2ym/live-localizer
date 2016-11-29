@@ -7,17 +7,22 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
 
 <!doctype html>
-<html lang="en">
+<html lang="en" preferred>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-  <title>My App</title>
+  <title>Live Localizer Basic Test</title>
 
   <meta name="theme-color" content="#fff">
 
+  <script src="../../../web-component-tester/browser.js"></script>
   <script>
 
     // setup Polymer options
@@ -39,8 +44,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </script>
 
+  <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
   <link rel="import" href="my-app.html">
-  <link rel="import" href="../../live-localizer.html">
+  <link rel="import" href="../../live-localizer-lazy.html">
 
   <style>
 
@@ -59,13 +65,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <my-app></my-app>
 
-  <live-localizer>
-    <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
-      auth-provider="google"
-      auth-domain="live-localizer-demo.firebaseapp.com"
-      database-url="https://live-localizer-demo.firebaseio.com"
-      api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
-    </live-localizer-firebase-storage>
-  </live-localizer>
+  <template is="dom-if" id="basic" restamp>
+    <live-localizer>
+      <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
+        auth-provider="google"
+        auth-domain="live-localizer-demo.firebaseapp.com"
+        database-url="https://live-localizer-demo.firebaseio.com"
+        api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+      </live-localizer-firebase-storage>
+    </live-localizer>
+  </template>
+
+  <!-- <script src="../../node_modules/babel-polyfill/browser.js"></script> -->
+  <script src="basic-test.js"></script>
 </body>
 </html>
