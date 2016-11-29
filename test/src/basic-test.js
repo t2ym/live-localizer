@@ -67,7 +67,9 @@ class Suite {
           if (step.iteration) {
             suite(step.name + ' iterations', async function () {
               for (let parameters of step.iteration.apply(self)) {
-                test(parameters.name ? parameters.name(parameters) : step.name, async function() {
+                test(parameters.name ?
+                      (typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name)
+                      : step.name, async function() {
                   if (step.operation) {
                     await step.operation.call(self, parameters);
                   }
@@ -183,7 +185,7 @@ class DragDialogTest extends OpenDialogTest {
       { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } },
       { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } },
       { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }
-    ].map((parameters) => { parameters.name = (p) => 'drag dialog by ' + p.mode + ' handle'; return parameters });
+    ].map((parameters) => { parameters.name = 'drag dialog by ' + parameters.mode + ' handle'; return parameters });
   }
   async operation(parameters) {
     let self = this;
