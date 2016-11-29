@@ -34,10 +34,6 @@ class Suite {
       }
     })
   }
-  append(array, item) {
-    array.push(item);
-    return array;
-  }
   * scenario() {
     // trick to unveil overridden methods
     let steps = [];
