@@ -147,7 +147,7 @@ var Suite = function () {
                                     switch (_context5.prev = _context5.next) {
                                       case 0:
                                         _loop2 = function _loop2(parameters) {
-                                          test(parameters.name ? parameters.name(parameters) : step.name, function _callee() {
+                                          test(parameters.name ? typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name : step.name, function _callee() {
                                             return regeneratorRuntime.async(function _callee$(_context4) {
                                               while (1) {
                                                 switch (_context4.prev = _context4.next) {
@@ -567,9 +567,7 @@ var DragDialogTest = function (_OpenDialogTest) {
               dx = 10;
               dy = 10;
               return _context15.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }, { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } }, { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } }, { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } }, { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } }, { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } }, { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } }, { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } }, { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } }, { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }].map(function (parameters) {
-                parameters.name = function (p) {
-                  return 'drag dialog by ' + p.mode + ' handle';
-                };return parameters;
+                parameters.name = 'drag dialog by ' + parameters.mode + ' handle';return parameters;
               }), 't0', 3);
 
             case 3:
