@@ -67,12 +67,6 @@ var Suite = function () {
       });
     }
   }, {
-    key: 'append',
-    value: function append(array, item) {
-      array.push(item);
-      return array;
-    }
-  }, {
     key: 'scenario',
     value: regeneratorRuntime.mark(function scenario() {
       var steps, proto;
