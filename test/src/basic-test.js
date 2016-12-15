@@ -6,7 +6,18 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 class Suite {
   static get reconnectable() { return true; }
   constructor(target) {
-    this.target = target;
+    if (this.constructor.name === 'Suite') {
+      // suite instance
+      this.scope = target || '';
+      this.classes = {};
+      this.mixins = {};
+      this.constructor.scopes = this.constructor.scopes || {};
+      this.constructor.scopes[this.scope] = this;
+    }
+    else {
+      // test instance
+      this.target = target;
+    }
   }
   uncamel(name) {
     return name
@@ -16,6 +27,135 @@ class Suite {
       .replace(/\b([A-Z]+)([A-Z])([a-z0-9])/, '$1 $2$3')
       // lowercase
       .toLowerCase();
+  }
+  set test(value) {
+    if (typeof value === 'function') {
+      if (value.name) {
+        // test class
+        if (this.classes[value.name]) {
+          // test class with the name already exists
+          throw new Error(this.constructor.name + '.' + this.scope + ': class ' + value.name + ' already exists');
+        }
+        else {
+          // register a new test class with the name
+          this.classes[value.name] = value;
+        }
+      }
+      else {
+        // test class mixin
+        let name = value(null).name;
+        if (name) {
+          if (this.mixins[name]) {
+            // test class mixin with the name already exists
+            throw new Error(this.constructor.name + '.' + this.scope + ': class mixin ' + name + ' already exists');
+          }
+          else {
+            // register a new test class mixin with the name
+            this.mixins[name] = value;
+          }
+        }
+        else {
+          // no name for the test class mixin
+          throw new Error(this.constructor.name + '.' + this.scope + ': class mixin has no name ' + value.toString());
+        }
+      }
+    }
+    else if (typeof value === 'object') {
+      if (value) {
+        // branch object
+        this.generateClasses(value, []);
+      }
+      else {
+        throw new Error(this.constructor.name + '.' + this.scope + ': null object is not expected');
+      }
+    }
+  }
+  get test() {
+    let list = [];
+    for (let c in this.classes) {
+      list.push(this.classes[c]);
+    }
+    return list;
+  }
+  generateClasses(branch, chain) {
+    if (typeof branch === 'string') {
+      console.log('string', branch || chain[chain.length - 1], chain);
+      this.generateClass(branch, chain);
+    }
+    else if (typeof branch === 'object') {
+      if (branch) {
+        for (let prop in branch) {
+          chain.push(prop);
+          this.generateClasses(branch[prop], chain);
+          chain.pop();
+        }
+      }
+      else {
+        console.log('null', branch, chain);
+        this.generateClass(branch, chain);
+      }
+    }
+    else {
+      throw new Error(this.constructor.name + '.' + this.scope + ': unknown branch type ' + typeof branch + branch);
+    }
+  }
+  generateClass(name, chain) {
+    let self = this;
+    let expression;
+    if (!(chain.length >= 2)) {
+      throw new Error(this.constructor.name + '.' + this.scope + ':generateClass invalid chain.length ' + chain.length);
+    }
+    if (!name) {
+      name = chain[chain.length - 1];
+    }
+    if (!chain[0]) {
+      // class mixin
+      if (self.mixins[name]) {
+        throw new Error(this.constructor.name + '.' + this.scope + ':generateClass mixin ' + name + ' already exists');
+      }
+      chain.forEach((c, i) => {
+        if (i === 0) {
+          expression = 'base';
+        }
+        else if (self.mixins[c]) {
+          expression = 'self.mixins.' + c + '(' + expression + ')';
+        }
+        else {
+          throw new Error(this.constructor.name + '.' + this.scope + ':generateClass mixin ' + c + ' does not exist');
+        }
+      });
+      expression = 'return (base) => ' + expression;
+      self.mixins[name] = (new Function('self', expression))(self);
+      console.log('generateClass mixins.' + name + ' = ' + expression);
+    }
+    else {
+      // class
+      if (this.classes[name]) {
+        throw new Error(this.constructor.name + '.' + this.scope + ':generateClass class ' + name + ' already exists');
+      }
+      chain.forEach((c, i) => {
+        if (i === 0) {
+          if (self.classes[c]) {
+            expression = 'self.classes.' + c;
+          }
+          else if ((new Function('return (typeof ' + c + ' === "function" && (new ' + c + '()) instanceof ' + self.constructor.name + ')'))()) {
+            expression = c;
+          }
+          else {
+            throw new Error(this.constructor.name + '.' + this.scope + ':generateClass global test class ' + c + ' does not exist');
+          }
+        }
+        else if (self.mixins[c]) {
+          expression = 'self.mixins.' + c + '(' + expression + ')';
+        }
+        else {
+          throw new Error(this.constructor.name + '.' + this.scope + ':generateClass mixin ' + c + ' does not exist');
+        }
+      });
+      expression = 'return class ' + name + ' extends ' + expression + ' {}';
+      self.classes[name] = (new Function('self', expression))(self);
+      console.log('generateClass classes.' + name + ' = ' + expression);
+    }
   }
   async setup() {
   }
@@ -61,7 +201,8 @@ class Suite {
       for (let step of self.scenario()) {
         if (step.operation || step.checkpoint) {
           if (step.iteration) {
-            suite(step.name + ' iterations', async function () {
+            // suite() has to be commented out since subsuites are executed after all the other sibling tests
+            //suite(step.name + ' iterations', async function () {
               for (let parameters of step.iteration.apply(self)) {
                 test(parameters.name ?
                       (typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name)
@@ -74,7 +215,7 @@ class Suite {
                   }
                 });
               }
-            });
+            //});
           }
           else {
             test(step.name, async function() {
@@ -95,6 +236,10 @@ class Suite {
     });
   }
 }
+// global test suites object
+testSuites = window.testSuites || {};
+
+// global test classes
 class LiveLocalizerSuite extends Suite {
   static get reconnectable() { return false; }
   // TODO: Can setup be converted to operation?
@@ -150,129 +295,196 @@ class InstantiateTest extends LiveLocalizerSuite {
     assert.isOk(self.fab.opened, 'fab is opened');
   }
 }
-class OpenDialogTest extends InstantiateTest {
-  async operation() {
-    let self = this;
-    await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
-  }
-  async checkpoint() {
-    let self = this;
-    assert.isOk(self.dialog.opened, 'dialog is opened');
-    assert.isNotOk(self.fab.opened, 'fab is not opened');
-    // store dialog coordinates
-    self.origin = {};
-    [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
-      self.origin[prop] = self.dialog[prop];
-    });
-  }
-}
-class DragDialogTest extends OpenDialogTest {
-  * iteration() {
-    let dx = 10;
-    let dy = 10;
-    yield *[
-      { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } },
-      { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } },
-      { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } },
-      { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } },
-      { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } },
-      { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } },
-      { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } },
-      { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } },
-      { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } },
-      { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }
-    ].map((parameters) => { parameters.name = 'drag dialog by ' + parameters.mode + ' handle'; return parameters });
-  }
-  async operation(parameters) {
-    let self = this;
-    let handle = self.dialog.$.handle.querySelector(parameters.mode.match(/^[.]/) ? parameters.mode : '[drag-handle-mode=' + parameters.mode + ']');
-    self.origin = {};
-    [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
-      self.origin[prop] = self.dialog[prop];
-    });
-    handle.dispatchEvent(new MouseEvent('mouseover', {
-      bubbles: true,
-      cancelable: true,
-      clientX: 0,
-      clientY: 0,
-      buttons: 1
-    }));
-    await self.forEvent(self.dialog, 'track', () => { MockInteractions.track(self.dialog, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
-  }
-  async checkpoint(parameters) {
-    for (let prop in parameters.expected) {
-      assert.equal(
-        this.dialog[prop],
-        this.origin[prop] + parameters.expected[prop],
-        'dialog is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+{
+  // basic scope
+  let basic = new Suite('basic');
+  basic.test = (base) => class OpenDialogTest extends base {
+    async operation() {
+      let self = this;
+      await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
+    }
+    async checkpoint() {
+      let self = this;
+      assert.isOk(self.dialog.opened, 'dialog is opened');
+      assert.isNotOk(self.fab.opened, 'fab is not opened');
+      // store dialog coordinates
+      self.origin = {};
+      [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
+        self.origin[prop] = self.dialog[prop];
+      });
     }
   }
-}
-class DragFabTest extends InstantiateTest {
-  * iteration() {
-    let dx = 10;
-    let dy = 10;
-    yield *[
-      { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }
-    ];
-  }
-  async operation(parameters) {
-    let self = this;
-    self.origin = {};
-    [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
-      self.origin[prop] = self.fab[prop];
-    });
-    self.fab.dispatchEvent(new MouseEvent('mouseover', {
-      bubbles: true,
-      cancelable: true,
-      clientX: 0,
-      clientY: 0,
-      buttons: 1
-    }));
-    await self.forEvent(self.fab, 'track', () => { MockInteractions.track(self.fab, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
-  }
-  async checkpoint(parameters) {
-    for (let prop in parameters.expected) {
-      assert.equal(
-        this.fab[prop],
-        this.origin[prop] + parameters.expected[prop],
-        'fab is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+  basic.test = (base) => class DragDialogTest extends base {
+    * iteration() {
+      let dx = 10;
+      let dy = 10;
+      yield *[
+        { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } },
+        { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } },
+        { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } },
+        { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } },
+        { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } },
+        { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } },
+        { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } },
+        { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } },
+        { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } },
+        { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }
+      ].map((parameters) => { parameters.name = 'drag dialog by ' + parameters.mode + ' handle'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      let handle = self.dialog.$.handle.querySelector(parameters.mode.match(/^[.]/) ? parameters.mode : '[drag-handle-mode=' + parameters.mode + ']');
+      self.origin = {};
+      [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
+        self.origin[prop] = self.dialog[prop];
+      });
+      handle.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      await self.forEvent(self.dialog, 'track', () => { MockInteractions.track(self.dialog, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
+    }
+    async checkpoint(parameters) {
+      for (let prop in parameters.expected) {
+        assert.equal(
+          this.dialog[prop],
+          this.origin[prop] + parameters.expected[prop],
+          'dialog is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+      }
     }
   }
-}
+  basic.test = (base) => class DragFabTest extends base {
+    * iteration() {
+      let dx = 10;
+      let dy = 10;
+      yield *[
+        { mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }
+      ];
+    }
+    async operation(parameters) {
+      let self = this;
+      self.origin = {};
+      [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
+        self.origin[prop] = self.fab[prop];
+      });
+      self.fab.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      await self.forEvent(self.fab, 'track', () => { MockInteractions.track(self.fab, parameters.dx, parameters.dy); }, (element, type, event) => event.detail.state === 'end');
+    }
+    async checkpoint(parameters) {
+      for (let prop in parameters.expected) {
+        assert.equal(
+          this.fab[prop],
+          this.origin[prop] + parameters.expected[prop],
+          'fab is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
+      }
+    }
+  }
+  basic.test = (base) => class CloseDialogTest extends base {
+    async operation() {
+      let self = this;
+      await self.forEvent(self.fab, 'neon-animation-finish', () => { MockInteractions.tap(self.dialog.$.close); }, true);
+    }
+    async checkpoint() {
+      assert.isNotOk(this.dialog.opened, 'dialog is not opened');
+      assert.isOk(this.fab.opened, 'fab is opened');
+    }
+  }
+  basic.test = (base) => class TestA extends base {
+    async operation() {
+      console.log('Test A operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test A');
+    }
+  }
+  basic.test = (base) => class TestB extends base {
+    async operation() {
+      console.log('Test B operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test B');
+    }
+  }
+  basic.test = class TestC extends InstantiateTest {
+    async operation() {
+      console.log('Test C operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test C');
+    }
+  }
+  basic.test = {
+    // test class mixins
+    '': {
+      TestA: {
+        TestB: 'TestAThenB'
+      },
+      TestB: {
+        TestA: 'TestBThenA'
+      }
+    },
+    // test classes
+    InstantiateTest: {
+      TestAThenB: 'TestABAtInitial',
+      OpenDialogTest: '',
+      DragFabTest: {
+        OpenDialogTest: 'DragFabAndOpenDialogTest'
+      }
+    },
+    OpenDialogTest: {
+      CloseDialogTest: 'OpenAndCloseDialogTest',
+      DragDialogTest: {
+        TestBThenA: {
+          CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
+        }
+      }
+    },
+    TestC: {
+      TestAThenB: 'TestCAB'
+    }
+  };
+} // basic scope
 // TODO: Refine handlers
 var match = window.location.href.match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
 if (match) {
   // Runner
+  let Classes = {};
+  for (let name in Suite.scopes.basic.classes) {
+    Classes[name] = Suite.scopes.basic.classes[name];
+  }
   testSuites = match[1].split(/,/).map((name) => {
-    // TODO: smarter scheme of conversion from class name to class
-    switch (name) {
-    case 'OpenDialogTest':
-      return OpenDialogTest;
-    case 'DragDialogTest':
-      return DragDialogTest;
-    case 'DragFabTest':
-      return DragFabTest;
-    default:
-      return null;
+    if (!Classes[name]) {
+      throw new Error('Test ' + name + ' is not defined');
     }
+    return Classes[name];
   });
 }
 else {
   // Driver
   testSuites = window.testSuites || {};
-  testSuites.basic = [ DragDialogTest, DragFabTest ];
+  // TODO: trim redundant tests
+  testSuites.basic = Suite.scopes.basic.test;
 }
-suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function() {
-  if (match) {
-    testSuites.forEach((suite) => {
-      if (suite) {
-        // TODO: handle parameters
-        (new suite('template#basic')).run();
-      }
-    });
-  }
-  return;
+(async function () {
+  suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), async function() {
+    if (match) {
+      testSuites.forEach(async (suite) => {
+        if (suite) {
+          // TODO: handle parameters
+          await (new suite('template#basic')).run();
+        }
+      });
+    }
+    return;
   // TODO: convert to classes
   var container;
   var element;
@@ -542,3 +754,4 @@ suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0
   });
 
 });
+})();
