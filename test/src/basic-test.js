@@ -194,8 +194,8 @@ class Suite {
   async run() {
     let self = this;
     suite(self.uncamel(self.constructor.name), async function () {
-      suiteSetup(function () {
-        return self.setup();
+      suiteSetup(async function () {
+        await self.setup();
       });
 
       for (let step of self.scenario()) {
@@ -230,8 +230,8 @@ class Suite {
         }
       }
 
-      suiteTeardown(function () {
-        return self.teardown();
+      suiteTeardown(async function () {
+        await self.teardown();
       });
     });
   }
