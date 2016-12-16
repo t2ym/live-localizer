@@ -78,7 +78,42 @@ class Suite {
     for (let c in this.leafClasses) {
       list.push(this.leafClasses[c]);
     }
-    return list;
+    let reconnectableList = [];
+    for (let i in list) {
+      if (list[i].reconnectable) {
+        if (reconnectableList.length === 0) {
+          reconnectableList.push([list[i]]);
+        }
+        else {
+          let last = reconnectableList[reconnectableList.length - 1];
+          if (last.length === 0) {
+            last.push(list[i]);
+          }
+          else {
+            if (last[last.length - 1].reconnectable) {
+              last.push(list[i]);
+            }
+            else {
+              reconnectableList.push([list[i]]);
+            }
+          }
+        }
+      }
+      else {
+        reconnectableList.push([list[i]]);
+      }
+    }
+    // [ 'UnreconnectableTest', 'ReconnectableTest,ReconnectableTest,...', 'UnreconnectableTest', ...]
+    return reconnectableList.map(l => l.map(c => c.name).join(','));
+  }
+  testClasses(csv) {
+    let self = this;
+    return csv.split(/,/).map((name) => {
+      if (!self.classes[name]) {
+        throw new Error('Suite.' + self.scope + ': Test ' + name + ' is not defined');
+      }
+      return self.classes[name];
+    });
   }
   updateLeafClasses(value) {
     let proto = value;
@@ -563,17 +598,12 @@ class DummyTest3 extends DummyTest2 {
   };
 
   // TODO: Refine handlers
-  let match = window.location.href.match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+  let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
   window.testSuites = window.testSuites || {};
 
   if (match) {
     // Runner
-    testSuites = match[1].split(/,/).map((name) => {
-      if (!Suite.scopes[scope].classes[name]) {
-        throw new Error('Test ' + name + ' is not defined');
-      }
-      return Suite.scopes[scope].classes[name];
-    });
+    testSuites = Suite.scopes[scope].testClasses(match[1]);
   }
   else {
     // Driver
