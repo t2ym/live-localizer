@@ -102,7 +102,7 @@ class Suite {
   generateClass(name, chain) {
     let self = this;
     let expression;
-    if (!(chain.length >= 2)) {
+    if (!(chain.length >= (chain[0] ? 1 : 2))) {
       throw new Error(this.constructor.name + '.' + this.scope + ':generateClass invalid chain.length ' + chain.length);
     }
     if (!name) {
@@ -152,7 +152,9 @@ class Suite {
           throw new Error(this.constructor.name + '.' + this.scope + ':generateClass mixin ' + c + ' does not exist');
         }
       });
-      expression = 'return class ' + name + ' extends ' + expression + ' {}';
+      expression = chain.length === 1 && name === expression
+        ? 'return ' + name
+        : 'return class ' + name + ' extends ' + expression + ' {}';
       self.classes[name] = (new Function('self', expression))(self);
       console.log('generateClass classes.' + name + ' = ' + expression);
     }
@@ -295,6 +297,22 @@ class InstantiateTest extends LiveLocalizerSuite {
     assert.isOk(self.fab.opened, 'fab is opened');
   }
 }
+class DummyTest1 extends Suite {
+  async operation() {
+    console.log('DummyTest 1 operation');
+  }
+  async checkpoint() {
+    console.log('Checkpoint for DummyTest 1');
+  }
+}
+class DummyTest2 extends Suite {
+  async operation() {
+    console.log('DummyTest 2 operation');
+  }
+  async checkpoint() {
+    console.log('Checkpoint for DummyTest 2');
+  }
+}
 {
   // basic scope
   let basic = new Suite('basic');
@@ -422,6 +440,14 @@ class InstantiateTest extends LiveLocalizerSuite {
       console.log('Checkpoint for Test C');
     }
   }
+  basic.test = class TestD extends Suite {
+    async operation() {
+      console.log('Test D operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test D');
+    }
+  }
   basic.test = {
     // test class mixins
     '': {
@@ -450,7 +476,10 @@ class InstantiateTest extends LiveLocalizerSuite {
     },
     TestC: {
       TestAThenB: 'TestCAB'
-    }
+    },
+    TestD: 'TestDAlias',
+    DummyTest1: '',
+    DummyTest2: 'DummyTest2Alias'
   };
 } // basic scope
 // TODO: Refine handlers
