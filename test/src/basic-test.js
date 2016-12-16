@@ -564,6 +564,8 @@ class DummyTest3 extends DummyTest2 {
 
   // TODO: Refine handlers
   let match = window.location.href.match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+  window.testSuites = window.testSuites || {};
+
   if (match) {
     // Runner
     testSuites = match[1].split(/,/).map((name) => {
@@ -575,7 +577,6 @@ class DummyTest3 extends DummyTest2 {
   }
   else {
     // Driver
-    testSuites = window.testSuites || {};
     testSuites[scope] = Suite.scopes[scope].test;
   }
   (async function () {
