@@ -10,6 +10,8 @@ class Suite {
       // suite instance
       this.scope = target || '';
       this.classes = {};
+      this.leafClasses = {};
+      this.branchScenarios = {};
       this.mixins = {};
       this.constructor.scopes = this.constructor.scopes || {};
       this.constructor.scopes[this.scope] = this;
@@ -39,6 +41,7 @@ class Suite {
         else {
           // register a new test class with the name
           this.classes[value.name] = value;
+          this.updateLeafClasses(value);
         }
       }
       else {
@@ -72,10 +75,40 @@ class Suite {
   }
   get test() {
     let list = [];
-    for (let c in this.classes) {
-      list.push(this.classes[c]);
+    for (let c in this.leafClasses) {
+      list.push(this.leafClasses[c]);
     }
     return list;
+  }
+  updateLeafClasses(value) {
+    let proto = value;
+    let chain = [];
+    let name = proto.name;
+    let isLeaf = true;
+    let scenario = '';
+    while (proto.name && proto.name !== 'Suite') {
+      chain.unshift(proto.name);
+      proto = Object.getPrototypeOf(proto);
+    }
+    for (let i in chain) {
+      scenario = scenario ? scenario + ',' + chain[i] : chain[i];
+      if (i < chain.length - 1) {
+        if (!this.branchScenarios[scenario]) {
+          this.branchScenarios[scenario] = true;
+        }
+        if (this.leafClasses[chain[i]]) {
+          delete this.leafClasses[chain[i]];
+        }
+      }
+      else {
+        if (this.branchScenarios[scenario]) {
+          isLeaf = false;
+        }
+      }
+    }
+    if (isLeaf) {
+      this.leafClasses[name] = value;
+    }
   }
   generateClasses(branch, chain) {
     if (typeof branch === 'string') {
@@ -154,8 +187,11 @@ class Suite {
       });
       expression = chain.length === 1 && name === expression
         ? 'return ' + name
-        : 'return class ' + name + ' extends ' + expression + ' {}';
+        : name === chain[chain.length - 1]
+          ? 'return ' + expression
+          : 'return class ' + name + ' extends ' + expression + ' {}';
       self.classes[name] = (new Function('self', expression))(self);
+      self.updateLeafClasses(self.classes[name]);
       console.log('generateClass classes.' + name + ' = ' + expression);
     }
   }
@@ -238,8 +274,6 @@ class Suite {
     });
   }
 }
-// global test suites object
-testSuites = window.testSuites || {};
 
 // global test classes
 class LiveLocalizerSuite extends Suite {
@@ -313,9 +347,18 @@ class DummyTest2 extends Suite {
     console.log('Checkpoint for DummyTest 2');
   }
 }
+class DummyTest3 extends DummyTest2 {
+  async operation() {
+    console.log('DummyTest 3 operation');
+  }
+  async checkpoint() {
+    console.log('Checkpoint for DummyTest 3');
+  }
+}
 {
   // basic scope
-  let basic = new Suite('basic');
+  let scope = 'basic';
+  let basic = new Suite(scope);
   basic.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
@@ -432,6 +475,22 @@ class DummyTest2 extends Suite {
       console.log('Checkpoint for Test B');
     }
   }
+  basic.test = (base) => class Test1 extends base {
+    async operation() {
+      console.log('Test 1 operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test 1');
+    }
+  }
+  basic.test = (base) => class Test2 extends base {
+    async operation() {
+      console.log('Test 2 operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test 2');
+    }
+  }
   basic.test = class TestC extends InstantiateTest {
     async operation() {
       console.log('Test C operation');
@@ -441,6 +500,14 @@ class DummyTest2 extends Suite {
     }
   }
   basic.test = class TestD extends Suite {
+    async operation() {
+      console.log('Test D operation');
+    }
+    async checkpoint() {
+      console.log('Checkpoint for Test D');
+    }
+  }
+  basic.test = class TestE extends Suite {
     async operation() {
       console.log('Test D operation');
     }
@@ -479,41 +546,49 @@ class DummyTest2 extends Suite {
     },
     TestD: 'TestDAlias',
     DummyTest1: '',
-    DummyTest2: 'DummyTest2Alias'
-  };
-} // basic scope
-// TODO: Refine handlers
-var match = window.location.href.match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
-if (match) {
-  // Runner
-  let Classes = {};
-  for (let name in Suite.scopes.basic.classes) {
-    Classes[name] = Suite.scopes.basic.classes[name];
-  }
-  testSuites = match[1].split(/,/).map((name) => {
-    if (!Classes[name]) {
-      throw new Error('Test ' + name + ' is not defined');
-    }
-    return Classes[name];
-  });
-}
-else {
-  // Driver
-  testSuites = window.testSuites || {};
-  // TODO: trim redundant tests
-  testSuites.basic = Suite.scopes.basic.test;
-}
-(async function () {
-  suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), async function() {
-    if (match) {
-      testSuites.forEach(async (suite) => {
-        if (suite) {
-          // TODO: handle parameters
-          await (new suite('template#basic')).run();
+    DummyTest2: 'DummyTest2Alias',
+    DummyTest3: '',
+    TestE: {
+      TestA: {
+        TestB: {
+          Test1: {
+            Test2: 'TestEAB12'
+          }
         }
-      });
+      },
+      TestB: {
+        Test1: ''
+      }
     }
-    return;
+  };
+
+  // TODO: Refine handlers
+  let match = window.location.href.match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+  if (match) {
+    // Runner
+    testSuites = match[1].split(/,/).map((name) => {
+      if (!Suite.scopes[scope].classes[name]) {
+        throw new Error('Test ' + name + ' is not defined');
+      }
+      return Suite.scopes[scope].classes[name];
+    });
+  }
+  else {
+    // Driver
+    testSuites = window.testSuites || {};
+    testSuites[scope] = Suite.scopes[scope].test;
+  }
+  (async function () {
+    suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), async function() {
+      if (match) {
+        testSuites.forEach(async (s) => {
+          if (s) {
+            // TODO: handle parameters
+            await (new s('template#basic')).run();
+          }
+        });
+      }
+      return;
   // TODO: convert to classes
   var container;
   var element;
@@ -784,3 +859,4 @@ else {
 
 });
 })();
+} // basic scope
