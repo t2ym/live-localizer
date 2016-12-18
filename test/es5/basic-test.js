@@ -23,6 +23,11 @@ var Suite = function () {
     get: function get() {
       return true;
     }
+  }, {
+    key: 'skipAfterFailure',
+    get: function get() {
+      return false;
+    }
   }]);
 
   function Suite(target) {
@@ -292,24 +297,38 @@ var Suite = function () {
                                     while (1) {
                                       switch (_context6.prev = _context6.next) {
                                         case 0:
-                                          if (!step.operation) {
+                                          if (!(self.constructor.skipAfterFailure && self.__failed)) {
                                             _context6.next = 3;
                                             break;
                                           }
 
-                                          _context6.next = 3;
-                                          return regeneratorRuntime.awrap(step.operation.call(self, parameters));
+                                          this.skip();
+                                          return _context6.abrupt('return');
 
                                         case 3:
-                                          if (!step.checkpoint) {
-                                            _context6.next = 6;
+                                          self.__failed = true;
+
+                                          if (!step.operation) {
+                                            _context6.next = 7;
                                             break;
                                           }
 
-                                          _context6.next = 6;
+                                          _context6.next = 7;
+                                          return regeneratorRuntime.awrap(step.operation.call(self, parameters));
+
+                                        case 7:
+                                          if (!step.checkpoint) {
+                                            _context6.next = 10;
+                                            break;
+                                          }
+
+                                          _context6.next = 10;
                                           return regeneratorRuntime.awrap(step.checkpoint.call(self, parameters));
 
-                                        case 6:
+                                        case 10:
+                                          self.__failed = false;
+
+                                        case 11:
                                         case 'end':
                                           return _context6.stop();
                                       }
@@ -351,24 +370,38 @@ var Suite = function () {
                                   while (1) {
                                     switch (_context7.prev = _context7.next) {
                                       case 0:
-                                        if (!step.operation) {
+                                        if (!(self.constructor.skipAfterFailure && self.__failed)) {
                                           _context7.next = 3;
                                           break;
                                         }
 
-                                        _context7.next = 3;
-                                        return regeneratorRuntime.awrap(step.operation.call(self));
+                                        this.skip();
+                                        return _context7.abrupt('return');
 
                                       case 3:
-                                        if (!step.checkpoint) {
-                                          _context7.next = 6;
+                                        self.__failed = true;
+
+                                        if (!step.operation) {
+                                          _context7.next = 7;
                                           break;
                                         }
 
-                                        _context7.next = 6;
+                                        _context7.next = 7;
+                                        return regeneratorRuntime.awrap(step.operation.call(self));
+
+                                      case 7:
+                                        if (!step.checkpoint) {
+                                          _context7.next = 10;
+                                          break;
+                                        }
+
+                                        _context7.next = 10;
                                         return regeneratorRuntime.awrap(step.checkpoint.call(self));
 
-                                      case 6:
+                                      case 10:
+                                        self.__failed = false;
+
+                                      case 11:
                                       case 'end':
                                         return _context7.stop();
                                     }
@@ -1342,6 +1375,7 @@ var DummyTest3 = function (_DummyTest) {
                 switch (_context32.prev = _context32.next) {
                   case 0:
                     console.log('Checkpoint for Test A');
+                    //assert.isOk(false, 'Failing test A');
 
                   case 1:
                   case 'end':
@@ -1626,6 +1660,11 @@ var DummyTest3 = function (_DummyTest) {
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'skipAfterFailure',
+        get: function get() {
+          return true;
         }
       }]);
 
