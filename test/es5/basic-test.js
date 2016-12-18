@@ -8,6 +8,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*
@@ -97,10 +99,12 @@ var Suite = function () {
   }, {
     key: 'generateClasses',
     value: function generateClasses(branch, chain) {
+      var _this = this;
+
       if (typeof branch === 'string') {
         console.log('string', branch || chain[chain.length - 1], chain);
         this.generateClass(branch, chain);
-      } else if ((typeof branch === 'undefined' ? 'undefined' : _typeof(branch)) === 'object') {
+      } else if ((typeof branch === 'undefined' ? 'undefined' : _typeof(branch)) === 'object' && !Array.isArray(branch)) {
         if (branch) {
           for (var prop in branch) {
             chain.push(prop);
@@ -111,6 +115,10 @@ var Suite = function () {
           console.log('null', branch, chain);
           this.generateClass(branch, chain);
         }
+      } else if ((typeof branch === 'undefined' ? 'undefined' : _typeof(branch)) === 'object' && Array.isArray(branch)) {
+        branch.forEach(function (item) {
+          _this.generateClasses(item, chain);
+        });
       } else {
         throw new Error(this.constructor.name + '.' + this.scope + ': unknown branch type ' + (typeof branch === 'undefined' ? 'undefined' : _typeof(branch)) + branch);
       }
@@ -118,7 +126,7 @@ var Suite = function () {
   }, {
     key: 'generateClass',
     value: function generateClass(name, chain) {
-      var _this = this;
+      var _this2 = this;
 
       var self = this;
       var expression = void 0;
@@ -139,7 +147,7 @@ var Suite = function () {
           } else if (self.mixins[c]) {
             expression = 'self.mixins.' + c + '(' + expression + ')';
           } else {
-            throw new Error(_this.constructor.name + '.' + _this.scope + ':generateClass mixin ' + c + ' does not exist');
+            throw new Error(_this2.constructor.name + '.' + _this2.scope + ':generateClass mixin ' + c + ' does not exist');
           }
         });
         expression = 'return (base) => ' + expression;
@@ -157,12 +165,12 @@ var Suite = function () {
             } else if (new Function('return (typeof ' + c + ' === "function" && (new ' + c + '()) instanceof ' + self.constructor.name + ')')()) {
               expression = c;
             } else {
-              throw new Error(_this.constructor.name + '.' + _this.scope + ':generateClass global test class ' + c + ' does not exist');
+              throw new Error(_this2.constructor.name + '.' + _this2.scope + ':generateClass global test class ' + c + ' does not exist');
             }
           } else if (self.mixins[c]) {
             expression = 'self.mixins.' + c + '(' + expression + ')';
           } else {
-            throw new Error(_this.constructor.name + '.' + _this.scope + ':generateClass mixin ' + c + ' does not exist');
+            throw new Error(_this2.constructor.name + '.' + _this2.scope + ':generateClass mixin ' + c + ' does not exist');
           }
         });
         expression = chain.length === 1 && name === expression ? 'return ' + name : name === chain[chain.length - 1] ? 'return ' + expression : 'return class ' + name + ' extends ' + expression + ' {}';
@@ -518,6 +526,187 @@ var Suite = function () {
         }).join(',');
       });
     }
+  }], [{
+    key: 'repeat',
+    value: function repeat(target, count, subclass) {
+      var scenario = {};
+      if (count < 1) {
+        scenario = subclass;
+      } else {
+        scenario[target] = subclass;
+        count--;
+        while (count-- > 0) {
+          scenario = _defineProperty({}, target, scenario);
+        }
+      }
+      return scenario;
+    }
+  }, {
+    key: '_permute',
+    value: regeneratorRuntime.mark(function _permute(targets) {
+      var i = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+      var result = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var subclass = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : function (list) {
+        return list.join('Then');
+      };
+
+      var len, j, swap, append, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, sub;
+
+      return regeneratorRuntime.wrap(function _permute$(_context10) {
+        while (1) {
+          switch (_context10.prev = _context10.next) {
+            case 0:
+              append = function append() {
+                // TODO: cache cursor
+                var cursor = result;
+                for (var k = 0; k < len; k++) {
+                  if (!cursor[targets[k]]) {
+                    if (k >= len - 1) {
+                      cursor[targets[k]] = subclass(targets);
+                    } else {
+                      cursor[targets[k]] = {};
+                    }
+                  }
+                  cursor = cursor[targets[k]];
+                }
+              };
+
+              swap = function swap() {
+                if (j !== i) {
+                  var tmp = targets[i];
+                  targets[i] = targets[j];
+                  targets[j] = tmp;
+                }
+              };
+
+              len = targets.length;
+              j = void 0;
+
+              if (!(i >= len - 1)) {
+                _context10.next = 10;
+                break;
+              }
+
+              _context10.next = 7;
+              return targets;
+
+            case 7:
+              append();
+              _context10.next = 44;
+              break;
+
+            case 10:
+              j = i;
+
+            case 11:
+              if (!(j < len)) {
+                _context10.next = 44;
+                break;
+              }
+
+              swap();
+              _iteratorNormalCompletion3 = true;
+              _didIteratorError3 = false;
+              _iteratorError3 = undefined;
+              _context10.prev = 16;
+              _iterator3 = this._permute(targets, i + 1, result)[Symbol.iterator]();
+
+            case 18:
+              if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                _context10.next = 26;
+                break;
+              }
+
+              sub = _step3.value;
+              _context10.next = 22;
+              return targets;
+
+            case 22:
+              append();
+
+            case 23:
+              _iteratorNormalCompletion3 = true;
+              _context10.next = 18;
+              break;
+
+            case 26:
+              _context10.next = 32;
+              break;
+
+            case 28:
+              _context10.prev = 28;
+              _context10.t0 = _context10['catch'](16);
+              _didIteratorError3 = true;
+              _iteratorError3 = _context10.t0;
+
+            case 32:
+              _context10.prev = 32;
+              _context10.prev = 33;
+
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+
+            case 35:
+              _context10.prev = 35;
+
+              if (!_didIteratorError3) {
+                _context10.next = 38;
+                break;
+              }
+
+              throw _iteratorError3;
+
+            case 38:
+              return _context10.finish(35);
+
+            case 39:
+              return _context10.finish(32);
+
+            case 40:
+              swap();
+
+            case 41:
+              j++;
+              _context10.next = 11;
+              break;
+
+            case 44:
+            case 'end':
+              return _context10.stop();
+          }
+        }
+      }, _permute, this, [[16, 28, 32, 40], [33,, 35, 39]]);
+    })
+  }, {
+    key: 'permute',
+    value: function permute(targets, subclass) {
+      var result = {};
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
+
+      try {
+        for (var _iterator4 = this._permute(targets, 0, result, subclass)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var chain = _step4.value;
+        }
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
+        }
+      }
+
+      return result;
+    }
   }]);
 
   return Suite;
@@ -540,11 +729,11 @@ var LiveLocalizerSuite = function (_Suite) {
 
     // TODO: Can setup be converted to operation?
     value: function setup() {
-      return regeneratorRuntime.async(function setup$(_context10) {
+      return regeneratorRuntime.async(function setup$(_context11) {
         while (1) {
-          switch (_context10.prev = _context10.next) {
+          switch (_context11.prev = _context11.next) {
             case 0:
-              _context10.next = 2;
+              _context11.next = 2;
               return regeneratorRuntime.awrap(_get(LiveLocalizerSuite.prototype.__proto__ || Object.getPrototypeOf(LiveLocalizerSuite.prototype), 'setup', this).call(this));
 
             case 2:
@@ -552,7 +741,7 @@ var LiveLocalizerSuite = function (_Suite) {
 
             case 3:
             case 'end':
-              return _context10.stop();
+              return _context11.stop();
           }
         }
       }, null, this);
@@ -561,23 +750,23 @@ var LiveLocalizerSuite = function (_Suite) {
     key: 'teardown',
     value: function teardown() {
       var self;
-      return regeneratorRuntime.async(function teardown$(_context11) {
+      return regeneratorRuntime.async(function teardown$(_context12) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context12.prev = _context12.next) {
             case 0:
               self = this;
-              _context11.next = 3;
+              _context12.next = 3;
               return regeneratorRuntime.awrap(_get(LiveLocalizerSuite.prototype.__proto__ || Object.getPrototypeOf(LiveLocalizerSuite.prototype), 'teardown', this).call(this));
 
             case 3:
-              _context11.next = 5;
+              _context12.next = 5;
               return regeneratorRuntime.awrap(self.forEvent(self.container, 'dom-change', function () {
                 self.container.if = false;
               }, true));
 
             case 5:
             case 'end':
-              return _context11.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -605,19 +794,19 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
     key: 'operation',
     value: function operation() {
       var self;
-      return regeneratorRuntime.async(function operation$(_context12) {
+      return regeneratorRuntime.async(function operation$(_context13) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               self = this;
-              _context12.next = 3;
+              _context13.next = 3;
               return regeneratorRuntime.awrap(self.forEvent(self.container, 'dom-change', function () {
                 self.container.if = true;
               }, true));
 
             case 3:
               self.element = document.querySelector('live-localizer');
-              _context12.next = 6;
+              _context13.next = 6;
               return regeneratorRuntime.awrap(self.forEvent(self.element, 'bundle-set-fetched'));
 
             case 6:
@@ -632,7 +821,7 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
 
             case 14:
             case 'end':
-              return _context12.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -641,9 +830,9 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
     key: 'checkpoint',
     value: function checkpoint() {
       var self;
-      return regeneratorRuntime.async(function checkpoint$(_context13) {
+      return regeneratorRuntime.async(function checkpoint$(_context14) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
               self = this;
               // element existence
@@ -673,7 +862,7 @@ var InstantiateTest = function (_LiveLocalizerSuite) {
 
             case 21:
             case 'end':
-              return _context13.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -695,15 +884,15 @@ var DummyTest1 = function (_Suite2) {
   _createClass(DummyTest1, [{
     key: 'operation',
     value: function operation() {
-      return regeneratorRuntime.async(function operation$(_context14) {
+      return regeneratorRuntime.async(function operation$(_context15) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               console.log('DummyTest 1 operation');
 
             case 1:
             case 'end':
-              return _context14.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -711,15 +900,15 @@ var DummyTest1 = function (_Suite2) {
   }, {
     key: 'checkpoint',
     value: function checkpoint() {
-      return regeneratorRuntime.async(function checkpoint$(_context15) {
+      return regeneratorRuntime.async(function checkpoint$(_context16) {
         while (1) {
-          switch (_context15.prev = _context15.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
               console.log('Checkpoint for DummyTest 1');
 
             case 1:
             case 'end':
-              return _context15.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -741,15 +930,15 @@ var DummyTest2 = function (_Suite3) {
   _createClass(DummyTest2, [{
     key: 'operation',
     value: function operation() {
-      return regeneratorRuntime.async(function operation$(_context16) {
+      return regeneratorRuntime.async(function operation$(_context17) {
         while (1) {
-          switch (_context16.prev = _context16.next) {
+          switch (_context17.prev = _context17.next) {
             case 0:
               console.log('DummyTest 2 operation');
 
             case 1:
             case 'end':
-              return _context16.stop();
+              return _context17.stop();
           }
         }
       }, null, this);
@@ -757,15 +946,15 @@ var DummyTest2 = function (_Suite3) {
   }, {
     key: 'checkpoint',
     value: function checkpoint() {
-      return regeneratorRuntime.async(function checkpoint$(_context17) {
+      return regeneratorRuntime.async(function checkpoint$(_context18) {
         while (1) {
-          switch (_context17.prev = _context17.next) {
+          switch (_context18.prev = _context18.next) {
             case 0:
               console.log('Checkpoint for DummyTest 2');
 
             case 1:
             case 'end':
-              return _context17.stop();
+              return _context18.stop();
           }
         }
       }, null, this);
@@ -787,15 +976,15 @@ var DummyTest3 = function (_DummyTest) {
   _createClass(DummyTest3, [{
     key: 'operation',
     value: function operation() {
-      return regeneratorRuntime.async(function operation$(_context18) {
+      return regeneratorRuntime.async(function operation$(_context19) {
         while (1) {
-          switch (_context18.prev = _context18.next) {
+          switch (_context19.prev = _context19.next) {
             case 0:
               console.log('DummyTest 3 operation');
 
             case 1:
             case 'end':
-              return _context18.stop();
+              return _context19.stop();
           }
         }
       }, null, this);
@@ -803,15 +992,15 @@ var DummyTest3 = function (_DummyTest) {
   }, {
     key: 'checkpoint',
     value: function checkpoint() {
-      return regeneratorRuntime.async(function checkpoint$(_context19) {
+      return regeneratorRuntime.async(function checkpoint$(_context20) {
         while (1) {
-          switch (_context19.prev = _context19.next) {
+          switch (_context20.prev = _context20.next) {
             case 0:
               console.log('Checkpoint for DummyTest 3');
 
             case 1:
             case 'end':
-              return _context19.stop();
+              return _context20.stop();
           }
         }
       }, null, this);
@@ -840,19 +1029,19 @@ var DummyTest3 = function (_DummyTest) {
           key: 'operation',
           value: function operation() {
             var self;
-            return regeneratorRuntime.async(function operation$(_context20) {
+            return regeneratorRuntime.async(function operation$(_context21) {
               while (1) {
-                switch (_context20.prev = _context20.next) {
+                switch (_context21.prev = _context21.next) {
                   case 0:
                     self = this;
-                    _context20.next = 3;
+                    _context21.next = 3;
                     return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'neon-animation-finish', function () {
                       MockInteractions.tap(self.fab);
                     }, true));
 
                   case 3:
                   case 'end':
-                    return _context20.stop();
+                    return _context21.stop();
                 }
               }
             }, null, this);
@@ -861,9 +1050,9 @@ var DummyTest3 = function (_DummyTest) {
           key: 'checkpoint',
           value: function checkpoint() {
             var self;
-            return regeneratorRuntime.async(function checkpoint$(_context21) {
+            return regeneratorRuntime.async(function checkpoint$(_context22) {
               while (1) {
-                switch (_context21.prev = _context21.next) {
+                switch (_context22.prev = _context22.next) {
                   case 0:
                     self = this;
 
@@ -877,7 +1066,7 @@ var DummyTest3 = function (_DummyTest) {
 
                   case 5:
                   case 'end':
-                    return _context21.stop();
+                    return _context22.stop();
                 }
               }
             }, null, this);
@@ -901,19 +1090,19 @@ var DummyTest3 = function (_DummyTest) {
           key: 'iteration',
           value: regeneratorRuntime.mark(function iteration() {
             var dx, dy;
-            return regeneratorRuntime.wrap(function iteration$(_context22) {
+            return regeneratorRuntime.wrap(function iteration$(_context23) {
               while (1) {
-                switch (_context22.prev = _context22.next) {
+                switch (_context23.prev = _context23.next) {
                   case 0:
                     dx = 10;
                     dy = 10;
-                    return _context22.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }, { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } }, { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } }, { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } }, { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } }, { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } }, { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } }, { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } }, { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } }, { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }].map(function (parameters) {
+                    return _context23.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }, { mode: 'upper-left', dx: -dx, dy: -dy, expected: { x: -dx, y: -dy, width: dx, height: dy } }, { mode: 'upper', dx: -dx, dy: -dy, expected: { x: 0, y: -dy, width: 0, height: dy } }, { mode: 'upper-right', dx: dx, dy: -dy, expected: { x: 0, y: -dy, width: dx, height: dy } }, { mode: 'middle-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: 0 } }, { mode: 'middle-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: 0 } }, { mode: 'lower-left', dx: -dx, dy: dy, expected: { x: -dx, y: 0, width: dx, height: dy } }, { mode: 'lower', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: dy } }, { mode: 'lower-right', dx: dx, dy: dy, expected: { x: 0, y: 0, width: dx, height: dy } }, { mode: '.title-pad', dx: dx, dy: dy, expected: { x: 0, y: 0, width: 0, height: 0 } }].map(function (parameters) {
                       parameters.name = 'drag dialog by ' + parameters.mode + ' handle';return parameters;
                     }), 't0', 3);
 
                   case 3:
                   case 'end':
-                    return _context22.stop();
+                    return _context23.stop();
                 }
               }
             }, iteration, this);
@@ -922,9 +1111,9 @@ var DummyTest3 = function (_DummyTest) {
           key: 'operation',
           value: function operation(parameters) {
             var self, handle;
-            return regeneratorRuntime.async(function operation$(_context23) {
+            return regeneratorRuntime.async(function operation$(_context24) {
               while (1) {
-                switch (_context23.prev = _context23.next) {
+                switch (_context24.prev = _context24.next) {
                   case 0:
                     self = this;
                     handle = self.dialog.$.handle.querySelector(parameters.mode.match(/^[.]/) ? parameters.mode : '[drag-handle-mode=' + parameters.mode + ']');
@@ -940,7 +1129,7 @@ var DummyTest3 = function (_DummyTest) {
                       clientY: 0,
                       buttons: 1
                     }));
-                    _context23.next = 7;
+                    _context24.next = 7;
                     return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'track', function () {
                       MockInteractions.track(self.dialog, parameters.dx, parameters.dy);
                     }, function (element, type, event) {
@@ -949,7 +1138,7 @@ var DummyTest3 = function (_DummyTest) {
 
                   case 7:
                   case 'end':
-                    return _context23.stop();
+                    return _context24.stop();
                 }
               }
             }, null, this);
@@ -958,9 +1147,9 @@ var DummyTest3 = function (_DummyTest) {
           key: 'checkpoint',
           value: function checkpoint(parameters) {
             var prop;
-            return regeneratorRuntime.async(function checkpoint$(_context24) {
+            return regeneratorRuntime.async(function checkpoint$(_context25) {
               while (1) {
-                switch (_context24.prev = _context24.next) {
+                switch (_context25.prev = _context25.next) {
                   case 0:
                     for (prop in parameters.expected) {
                       assert.equal(this.dialog[prop], this.origin[prop] + parameters.expected[prop], 'dialog is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
@@ -968,7 +1157,7 @@ var DummyTest3 = function (_DummyTest) {
 
                   case 1:
                   case 'end':
-                    return _context24.stop();
+                    return _context25.stop();
                 }
               }
             }, null, this);
@@ -992,17 +1181,17 @@ var DummyTest3 = function (_DummyTest) {
           key: 'iteration',
           value: regeneratorRuntime.mark(function iteration() {
             var dx, dy;
-            return regeneratorRuntime.wrap(function iteration$(_context25) {
+            return regeneratorRuntime.wrap(function iteration$(_context26) {
               while (1) {
-                switch (_context25.prev = _context25.next) {
+                switch (_context26.prev = _context26.next) {
                   case 0:
                     dx = 10;
                     dy = 10;
-                    return _context25.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }], 't0', 3);
+                    return _context26.delegateYield([{ mode: 'position', dx: dx, dy: dy, expected: { x: dx, y: dy, width: 0, height: 0 } }], 't0', 3);
 
                   case 3:
                   case 'end':
-                    return _context25.stop();
+                    return _context26.stop();
                 }
               }
             }, iteration, this);
@@ -1011,9 +1200,9 @@ var DummyTest3 = function (_DummyTest) {
           key: 'operation',
           value: function operation(parameters) {
             var self;
-            return regeneratorRuntime.async(function operation$(_context26) {
+            return regeneratorRuntime.async(function operation$(_context27) {
               while (1) {
-                switch (_context26.prev = _context26.next) {
+                switch (_context27.prev = _context27.next) {
                   case 0:
                     self = this;
 
@@ -1028,7 +1217,7 @@ var DummyTest3 = function (_DummyTest) {
                       clientY: 0,
                       buttons: 1
                     }));
-                    _context26.next = 6;
+                    _context27.next = 6;
                     return regeneratorRuntime.awrap(self.forEvent(self.fab, 'track', function () {
                       MockInteractions.track(self.fab, parameters.dx, parameters.dy);
                     }, function (element, type, event) {
@@ -1037,7 +1226,7 @@ var DummyTest3 = function (_DummyTest) {
 
                   case 6:
                   case 'end':
-                    return _context26.stop();
+                    return _context27.stop();
                 }
               }
             }, null, this);
@@ -1046,9 +1235,9 @@ var DummyTest3 = function (_DummyTest) {
           key: 'checkpoint',
           value: function checkpoint(parameters) {
             var prop;
-            return regeneratorRuntime.async(function checkpoint$(_context27) {
+            return regeneratorRuntime.async(function checkpoint$(_context28) {
               while (1) {
-                switch (_context27.prev = _context27.next) {
+                switch (_context28.prev = _context28.next) {
                   case 0:
                     for (prop in parameters.expected) {
                       assert.equal(this.fab[prop], this.origin[prop] + parameters.expected[prop], 'fab is dragged with ' + parameters.mode + ' handle by ' + parameters.expected[prop] + ' in ' + prop);
@@ -1056,7 +1245,7 @@ var DummyTest3 = function (_DummyTest) {
 
                   case 1:
                   case 'end':
-                    return _context27.stop();
+                    return _context28.stop();
                 }
               }
             }, null, this);
@@ -1080,19 +1269,19 @@ var DummyTest3 = function (_DummyTest) {
           key: 'operation',
           value: function operation() {
             var self;
-            return regeneratorRuntime.async(function operation$(_context28) {
+            return regeneratorRuntime.async(function operation$(_context29) {
               while (1) {
-                switch (_context28.prev = _context28.next) {
+                switch (_context29.prev = _context29.next) {
                   case 0:
                     self = this;
-                    _context28.next = 3;
+                    _context29.next = 3;
                     return regeneratorRuntime.awrap(self.forEvent(self.fab, 'neon-animation-finish', function () {
                       MockInteractions.tap(self.dialog.$.close);
                     }, true));
 
                   case 3:
                   case 'end':
-                    return _context28.stop();
+                    return _context29.stop();
                 }
               }
             }, null, this);
@@ -1100,16 +1289,16 @@ var DummyTest3 = function (_DummyTest) {
         }, {
           key: 'checkpoint',
           value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context29) {
+            return regeneratorRuntime.async(function checkpoint$(_context30) {
               while (1) {
-                switch (_context29.prev = _context29.next) {
+                switch (_context30.prev = _context30.next) {
                   case 0:
                     assert.isNotOk(this.dialog.opened, 'dialog is not opened');
                     assert.isOk(this.fab.opened, 'fab is opened');
 
                   case 2:
                   case 'end':
-                    return _context29.stop();
+                    return _context30.stop();
                 }
               }
             }, null, this);
@@ -1132,15 +1321,15 @@ var DummyTest3 = function (_DummyTest) {
         _createClass(TestA, [{
           key: 'operation',
           value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context30) {
+            return regeneratorRuntime.async(function operation$(_context31) {
               while (1) {
-                switch (_context30.prev = _context30.next) {
+                switch (_context31.prev = _context31.next) {
                   case 0:
                     console.log('Test A operation');
 
                   case 1:
                   case 'end':
-                    return _context30.stop();
+                    return _context31.stop();
                 }
               }
             }, null, this);
@@ -1148,15 +1337,15 @@ var DummyTest3 = function (_DummyTest) {
         }, {
           key: 'checkpoint',
           value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context31) {
+            return regeneratorRuntime.async(function checkpoint$(_context32) {
               while (1) {
-                switch (_context31.prev = _context31.next) {
+                switch (_context32.prev = _context32.next) {
                   case 0:
                     console.log('Checkpoint for Test A');
 
                   case 1:
                   case 'end':
-                    return _context31.stop();
+                    return _context32.stop();
                 }
               }
             }, null, this);
@@ -1179,15 +1368,15 @@ var DummyTest3 = function (_DummyTest) {
         _createClass(TestB, [{
           key: 'operation',
           value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context32) {
+            return regeneratorRuntime.async(function operation$(_context33) {
               while (1) {
-                switch (_context32.prev = _context32.next) {
+                switch (_context33.prev = _context33.next) {
                   case 0:
                     console.log('Test B operation');
 
                   case 1:
                   case 'end':
-                    return _context32.stop();
+                    return _context33.stop();
                 }
               }
             }, null, this);
@@ -1195,15 +1384,15 @@ var DummyTest3 = function (_DummyTest) {
         }, {
           key: 'checkpoint',
           value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context33) {
+            return regeneratorRuntime.async(function checkpoint$(_context34) {
               while (1) {
-                switch (_context33.prev = _context33.next) {
+                switch (_context34.prev = _context34.next) {
                   case 0:
                     console.log('Checkpoint for Test B');
 
                   case 1:
                   case 'end':
-                    return _context33.stop();
+                    return _context34.stop();
                 }
               }
             }, null, this);
@@ -1226,15 +1415,15 @@ var DummyTest3 = function (_DummyTest) {
         _createClass(Test1, [{
           key: 'operation',
           value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context34) {
+            return regeneratorRuntime.async(function operation$(_context35) {
               while (1) {
-                switch (_context34.prev = _context34.next) {
+                switch (_context35.prev = _context35.next) {
                   case 0:
                     console.log('Test 1 operation');
 
                   case 1:
                   case 'end':
-                    return _context34.stop();
+                    return _context35.stop();
                 }
               }
             }, null, this);
@@ -1242,15 +1431,15 @@ var DummyTest3 = function (_DummyTest) {
         }, {
           key: 'checkpoint',
           value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context35) {
+            return regeneratorRuntime.async(function checkpoint$(_context36) {
               while (1) {
-                switch (_context35.prev = _context35.next) {
+                switch (_context36.prev = _context36.next) {
                   case 0:
                     console.log('Checkpoint for Test 1');
 
                   case 1:
                   case 'end':
-                    return _context35.stop();
+                    return _context36.stop();
                 }
               }
             }, null, this);
@@ -1273,15 +1462,15 @@ var DummyTest3 = function (_DummyTest) {
         _createClass(Test2, [{
           key: 'operation',
           value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context36) {
+            return regeneratorRuntime.async(function operation$(_context37) {
               while (1) {
-                switch (_context36.prev = _context36.next) {
+                switch (_context37.prev = _context37.next) {
                   case 0:
                     console.log('Test 2 operation');
 
                   case 1:
                   case 'end':
-                    return _context36.stop();
+                    return _context37.stop();
                 }
               }
             }, null, this);
@@ -1289,15 +1478,15 @@ var DummyTest3 = function (_DummyTest) {
         }, {
           key: 'checkpoint',
           value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context37) {
+            return regeneratorRuntime.async(function checkpoint$(_context38) {
               while (1) {
-                switch (_context37.prev = _context37.next) {
+                switch (_context38.prev = _context38.next) {
                   case 0:
                     console.log('Checkpoint for Test 2');
 
                   case 1:
                   case 'end':
-                    return _context37.stop();
+                    return _context38.stop();
                 }
               }
             }, null, this);
@@ -1319,15 +1508,15 @@ var DummyTest3 = function (_DummyTest) {
       _createClass(TestC, [{
         key: 'operation',
         value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context38) {
+          return regeneratorRuntime.async(function operation$(_context39) {
             while (1) {
-              switch (_context38.prev = _context38.next) {
+              switch (_context39.prev = _context39.next) {
                 case 0:
                   console.log('Test C operation');
 
                 case 1:
                 case 'end':
-                  return _context38.stop();
+                  return _context39.stop();
               }
             }
           }, null, this);
@@ -1335,15 +1524,15 @@ var DummyTest3 = function (_DummyTest) {
       }, {
         key: 'checkpoint',
         value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context39) {
+          return regeneratorRuntime.async(function checkpoint$(_context40) {
             while (1) {
-              switch (_context39.prev = _context39.next) {
+              switch (_context40.prev = _context40.next) {
                 case 0:
                   console.log('Checkpoint for Test C');
 
                 case 1:
                 case 'end':
-                  return _context39.stop();
+                  return _context40.stop();
               }
             }
           }, null, this);
@@ -1364,15 +1553,15 @@ var DummyTest3 = function (_DummyTest) {
       _createClass(TestD, [{
         key: 'operation',
         value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context40) {
+          return regeneratorRuntime.async(function operation$(_context41) {
             while (1) {
-              switch (_context40.prev = _context40.next) {
+              switch (_context41.prev = _context41.next) {
                 case 0:
                   console.log('Test D operation');
 
                 case 1:
                 case 'end':
-                  return _context40.stop();
+                  return _context41.stop();
               }
             }
           }, null, this);
@@ -1380,15 +1569,15 @@ var DummyTest3 = function (_DummyTest) {
       }, {
         key: 'checkpoint',
         value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context41) {
+          return regeneratorRuntime.async(function checkpoint$(_context42) {
             while (1) {
-              switch (_context41.prev = _context41.next) {
+              switch (_context42.prev = _context42.next) {
                 case 0:
                   console.log('Checkpoint for Test D');
 
                 case 1:
                 case 'end':
-                  return _context41.stop();
+                  return _context42.stop();
               }
             }
           }, null, this);
@@ -1409,15 +1598,15 @@ var DummyTest3 = function (_DummyTest) {
       _createClass(TestE, [{
         key: 'operation',
         value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context42) {
+          return regeneratorRuntime.async(function operation$(_context43) {
             while (1) {
-              switch (_context42.prev = _context42.next) {
+              switch (_context43.prev = _context43.next) {
                 case 0:
                   console.log('Test D operation');
 
                 case 1:
                 case 'end':
-                  return _context42.stop();
+                  return _context43.stop();
               }
             }
           }, null, this);
@@ -1425,15 +1614,15 @@ var DummyTest3 = function (_DummyTest) {
       }, {
         key: 'checkpoint',
         value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context43) {
+          return regeneratorRuntime.async(function checkpoint$(_context44) {
             while (1) {
-              switch (_context43.prev = _context43.next) {
+              switch (_context44.prev = _context44.next) {
                 case 0:
                   console.log('Checkpoint for Test D');
 
                 case 1:
                 case 'end':
-                  return _context43.stop();
+                  return _context44.stop();
               }
             }
           }, null, this);
@@ -1444,14 +1633,14 @@ var DummyTest3 = function (_DummyTest) {
     }(Suite);
     basic.test = {
       // test class mixins
-      '': {
+      '': [{
         TestA: {
           TestB: 'TestAThenB'
         },
         TestB: {
           TestA: 'TestBThenA'
         }
-      },
+      }, Suite.repeat('TestAThenB', 3, 'TestAB3')],
       // test classes
       InstantiateTest: {
         TestAThenB: 'TestABAtInitial',
@@ -1475,7 +1664,7 @@ var DummyTest3 = function (_DummyTest) {
       DummyTest1: '',
       DummyTest2: 'DummyTest2Alias',
       DummyTest3: '',
-      TestE: {
+      TestE: [{
         TestA: {
           TestB: {
             Test1: {
@@ -1485,8 +1674,15 @@ var DummyTest3 = function (_DummyTest) {
         },
         TestB: {
           Test1: ''
-        }
-      }
+        },
+        TestAB3: 'TestEAB3'
+      }, Suite.permute(['TestA', 'TestB', 'Test1'], function (scenario) {
+        return {
+          Test2: 'Test_E_' + scenario.map(function (n) {
+            return n.replace(/^Test/, '');
+          }).join('_') + '_2'
+        };
+      })]
     };
 
     // TODO: Refine handlers
@@ -1501,45 +1697,45 @@ var DummyTest3 = function (_DummyTest) {
       testSuites[scope] = Suite.scopes[scope].test;
     }
     (function _callee8() {
-      return regeneratorRuntime.async(function _callee8$(_context46) {
+      return regeneratorRuntime.async(function _callee8$(_context47) {
         while (1) {
-          switch (_context46.prev = _context46.next) {
+          switch (_context47.prev = _context47.next) {
             case 0:
               suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function _callee7() {
-                var _this18 = this;
+                var _this19 = this;
 
                 var container, element, main, fab, dialog, panel, model, iconView, listView, storageView, origin;
-                return regeneratorRuntime.async(function _callee7$(_context45) {
+                return regeneratorRuntime.async(function _callee7$(_context46) {
                   while (1) {
-                    switch (_context45.prev = _context45.next) {
+                    switch (_context46.prev = _context46.next) {
                       case 0:
                         if (match) {
                           testSuites.forEach(function _callee6(s) {
-                            return regeneratorRuntime.async(function _callee6$(_context44) {
+                            return regeneratorRuntime.async(function _callee6$(_context45) {
                               while (1) {
-                                switch (_context44.prev = _context44.next) {
+                                switch (_context45.prev = _context45.next) {
                                   case 0:
                                     if (!s) {
-                                      _context44.next = 3;
+                                      _context45.next = 3;
                                       break;
                                     }
 
-                                    _context44.next = 3;
+                                    _context45.next = 3;
                                     return regeneratorRuntime.awrap(new s('template#basic').run());
 
                                   case 3:
                                   case 'end':
-                                    return _context44.stop();
+                                    return _context45.stop();
                                 }
                               }
-                            }, null, _this18);
+                            }, null, _this19);
                           });
                         }
-                        return _context45.abrupt('return');
+                        return _context46.abrupt('return');
 
                       case 5:
                       case 'end':
-                        return _context45.stop();
+                        return _context46.stop();
                     }
                   }
                 }, null, this);
@@ -1547,7 +1743,7 @@ var DummyTest3 = function (_DummyTest) {
 
             case 1:
             case 'end':
-              return _context46.stop();
+              return _context47.stop();
           }
         }
       }, null, this);
