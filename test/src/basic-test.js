@@ -251,6 +251,51 @@ class Suite {
     }
     return scenario;
   }
+  static * _permute(targets, i = 0, result = {}, subclass = (list) => list.join('Then')) {
+    let len = targets.length;
+    let j;
+    function swap() {
+      if (j !== i) {
+        let tmp = targets[i];
+        targets[i] = targets[j];
+        targets[j] = tmp;
+      }
+    }
+    function append() {
+      // TODO: cache cursor
+      let cursor = result;
+      for (let k = 0; k < len; k++) {
+        if (!cursor[targets[k]]) {
+          if (k >= len - 1) {
+            cursor[targets[k]] = subclass(targets);
+          }
+          else {
+            cursor[targets[k]] = {};
+          }
+        }
+        cursor = cursor[targets[k]];
+      }
+    }
+    if (i >= len - 1) {
+      yield targets;
+      append();
+    }
+    else {
+      for (j = i; j < len; j++) {
+        swap();
+        for (let sub of this._permute(targets, i + 1, result)) {
+          yield targets;
+          append();
+        }
+        swap();
+      }
+    }
+  }
+  static permute(targets, subclass) {
+    let result = {};
+    for (let chain of this._permute(targets, 0, result, subclass)) {}
+    return result;
+  }
   async setup() {
   }
   forEvent(element, type, trigger, condition) {
@@ -607,19 +652,24 @@ class DummyTest3 extends DummyTest2 {
     DummyTest1: '',
     DummyTest2: 'DummyTest2Alias',
     DummyTest3: '',
-    TestE: {
-      TestA: {
-        TestB: {
-          Test1: {
-            Test2: 'TestEAB12'
+    TestE: [
+      {
+        TestA: {
+          TestB: {
+            Test1: {
+              Test2: 'TestEAB12'
+            }
           }
-        }
+        },
+        TestB: {
+          Test1: ''
+        },
+        TestAB3: 'TestEAB3'
       },
-      TestB: {
-        Test1: ''
-      },
-      TestAB3: 'TestEAB3'
-    }
+      Suite.permute([ 'TestA', 'TestB', 'Test1' ], (scenario) => ({
+        Test2: 'Test_E_' + scenario.map(n => n.replace(/^Test/,'')).join('_') + '_2'
+      }))
+    ]
   };
 
   // TODO: Refine handlers
