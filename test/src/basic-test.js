@@ -5,6 +5,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 // TODO: move to a common script file
 class Suite {
   static get reconnectable() { return true; }
+  static get skipAfterFailure() { return false; }
   constructor(target) {
     if (this.constructor.name === 'Suite') {
       // suite instance
@@ -346,24 +347,36 @@ class Suite {
                 test(parameters.name ?
                       (typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name)
                       : step.name, async function() {
+                  if (self.constructor.skipAfterFailure && self.__failed) {
+                    this.skip();
+                    return;
+                  }
+                  self.__failed = true;
                   if (step.operation) {
                     await step.operation.call(self, parameters);
                   }
                   if (step.checkpoint) {
                     await step.checkpoint.call(self, parameters);
                   }
+                  self.__failed = false;
                 });
               }
             //});
           }
           else {
             test(step.name, async function() {
+              if (self.constructor.skipAfterFailure && self.__failed) {
+                this.skip();
+                return;
+              }
+              self.__failed = true;
               if (step.operation) {
                 await step.operation.call(self);
               }
               if (step.checkpoint) {
                 await step.checkpoint.call(self);
               }
+              self.__failed = false;
             });
           }
         }
@@ -566,6 +579,7 @@ class DummyTest3 extends DummyTest2 {
     }
     async checkpoint() {
       console.log('Checkpoint for Test A');
+      //assert.isOk(false, 'Failing test A');
     }
   }
   basic.test = (base) => class TestB extends base {
@@ -609,6 +623,7 @@ class DummyTest3 extends DummyTest2 {
     }
   }
   basic.test = class TestE extends Suite {
+    static get skipAfterFailure() { return true; }
     async operation() {
       console.log('Test D operation');
     }
