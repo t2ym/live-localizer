@@ -148,8 +148,16 @@ class Suite {
   }
   generateClasses(branch, chain) {
     if (typeof branch === 'string') {
-      console.log('string', branch || chain[chain.length - 1], chain);
-      this.generateClass(branch, chain);
+      let description = branch.split(/;/);
+      if (description.length > 1) {
+        branch = description.shift();
+        description = description.join(';').replace(/^[\w]*/, '');
+      }
+      else {
+        description = '';
+      }
+      console.log('string', branch || chain[chain.length - 1], chain, description);
+      this.generateClass(branch, chain, description);
     }
     else if (typeof branch === 'object' && !Array.isArray(branch)) {
       if (branch) {
@@ -173,7 +181,7 @@ class Suite {
       throw new Error(this.constructor.name + '.' + this.scope + ': unknown branch type ' + typeof branch + branch);
     }
   }
-  generateClass(name, chain) {
+  generateClass(name, chain, description) {
     let self = this;
     let expression;
     if (!(chain.length >= (chain[0] ? 1 : 2))) {
@@ -230,7 +238,7 @@ class Suite {
         ? 'return ' + name
         : name === chain[chain.length - 1]
           ? 'return ' + expression
-          : 'return class ' + name + ' extends ' + expression + ' {}';
+          : 'return class ' + name + ' extends ' + expression + (description ? ' { get description() { return "' + description.replace(/"/g,'\\"') + '"; } }' : ' {}');
       self.classes[name] = (new Function('self', expression))(self);
       self.updateLeafClasses(self.classes[name]);
       console.log('generateClass classes.' + name + ' = ' + expression);
@@ -320,7 +328,7 @@ class Suite {
     let proto = Object.getPrototypeOf(this);
     while (proto.constructor.name && proto.constructor.name !== 'Object') {
       steps.unshift({
-        name: this.uncamel(proto.constructor.name),
+        name: proto.hasOwnProperty('description') ? proto.description : this.uncamel(proto.constructor.name),
         iteration: proto.hasOwnProperty('iteration') ? proto.iteration : undefined,
         operation: proto.hasOwnProperty('operation') ? proto.operation : undefined,
         checkpoint: proto.hasOwnProperty('checkpoint') ? proto.checkpoint: undefined
@@ -333,7 +341,7 @@ class Suite {
   }
   async run() {
     let self = this;
-    suite(self.uncamel(self.constructor.name), async function () {
+    suite(Object.getOwnPropertyDescriptor(Object.getPrototypeOf(self), 'description') ? self.description : self.uncamel(self.constructor.name), async function () {
       suiteSetup(async function () {
         await self.setup();
       });
@@ -462,6 +470,7 @@ class DummyTest2 extends Suite {
   }
 }
 class DummyTest3 extends DummyTest2 {
+  get description() { return 'Description of Dummy Test 3'; }
   async operation() {
     console.log('DummyTest 3 operation');
   }
@@ -574,6 +583,7 @@ class DummyTest3 extends DummyTest2 {
     }
   }
   basic.test = (base) => class TestA extends base {
+    get description() { return 'Description of Test A'; }
     async operation() {
       console.log('Test A operation');
     }
@@ -679,7 +689,7 @@ class DummyTest3 extends DummyTest2 {
         TestB: {
           Test1: ''
         },
-        TestAB3: 'TestEAB3'
+        TestAB3: 'TestEAB3; Description of "Test EAB3"'
       },
       Suite.permute([ 'TestA', 'TestB', 'Test1' ], (scenario) => ({
         Test2: 'Test_E_' + scenario.map(n => n.replace(/^Test/,'')).join('_') + '_2'
