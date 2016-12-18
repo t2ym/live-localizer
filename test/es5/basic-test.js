@@ -56,9 +56,9 @@ var Suite = function () {
     }
   }, {
     key: 'testClasses',
-    value: function testClasses(csv) {
+    value: function testClasses(tests) {
       var self = this;
-      return csv.split(/,/).map(function (name) {
+      return (tests.match(/^[0-9]$/) ? self.test[tests] : tests).split(/,/).map(function (name) {
         if (!self.classes[name]) {
           throw new Error('Suite.' + self.scope + ': Test ' + name + ' is not defined');
         }
