@@ -106,9 +106,9 @@ class Suite {
     // [ 'UnreconnectableTest', 'ReconnectableTest,ReconnectableTest,...', 'UnreconnectableTest', ...]
     return reconnectableList.map(l => l.map(c => c.name).join(','));
   }
-  testClasses(csv) {
+  testClasses(tests) {
     let self = this;
-    return csv.split(/,/).map((name) => {
+    return (tests.match(/^[0-9]$/) ? self.test[tests] : tests).split(/,/).map((name) => {
       if (!self.classes[name]) {
         throw new Error('Suite.' + self.scope + ': Test ' + name + ' is not defined');
       }
