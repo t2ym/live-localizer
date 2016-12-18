@@ -151,7 +151,7 @@ class Suite {
       let description = branch.split(/;/);
       if (description.length > 1) {
         branch = description.shift();
-        description = description.join(';').replace(/^[\w]*/, '');
+        description = description.join(';').replace(/^[\s]*/, '');
       }
       else {
         description = '';
