@@ -150,7 +150,7 @@ class Suite {
       console.log('string', branch || chain[chain.length - 1], chain);
       this.generateClass(branch, chain);
     }
-    else if (typeof branch === 'object') {
+    else if (typeof branch === 'object' && !Array.isArray(branch)) {
       if (branch) {
         for (let prop in branch) {
           chain.push(prop);
@@ -162,6 +162,11 @@ class Suite {
         console.log('null', branch, chain);
         this.generateClass(branch, chain);
       }
+    }
+    else if (typeof branch === 'object' && Array.isArray(branch)) {
+      branch.forEach((item) => {
+        this.generateClasses(item, chain);
+      });
     }
     else {
       throw new Error(this.constructor.name + '.' + this.scope + ': unknown branch type ' + typeof branch + branch);
@@ -229,6 +234,22 @@ class Suite {
       self.updateLeafClasses(self.classes[name]);
       console.log('generateClass classes.' + name + ' = ' + expression);
     }
+  }
+  static repeat(target, count, subclass) {
+    let scenario = {};
+    if (count < 1) {
+      scenario = subclass;
+    }
+    else {
+      scenario[target] = subclass;
+      count--;
+      while (count-- > 0) {
+        scenario = {
+          [target]: scenario
+        };
+      }
+    }
+    return scenario;
   }
   async setup() {
   }
@@ -552,14 +573,17 @@ class DummyTest3 extends DummyTest2 {
   }
   basic.test = {
     // test class mixins
-    '': {
-      TestA: {
-        TestB: 'TestAThenB'
+    '': [
+      {
+        TestA: {
+          TestB: 'TestAThenB'
+        },
+        TestB: {
+          TestA: 'TestBThenA'
+        },
       },
-      TestB: {
-        TestA: 'TestBThenA'
-      }
-    },
+      Suite.repeat('TestAThenB', 3, 'TestAB3')
+    ],
     // test classes
     InstantiateTest: {
       TestAThenB: 'TestABAtInitial',
@@ -593,7 +617,8 @@ class DummyTest3 extends DummyTest2 {
       },
       TestB: {
         Test1: ''
-      }
+      },
+      TestAB3: 'TestEAB3'
     }
   };
 
