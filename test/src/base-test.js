@@ -2,6 +2,30 @@
 @license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
+(function (root, factory) {
+
+  'use strict';
+
+  /* istanbul ignore if: AMD is not tested */
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([], function () {
+      return (root.Suite = root.Suite || factory());
+    });
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like enviroments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    // Browser globals
+    root.Suite = root.Suite || factory();
+  }
+
+}(this, function () {
+// UMD Definition above, do not remove this line
+  'use strict';
+
 class Suite {
   static get reconnectable() { return true; }
   static get skipAfterFailure() { return false; }
@@ -395,3 +419,5 @@ class Suite {
     });
   }
 }
+  return Suite;
+})); // UMD Definition
