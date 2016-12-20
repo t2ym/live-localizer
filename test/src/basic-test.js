@@ -106,81 +106,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.fab.opened, 'fab is opened');
     }
   }
-  basic.test = (base) => class TestA extends base {
-    get description() { return 'Description of Test A'; }
-    async operation() {
-      console.log('Test A operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test A');
-      //assert.isOk(false, 'Failing test A');
-    }
-  }
-  basic.test = (base) => class TestB extends base {
-    async operation() {
-      console.log('Test B operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test B');
-    }
-  }
-  basic.test = (base) => class Test1 extends base {
-    async operation() {
-      console.log('Test 1 operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test 1');
-    }
-  }
-  basic.test = (base) => class Test2 extends base {
-    async operation() {
-      console.log('Test 2 operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test 2');
-    }
-  }
-  basic.test = class TestC extends InstantiateTest {
-    async operation() {
-      console.log('Test C operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test C');
-    }
-  }
-  basic.test = class TestD extends Suite {
-    async operation() {
-      console.log('Test D operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test D');
-    }
-  }
-  basic.test = class TestE extends Suite {
-    static get skipAfterFailure() { return true; }
-    async operation() {
-      console.log('Test D operation');
-    }
-    async checkpoint() {
-      console.log('Checkpoint for Test D');
-    }
-  }
   basic.test = {
     // test class mixins
-    '': [
-      {
-        TestA: {
-          TestB: 'TestAThenB'
-        },
-        TestB: {
-          TestA: 'TestBThenA'
-        },
-      },
-      Suite.repeat('TestAThenB', 3, 'TestAB3')
-    ],
+    '': [],
     // test classes
     InstantiateTest: {
-      TestAThenB: 'TestABAtInitial',
       OpenDialogTest: '',
       DragFabTest: {
         OpenDialogTest: 'DragFabAndOpenDialogTest'
@@ -189,36 +119,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
       DragDialogTest: {
-        TestBThenA: {
-          CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
-        }
+        CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
       }
-    },
-    TestC: {
-      TestAThenB: 'TestCAB'
-    },
-    TestD: 'TestDAlias',
-    DummyTest1: '',
-    DummyTest2: 'DummyTest2Alias',
-    DummyTest3: '',
-    TestE: [
-      {
-        TestA: {
-          TestB: {
-            Test1: {
-              Test2: 'TestEAB12'
-            }
-          }
-        },
-        TestB: {
-          Test1: ''
-        },
-        TestAB3: 'TestEAB3; Description of "Test EAB3"'
-      },
-      Suite.permute([ 'TestA', 'TestB', 'Test1' ], (scenario) => ({
-        Test2: 'Test_E_' + scenario.map(n => n.replace(/^Test/,'')).join('_') + '_2'
-      }))
-    ]
+    }
   };
 
   // TODO: Refine handlers
