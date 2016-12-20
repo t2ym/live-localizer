@@ -5,7 +5,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // basic scope
   let scope = 'basic';
-  let basic = new Suite(scope);
+  let basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
   basic.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
@@ -130,23 +130,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   if (match) {
     // Runner
-    testSuites = Suite.scopes[scope].testClasses(match[1]);
+    basic.run(match[1], 'template#basic');
   }
   else {
     // Driver
     testSuites[scope] = Suite.scopes[scope].test;
   }
   (async function () {
-    suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), async function() {
-      if (match) {
-        testSuites.forEach(async (s) => {
-          if (s) {
-            // TODO: handle parameters
-            await (new s('template#basic')).run();
-          }
-        });
-      }
-      return;
+    return;
   // TODO: convert to classes
   var container;
   var element;
