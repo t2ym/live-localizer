@@ -405,7 +405,5 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     container.if = false;
     return Promise.resolve();
   });
-
-});
 })();
 } // basic scope
