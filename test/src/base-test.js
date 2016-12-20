@@ -29,10 +29,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 class Suite {
   static get reconnectable() { return true; }
   static get skipAfterFailure() { return false; }
-  constructor(target) {
+  constructor(target, description = target + ' suite') {
     if (this.constructor.name === 'Suite') {
       // suite instance
       this.scope = target || '';
+      this.description = description;
       this.classes = {};
       this.leafClasses = {};
       this.branchScenarios = {};
@@ -362,61 +363,94 @@ class Suite {
   }
   async teardown() {
   }
-  async run() {
+  async run(classes, target) {
+    // TODO: return a Promise object?
     let self = this;
-    suite(Object.getOwnPropertyDescriptor(Object.getPrototypeOf(self), 'description') ? self.description : self.uncamel(self.constructor.name), async function () {
-      suiteSetup(async function () {
-        await self.setup();
-      });
-
-      for (let step of self.scenario()) {
-        if (step.operation || step.checkpoint) {
-          if (step.iteration) {
-            // suite() has to be commented out since subsuites are executed after all the other sibling tests
-            //suite(step.name + ' iterations', async function () {
-              for (let parameters of step.iteration.apply(self)) {
-                test(parameters.name ?
-                      (typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name)
-                      : step.name, async function() {
-                  if (self.constructor.skipAfterFailure && self.__failed) {
-                    this.skip();
-                    return;
-                  }
-                  self.__failed = true;
-                  if (step.operation) {
-                    await step.operation.call(self, parameters);
-                  }
-                  if (step.checkpoint) {
-                    await step.checkpoint.call(self, parameters);
-                  }
-                  self.__failed = false;
-                });
-              }
-            //});
-          }
-          else {
-            test(step.name, async function() {
-              if (self.constructor.skipAfterFailure && self.__failed) {
-                this.skip();
-                return;
-              }
-              self.__failed = true;
-              if (step.operation) {
-                await step.operation.call(self);
-              }
-              if (step.checkpoint) {
-                await step.checkpoint.call(self);
-              }
-              self.__failed = false;
-            });
-          }
+    if (self.constructor.name === 'Suite') {
+      // Suite Runner
+      let testSuites = [];
+      if (typeof classes === 'number' || typeof classes === 'string') {
+        // Number 0
+        // Number string '0'
+        // CSV string 'Test1,Test2'
+        testSuites = self.testClasses(classes);
+      }
+      else if (typeof classes === 'object' && Array.isArray(classes)) {
+        // String Array [ 'Test1', 'Test2' ]
+        // Class Array [ Test1, Test2 ]
+        // TODO: handle errors if item is neither a string nor a class
+        testSuites = classes.map((item) => typeof item === 'string' ? self.classes[item] : item);
+      }
+      else if (typeof classes === 'object' && !Array.isArray(classes) && classes) {
+        // Object { Test1: Test1, Test2: Test2 } - property names are discarded
+        for (let c in classes) {
+          testSuites.push(classes[c]);
         }
       }
-
-      suiteTeardown(async function () {
-        await self.teardown();
+      suite(self.description || (self.scope + ' suite'), function() {
+        // Note: Not waiting for async forEach so that each subsuite runs under the parent suite
+        Promise.all(testSuites.map(async (s) => (new s(target)).run()))
+          .then(() => {
+            console.log(self.description + ' done for ', classes);
+          });
       });
-    });
+    }
+    else {
+      // Scenario Runner
+      suite(Object.getOwnPropertyDescriptor(Object.getPrototypeOf(self), 'description') ? self.description : self.uncamel(self.constructor.name), async function () {
+        suiteSetup(async function () {
+          await self.setup();
+        });
+
+        for (let step of self.scenario()) {
+          if (step.operation || step.checkpoint) {
+            if (step.iteration) {
+              // suite() has to be commented out since subsuites are executed after all the other sibling tests
+              //suite(step.name + ' iterations', async function () {
+                for (let parameters of step.iteration.apply(self)) {
+                  test(parameters.name ?
+                        (typeof parameters.name === 'function' ? parameters.name(parameters) : parameters.name)
+                        : step.name, async function() {
+                    if (self.constructor.skipAfterFailure && self.__failed) {
+                      this.skip();
+                      return;
+                    }
+                    self.__failed = true;
+                    if (step.operation) {
+                      await step.operation.call(self, parameters);
+                    }
+                    if (step.checkpoint) {
+                      await step.checkpoint.call(self, parameters);
+                    }
+                    self.__failed = false;
+                  });
+                }
+              //});
+            }
+            else {
+              test(step.name, async function() {
+                if (self.constructor.skipAfterFailure && self.__failed) {
+                  this.skip();
+                  return;
+                }
+                self.__failed = true;
+                if (step.operation) {
+                  await step.operation.call(self);
+                }
+                if (step.checkpoint) {
+                  await step.checkpoint.call(self);
+                }
+                self.__failed = false;
+              });
+            }
+          }
+        }
+
+        suiteTeardown(async function () {
+          await self.teardown();
+        });
+      });
+    }
   }
 }
   return Suite;

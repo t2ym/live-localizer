@@ -5,7 +5,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // example scope
   let scope = 'example';
-  let example = new Suite(scope);
+  let example = new Suite(scope, 'Description of Example Suite');
   example.test = class ExampleSuite extends Suite {
     async setup() {
       await super.setup();
@@ -122,14 +122,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   if (match) {
     // Runner
-    testSuites = Suite.scopes[scope].testClasses(match[1]);
-    (async function () {
-      suite('example suite', async function() {
-        for (let i in testSuites) {
-          await (new testSuites[i]('#example')).run();
-        }
-      });
-    })();
+    example.run(match[1], '#example');
   }
   else {
     // Driver
