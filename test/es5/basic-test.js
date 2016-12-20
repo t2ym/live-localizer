@@ -308,353 +308,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return CloseDialogTest;
       }(base);
     };
-    basic.test = function (base) {
-      return function (_base5) {
-        _inherits(TestA, _base5);
-
-        function TestA() {
-          _classCallCheck(this, TestA);
-
-          return _possibleConstructorReturn(this, (TestA.__proto__ || Object.getPrototypeOf(TestA)).apply(this, arguments));
-        }
-
-        _createClass(TestA, [{
-          key: 'operation',
-          value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context11) {
-              while (1) {
-                switch (_context11.prev = _context11.next) {
-                  case 0:
-                    console.log('Test A operation');
-
-                  case 1:
-                  case 'end':
-                    return _context11.stop();
-                }
-              }
-            }, null, this);
-          }
-        }, {
-          key: 'checkpoint',
-          value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context12) {
-              while (1) {
-                switch (_context12.prev = _context12.next) {
-                  case 0:
-                    console.log('Checkpoint for Test A');
-                    //assert.isOk(false, 'Failing test A');
-
-                  case 1:
-                  case 'end':
-                    return _context12.stop();
-                }
-              }
-            }, null, this);
-          }
-        }, {
-          key: 'description',
-          get: function get() {
-            return 'Description of Test A';
-          }
-        }]);
-
-        return TestA;
-      }(base);
-    };
-    basic.test = function (base) {
-      return function (_base6) {
-        _inherits(TestB, _base6);
-
-        function TestB() {
-          _classCallCheck(this, TestB);
-
-          return _possibleConstructorReturn(this, (TestB.__proto__ || Object.getPrototypeOf(TestB)).apply(this, arguments));
-        }
-
-        _createClass(TestB, [{
-          key: 'operation',
-          value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context13) {
-              while (1) {
-                switch (_context13.prev = _context13.next) {
-                  case 0:
-                    console.log('Test B operation');
-
-                  case 1:
-                  case 'end':
-                    return _context13.stop();
-                }
-              }
-            }, null, this);
-          }
-        }, {
-          key: 'checkpoint',
-          value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context14) {
-              while (1) {
-                switch (_context14.prev = _context14.next) {
-                  case 0:
-                    console.log('Checkpoint for Test B');
-
-                  case 1:
-                  case 'end':
-                    return _context14.stop();
-                }
-              }
-            }, null, this);
-          }
-        }]);
-
-        return TestB;
-      }(base);
-    };
-    basic.test = function (base) {
-      return function (_base7) {
-        _inherits(Test1, _base7);
-
-        function Test1() {
-          _classCallCheck(this, Test1);
-
-          return _possibleConstructorReturn(this, (Test1.__proto__ || Object.getPrototypeOf(Test1)).apply(this, arguments));
-        }
-
-        _createClass(Test1, [{
-          key: 'operation',
-          value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context15) {
-              while (1) {
-                switch (_context15.prev = _context15.next) {
-                  case 0:
-                    console.log('Test 1 operation');
-
-                  case 1:
-                  case 'end':
-                    return _context15.stop();
-                }
-              }
-            }, null, this);
-          }
-        }, {
-          key: 'checkpoint',
-          value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context16) {
-              while (1) {
-                switch (_context16.prev = _context16.next) {
-                  case 0:
-                    console.log('Checkpoint for Test 1');
-
-                  case 1:
-                  case 'end':
-                    return _context16.stop();
-                }
-              }
-            }, null, this);
-          }
-        }]);
-
-        return Test1;
-      }(base);
-    };
-    basic.test = function (base) {
-      return function (_base8) {
-        _inherits(Test2, _base8);
-
-        function Test2() {
-          _classCallCheck(this, Test2);
-
-          return _possibleConstructorReturn(this, (Test2.__proto__ || Object.getPrototypeOf(Test2)).apply(this, arguments));
-        }
-
-        _createClass(Test2, [{
-          key: 'operation',
-          value: function operation() {
-            return regeneratorRuntime.async(function operation$(_context17) {
-              while (1) {
-                switch (_context17.prev = _context17.next) {
-                  case 0:
-                    console.log('Test 2 operation');
-
-                  case 1:
-                  case 'end':
-                    return _context17.stop();
-                }
-              }
-            }, null, this);
-          }
-        }, {
-          key: 'checkpoint',
-          value: function checkpoint() {
-            return regeneratorRuntime.async(function checkpoint$(_context18) {
-              while (1) {
-                switch (_context18.prev = _context18.next) {
-                  case 0:
-                    console.log('Checkpoint for Test 2');
-
-                  case 1:
-                  case 'end':
-                    return _context18.stop();
-                }
-              }
-            }, null, this);
-          }
-        }]);
-
-        return Test2;
-      }(base);
-    };
-    basic.test = function (_InstantiateTest) {
-      _inherits(TestC, _InstantiateTest);
-
-      function TestC() {
-        _classCallCheck(this, TestC);
-
-        return _possibleConstructorReturn(this, (TestC.__proto__ || Object.getPrototypeOf(TestC)).apply(this, arguments));
-      }
-
-      _createClass(TestC, [{
-        key: 'operation',
-        value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context19) {
-            while (1) {
-              switch (_context19.prev = _context19.next) {
-                case 0:
-                  console.log('Test C operation');
-
-                case 1:
-                case 'end':
-                  return _context19.stop();
-              }
-            }
-          }, null, this);
-        }
-      }, {
-        key: 'checkpoint',
-        value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context20) {
-            while (1) {
-              switch (_context20.prev = _context20.next) {
-                case 0:
-                  console.log('Checkpoint for Test C');
-
-                case 1:
-                case 'end':
-                  return _context20.stop();
-              }
-            }
-          }, null, this);
-        }
-      }]);
-
-      return TestC;
-    }(InstantiateTest);
-    basic.test = function (_Suite) {
-      _inherits(TestD, _Suite);
-
-      function TestD() {
-        _classCallCheck(this, TestD);
-
-        return _possibleConstructorReturn(this, (TestD.__proto__ || Object.getPrototypeOf(TestD)).apply(this, arguments));
-      }
-
-      _createClass(TestD, [{
-        key: 'operation',
-        value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context21) {
-            while (1) {
-              switch (_context21.prev = _context21.next) {
-                case 0:
-                  console.log('Test D operation');
-
-                case 1:
-                case 'end':
-                  return _context21.stop();
-              }
-            }
-          }, null, this);
-        }
-      }, {
-        key: 'checkpoint',
-        value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context22) {
-            while (1) {
-              switch (_context22.prev = _context22.next) {
-                case 0:
-                  console.log('Checkpoint for Test D');
-
-                case 1:
-                case 'end':
-                  return _context22.stop();
-              }
-            }
-          }, null, this);
-        }
-      }]);
-
-      return TestD;
-    }(Suite);
-    basic.test = function (_Suite2) {
-      _inherits(TestE, _Suite2);
-
-      function TestE() {
-        _classCallCheck(this, TestE);
-
-        return _possibleConstructorReturn(this, (TestE.__proto__ || Object.getPrototypeOf(TestE)).apply(this, arguments));
-      }
-
-      _createClass(TestE, [{
-        key: 'operation',
-        value: function operation() {
-          return regeneratorRuntime.async(function operation$(_context23) {
-            while (1) {
-              switch (_context23.prev = _context23.next) {
-                case 0:
-                  console.log('Test D operation');
-
-                case 1:
-                case 'end':
-                  return _context23.stop();
-              }
-            }
-          }, null, this);
-        }
-      }, {
-        key: 'checkpoint',
-        value: function checkpoint() {
-          return regeneratorRuntime.async(function checkpoint$(_context24) {
-            while (1) {
-              switch (_context24.prev = _context24.next) {
-                case 0:
-                  console.log('Checkpoint for Test D');
-
-                case 1:
-                case 'end':
-                  return _context24.stop();
-              }
-            }
-          }, null, this);
-        }
-      }], [{
-        key: 'skipAfterFailure',
-        get: function get() {
-          return true;
-        }
-      }]);
-
-      return TestE;
-    }(Suite);
     basic.test = {
       // test class mixins
-      '': [{
-        TestA: {
-          TestB: 'TestAThenB'
-        },
-        TestB: {
-          TestA: 'TestBThenA'
-        }
-      }, Suite.repeat('TestAThenB', 3, 'TestAB3')],
+      '': [],
       // test classes
       InstantiateTest: {
-        TestAThenB: 'TestABAtInitial',
         OpenDialogTest: '',
         DragFabTest: {
           OpenDialogTest: 'DragFabAndOpenDialogTest'
@@ -663,37 +321,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       OpenDialogTest: {
         CloseDialogTest: 'OpenAndCloseDialogTest',
         DragDialogTest: {
-          TestBThenA: {
-            CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
-          }
+          CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
         }
-      },
-      TestC: {
-        TestAThenB: 'TestCAB'
-      },
-      TestD: 'TestDAlias',
-      DummyTest1: '',
-      DummyTest2: 'DummyTest2Alias',
-      DummyTest3: '',
-      TestE: [{
-        TestA: {
-          TestB: {
-            Test1: {
-              Test2: 'TestEAB12'
-            }
-          }
-        },
-        TestB: {
-          Test1: ''
-        },
-        TestAB3: 'TestEAB3; Description of "Test EAB3"'
-      }, Suite.permute(['TestA', 'TestB', 'Test1'], function (scenario) {
-        return {
-          Test2: 'Test_E_' + scenario.map(function (n) {
-            return n.replace(/^Test/, '');
-          }).join('_') + '_2'
-        };
-      })]
+      }
     };
 
     // TODO: Refine handlers
@@ -708,45 +338,45 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       testSuites[scope] = Suite.scopes[scope].test;
     }
     (function _callee3() {
-      return regeneratorRuntime.async(function _callee3$(_context27) {
+      return regeneratorRuntime.async(function _callee3$(_context13) {
         while (1) {
-          switch (_context27.prev = _context27.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
               suite('live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'), function _callee2() {
-                var _this12 = this;
+                var _this5 = this;
 
                 var container, element, main, fab, dialog, panel, model, iconView, listView, storageView, origin;
-                return regeneratorRuntime.async(function _callee2$(_context26) {
+                return regeneratorRuntime.async(function _callee2$(_context12) {
                   while (1) {
-                    switch (_context26.prev = _context26.next) {
+                    switch (_context12.prev = _context12.next) {
                       case 0:
                         if (match) {
                           testSuites.forEach(function _callee(s) {
-                            return regeneratorRuntime.async(function _callee$(_context25) {
+                            return regeneratorRuntime.async(function _callee$(_context11) {
                               while (1) {
-                                switch (_context25.prev = _context25.next) {
+                                switch (_context11.prev = _context11.next) {
                                   case 0:
                                     if (!s) {
-                                      _context25.next = 3;
+                                      _context11.next = 3;
                                       break;
                                     }
 
-                                    _context25.next = 3;
+                                    _context11.next = 3;
                                     return regeneratorRuntime.awrap(new s('template#basic').run());
 
                                   case 3:
                                   case 'end':
-                                    return _context25.stop();
+                                    return _context11.stop();
                                 }
                               }
-                            }, null, _this12);
+                            }, null, _this5);
                           });
                         }
-                        return _context26.abrupt('return');
+                        return _context12.abrupt('return');
 
                       case 5:
                       case 'end':
-                        return _context26.stop();
+                        return _context12.stop();
                     }
                   }
                 }, null, this);
@@ -754,7 +384,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
             case 1:
             case 'end':
-              return _context27.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
