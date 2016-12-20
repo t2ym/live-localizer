@@ -15,7 +15,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // example scope
   var scope = 'example';
-  var example = new Suite(scope);
+  var example = new Suite(scope, 'Description of Example Suite');
   example.test = function (_Suite) {
     _inherits(ExampleSuite, _Suite);
 
@@ -444,49 +444,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   if (match) {
     // Runner
-    testSuites = Suite.scopes[scope].testClasses(match[1]);
-    (function _callee2() {
-      return regeneratorRuntime.async(function _callee2$(_context18) {
-        while (1) {
-          switch (_context18.prev = _context18.next) {
-            case 0:
-              suite('example suite', function _callee() {
-                var i;
-                return regeneratorRuntime.async(function _callee$(_context17) {
-                  while (1) {
-                    switch (_context17.prev = _context17.next) {
-                      case 0:
-                        _context17.t0 = regeneratorRuntime.keys(testSuites);
-
-                      case 1:
-                        if ((_context17.t1 = _context17.t0()).done) {
-                          _context17.next = 7;
-                          break;
-                        }
-
-                        i = _context17.t1.value;
-                        _context17.next = 5;
-                        return regeneratorRuntime.awrap(new testSuites[i]('#example').run());
-
-                      case 5:
-                        _context17.next = 1;
-                        break;
-
-                      case 7:
-                      case 'end':
-                        return _context17.stop();
-                    }
-                  }
-                }, null, this);
-              });
-
-            case 1:
-            case 'end':
-              return _context18.stop();
-          }
-        }
-      }, null, this);
-    })();
+    example.run(match[1], '#example');
   } else {
     // Driver
     testSuites[scope] = Suite.scopes[scope].test;
