@@ -11,7 +11,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="src/base-test.js"></script>
+    <!-- <script src="../node_modules/babel-polyfill/browser.js"></script> -->
+    <script src="../../scenarist/Suite.js"></script>
     <script src="src/common-test.js"></script>
     <script src="src/example-test.js"></script>
   </head>
@@ -20,7 +21,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       var hasShadow = Boolean(Element.prototype.createShadowRoot);
       var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
       var suites = [];
-      [ 'Shadow', 'Shady' ].forEach(function (dom) {
+      [ 'shadow', 'shady' ].forEach(function (dom) {
         [ 'src' ].forEach(function (phase) {
           [
             'example'

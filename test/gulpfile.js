@@ -410,8 +410,11 @@ gulp.task('i18n', () => {
 gulp.task('es5', () => {
   return gulp.src([ 'src/**/*' ], { base: 'src' })
     .pipe(gulpif('*-test.html',
-      replace('<!-- <script src="..\/..\/node_modules\/babel-polyfill\/browser.js"><\/script> -->',
-              '<script src="..\/..\/node_modules\/babel-polyfill\/browser.js"><\/script>', 'g')))
+      replace('<!-- <script src="../../node_modules/babel-polyfill/browser.js"></script> -->',
+              '<script src="../../node_modules/babel-polyfill/browser.js"></script>', 'g')))
+    .pipe(gulpif('*-test.html',
+      replace('<script src="../../../scenarist/Suite.js"></script>',
+              '<script src="../../../scenarist/Suite.min.js"></script>', 'g')))
     .pipe(gulpif('*-test.js', babel({
       "presets": [ /*'es2015'*/ ],
       "plugins": [

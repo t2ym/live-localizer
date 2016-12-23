@@ -13,7 +13,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // basic scope
   var scope = 'basic';
-  var basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  var basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
   basic.test = function (base) {
     return function (_base) {
       _inherits(OpenDialogTest, _base);
@@ -320,7 +320,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
       DragDialogTest: {
-        CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
+        CloseDialogTest: 'OpenAndDragAndCloseDialogTest'
       }
     }
   };

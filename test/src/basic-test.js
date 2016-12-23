@@ -5,7 +5,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // basic scope
   let scope = 'basic';
-  let basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=Shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  let basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
   basic.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
@@ -119,7 +119,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
       DragDialogTest: {
-        CloseDialogTest: 'OpenAndDragAndTestBAAndCloseDialogTest'
+        CloseDialogTest: 'OpenAndDragAndCloseDialogTest'
       }
     }
   };
