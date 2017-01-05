@@ -58,28 +58,3 @@ class InstantiateTest extends LiveLocalizerSuite {
     assert.isOk(self.fab.opened, 'fab is opened');
   }
 }
-class DummyTest1 extends Suite {
-  async operation() {
-    console.log('DummyTest 1 operation');
-  }
-  async checkpoint() {
-    console.log('Checkpoint for DummyTest 1');
-  }
-}
-class DummyTest2 extends Suite {
-  async operation() {
-    console.log('DummyTest 2 operation');
-  }
-  async checkpoint() {
-    console.log('Checkpoint for DummyTest 2');
-  }
-}
-class DummyTest3 extends DummyTest2 {
-  get description() { return 'Description of Dummy Test 3'; }
-  async operation() {
-    console.log('DummyTest 3 operation');
-  }
-  async checkpoint() {
-    console.log('Checkpoint for DummyTest 3');
-  }
-}
