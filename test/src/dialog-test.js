@@ -3,10 +3,10 @@
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
 {
-  // basic scope
-  let scope = 'basic';
-  let basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
-  basic.test = (base) => class OpenDialogTest extends base {
+  // dialog scope
+  let scope = 'dialog';
+  let dialog = new Suite(scope, 'live-localizer dialog and fab tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  dialog.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
@@ -22,7 +22,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
   }
-  basic.test = (base) => class DragDialogTest extends base {
+  dialog.test = (base) => class DragDialogTest extends base {
     * iteration() {
       let dx = 10;
       let dy = 10;
@@ -64,7 +64,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  basic.test = (base) => class DragFabTest extends base {
+  dialog.test = (base) => class DragFabTest extends base {
     * iteration() {
       let dx = 10;
       let dy = 10;
@@ -96,7 +96,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  basic.test = (base) => class MaximizeDialogTest extends base {
+  dialog.test = (base) => class MaximizeDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'height-changed', () => { MockInteractions.tap(self.dialog.$.fullscreen); }, true);
@@ -106,7 +106,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.dialog.fullscreen, 'dialog is in fullscreen');
     }
   }
-  basic.test = (base) => class UnmaximizeDialogTest extends base {
+  dialog.test = (base) => class UnmaximizeDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'height-changed', () => { MockInteractions.tap(self.dialog.$['fullscreen-exit']); }, true);
@@ -116,7 +116,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isNotOk(this.dialog.fullscreen, 'dialog is not in fullscreen');
     }
   }
-  basic.test = (base) => class ResetDialogPositionTest extends base {
+  dialog.test = (base) => class ResetDialogPositionTest extends base {
     * iteration() {
       yield * [
         { name: 'reset fully overlapping dialog', x: -100, y: -100, width: 10000, height: 10000 },
@@ -142,7 +142,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
   }
-  basic.test = (base) => class ResetFabPositionTest extends base {
+  dialog.test = (base) => class ResetFabPositionTest extends base {
     * iteration() {
       yield * [
         { name: 'reset fab position from bottom left', x: -100, y: window.innerHeight + 100 },
@@ -165,7 +165,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.fab.resetPosition();
     }
   }
-  basic.test = (base) => class CloseDialogTest extends base {
+  dialog.test = (base) => class CloseDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.fab, 'neon-animation-finish', () => { MockInteractions.tap(self.dialog.$.close); }, true);
@@ -175,7 +175,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.fab.opened, 'fab is opened');
     }
   }
-  basic.test = {
+  dialog.test = {
     // test class mixins
     '': [],
     // test classes
@@ -210,6 +210,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   if (match) {
     // Runner
-    basic.run(match[1], 'template#basic');
+    dialog.run(match[1], 'template#container');
   }
-} // basic scope
+} // dialog scope

@@ -46,7 +46,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
   <link rel="import" href="my-app.html">
-  <link rel="import" href="../../live-localizer-lazy.html">
+  <link rel="import" href="../../live-localizer.html">
 
   <style>
 
@@ -65,7 +65,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   <my-app></my-app>
 
-  <template is="dom-if" id="basic" restamp>
+  <template is="dom-if" id="container" restamp>
     <live-localizer>
       <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
         auth-provider="google"
@@ -76,9 +76,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     </live-localizer>
   </template>
 
-  <script src="../../node_modules/babel-polyfill/browser.js"></script>
-  <script src="../../../scenarist/Suite.min.js"></script>
+  <!-- <script src="../../node_modules/babel-polyfill/browser.js"></script> -->
+  <script src="../../../scenarist/Suite.js"></script>
   <script src="common-test.js"></script>
-  <script src="basic-test.js"></script>
+  <script src="dialog-test.js"></script>
 </body>
 </html>

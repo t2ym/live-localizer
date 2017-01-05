@@ -11,10 +11,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
 {
-  // basic scope
-  var scope = 'basic';
-  var basic = new Suite(scope, 'live-localizer with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
-  basic.test = function (base) {
+  // dialog scope
+  var scope = 'dialog';
+  var dialog = new Suite(scope, 'live-localizer dialog and fab tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  dialog.test = function (base) {
     return function (_base) {
       _inherits(OpenDialogTest, _base);
 
@@ -75,7 +75,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return OpenDialogTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base2) {
       _inherits(DragDialogTest, _base2);
 
@@ -166,7 +166,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return DragDialogTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base3) {
       _inherits(DragFabTest, _base3);
 
@@ -254,7 +254,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return DragFabTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base4) {
       _inherits(MaximizeDialogTest, _base4);
 
@@ -307,7 +307,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return MaximizeDialogTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base5) {
       _inherits(UnmaximizeDialogTest, _base5);
 
@@ -360,7 +360,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return UnmaximizeDialogTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base6) {
       _inherits(ResetDialogPositionTest, _base6);
 
@@ -442,7 +442,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return ResetDialogPositionTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base7) {
       _inherits(ResetFabPositionTest, _base7);
 
@@ -521,7 +521,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return ResetFabPositionTest;
     }(base);
   };
-  basic.test = function (base) {
+  dialog.test = function (base) {
     return function (_base8) {
       _inherits(CloseDialogTest, _base8);
 
@@ -574,7 +574,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return CloseDialogTest;
     }(base);
   };
-  basic.test = {
+  dialog.test = {
     // test class mixins
     '': [],
     // test classes
@@ -609,6 +609,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   if (match) {
     // Runner
-    basic.run(match[1], 'template#basic');
+    dialog.run(match[1], 'template#container');
   }
-} // basic scope
+} // dialog scope
