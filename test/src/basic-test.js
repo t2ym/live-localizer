@@ -207,14 +207,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   // TODO: Refine handlers
   let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
-  window.testSuites = window.testSuites || {};
 
   if (match) {
     // Runner
     basic.run(match[1], 'template#basic');
-  }
-  else {
-    // Driver
-    testSuites[scope] = Suite.scopes[scope].test;
   }
 } // basic scope

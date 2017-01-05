@@ -20,15 +20,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <script>
       var hasShadow = Boolean(Element.prototype.createShadowRoot);
       var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
+      var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]mode=fast[^a-zA-Z0-9]?.*$/);
+      var fast = match ? true : false;
       var suites = [];
-      [ 'shadow', 'shady' ].forEach(function (dom) {
+      (fast ? [ 'shadow' ] : [ 'shadow', 'shady' ]).forEach(function (dom) {
         [ 'src' ].forEach(function (phase) {
-          [
-            'basic', 'basic-lazy'
-          ].forEach(function (type) {
-            testSuites[type.replace(/-lazy$/,'')].forEach(function (reconnectableSuites, i) {
-              suites.push(phase + '/' + type + '-test.html' + '?dom=' + dom + '&TestSuites=' + i);
-            });
+          (fast ? [ '' ] : [ '', '-lazy' ]).forEach(function (type) {
+            for (var scope in Suite.scopes) {
+              Suite.scopes[scope].test.forEach(function (tests, index) {
+                suites.push(phase + '/' + scope + type + '-test.html' + '?dom=' + dom + '&TestSuites=' + index);
+              });
+            }
           });
         });
       });

@@ -256,15 +256,15 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   };
   basic.test = function (base) {
     return function (_base4) {
-      _inherits(CloseDialogTest, _base4);
+      _inherits(MaximizeDialogTest, _base4);
 
-      function CloseDialogTest() {
-        _classCallCheck(this, CloseDialogTest);
+      function MaximizeDialogTest() {
+        _classCallCheck(this, MaximizeDialogTest);
 
-        return _possibleConstructorReturn(this, (CloseDialogTest.__proto__ || Object.getPrototypeOf(CloseDialogTest)).apply(this, arguments));
+        return _possibleConstructorReturn(this, (MaximizeDialogTest.__proto__ || Object.getPrototypeOf(MaximizeDialogTest)).apply(this, arguments));
       }
 
-      _createClass(CloseDialogTest, [{
+      _createClass(MaximizeDialogTest, [{
         key: 'operation',
         value: function operation() {
           var self;
@@ -274,8 +274,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 case 0:
                   self = this;
                   _context9.next = 3;
-                  return regeneratorRuntime.awrap(self.forEvent(self.fab, 'neon-animation-finish', function () {
-                    MockInteractions.tap(self.dialog.$.close);
+                  return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'height-changed', function () {
+                    MockInteractions.tap(self.dialog.$.fullscreen);
                   }, true));
 
                 case 3:
@@ -292,12 +292,279 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             while (1) {
               switch (_context10.prev = _context10.next) {
                 case 0:
+                  assert.isOk(this.dialog.opened, 'dialog is opened');
+                  assert.isOk(this.dialog.fullscreen, 'dialog is in fullscreen');
+
+                case 2:
+                case 'end':
+                  return _context10.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return MaximizeDialogTest;
+    }(base);
+  };
+  basic.test = function (base) {
+    return function (_base5) {
+      _inherits(UnmaximizeDialogTest, _base5);
+
+      function UnmaximizeDialogTest() {
+        _classCallCheck(this, UnmaximizeDialogTest);
+
+        return _possibleConstructorReturn(this, (UnmaximizeDialogTest.__proto__ || Object.getPrototypeOf(UnmaximizeDialogTest)).apply(this, arguments));
+      }
+
+      _createClass(UnmaximizeDialogTest, [{
+        key: 'operation',
+        value: function operation() {
+          var self;
+          return regeneratorRuntime.async(function operation$(_context11) {
+            while (1) {
+              switch (_context11.prev = _context11.next) {
+                case 0:
+                  self = this;
+                  _context11.next = 3;
+                  return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'height-changed', function () {
+                    MockInteractions.tap(self.dialog.$['fullscreen-exit']);
+                  }, true));
+
+                case 3:
+                case 'end':
+                  return _context11.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint() {
+          return regeneratorRuntime.async(function checkpoint$(_context12) {
+            while (1) {
+              switch (_context12.prev = _context12.next) {
+                case 0:
+                  assert.isOk(this.dialog.opened, 'dialog is opened');
+                  assert.isNotOk(this.dialog.fullscreen, 'dialog is not in fullscreen');
+
+                case 2:
+                case 'end':
+                  return _context12.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return UnmaximizeDialogTest;
+    }(base);
+  };
+  basic.test = function (base) {
+    return function (_base6) {
+      _inherits(ResetDialogPositionTest, _base6);
+
+      function ResetDialogPositionTest() {
+        _classCallCheck(this, ResetDialogPositionTest);
+
+        return _possibleConstructorReturn(this, (ResetDialogPositionTest.__proto__ || Object.getPrototypeOf(ResetDialogPositionTest)).apply(this, arguments));
+      }
+
+      _createClass(ResetDialogPositionTest, [{
+        key: 'iteration',
+        value: regeneratorRuntime.mark(function iteration() {
+          return regeneratorRuntime.wrap(function iteration$(_context13) {
+            while (1) {
+              switch (_context13.prev = _context13.next) {
+                case 0:
+                  return _context13.delegateYield([{ name: 'reset fully overlapping dialog', x: -100, y: -100, width: 10000, height: 10000 }, { name: 'reset patially overlapping dialog', x: window.innerWidth / 2, y: window.innerHeight / 2, width: window.innerWidth * 0.75, height: window.innerHeight * 0.75 }], 't0', 1);
+
+                case 1:
+                case 'end':
+                  return _context13.stop();
+              }
+            }
+          }, iteration, this);
+        })
+      }, {
+        key: 'operation',
+        value: function operation(dimension) {
+          var self;
+          return regeneratorRuntime.async(function operation$(_context14) {
+            while (1) {
+              switch (_context14.prev = _context14.next) {
+                case 0:
+                  self = this;
+
+                  self.dialog.x = dimension.x;
+                  self.dialog.y = dimension.y;
+                  self.dialog.width = dimension.width;
+                  self.dialog.height = dimension.height;
+                  _context14.next = 7;
+                  return regeneratorRuntime.awrap(self.forEvent(self.dialog, 'resize', function () {
+                    self.dialog.fire('resize');
+                  }, true));
+
+                case 7:
+                case 'end':
+                  return _context14.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint(dimension) {
+          var self;
+          return regeneratorRuntime.async(function checkpoint$(_context15) {
+            while (1) {
+              switch (_context15.prev = _context15.next) {
+                case 0:
+                  self = this;
+
+                  assert.isOk(self.dialog.x >= 0, 'x is non-negative');
+                  assert.isOk(self.dialog.y >= 0, 'y is non-negative');
+                  assert.isOk(self.dialog.width <= window.innerWidth, 'width is within innerWidth');
+                  assert.isOk(self.dialog.height <= window.innerHeight, 'height is within innerHeight');
+                  ['x', 'y', 'width', 'height'].forEach(function (prop) {
+                    self.dialog[prop] = self.origin[prop];
+                  });
+
+                case 6:
+                case 'end':
+                  return _context15.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return ResetDialogPositionTest;
+    }(base);
+  };
+  basic.test = function (base) {
+    return function (_base7) {
+      _inherits(ResetFabPositionTest, _base7);
+
+      function ResetFabPositionTest() {
+        _classCallCheck(this, ResetFabPositionTest);
+
+        return _possibleConstructorReturn(this, (ResetFabPositionTest.__proto__ || Object.getPrototypeOf(ResetFabPositionTest)).apply(this, arguments));
+      }
+
+      _createClass(ResetFabPositionTest, [{
+        key: 'iteration',
+        value: regeneratorRuntime.mark(function iteration() {
+          return regeneratorRuntime.wrap(function iteration$(_context16) {
+            while (1) {
+              switch (_context16.prev = _context16.next) {
+                case 0:
+                  return _context16.delegateYield([{ name: 'reset fab position from bottom left', x: -100, y: window.innerHeight + 100 }, { name: 'reset fab position from top right', x: window.innerWidth + 100, y: -100 }], 't0', 1);
+
+                case 1:
+                case 'end':
+                  return _context16.stop();
+              }
+            }
+          }, iteration, this);
+        })
+      }, {
+        key: 'operation',
+        value: function operation(dimension) {
+          var self;
+          return regeneratorRuntime.async(function operation$(_context17) {
+            while (1) {
+              switch (_context17.prev = _context17.next) {
+                case 0:
+                  self = this;
+
+                  self.fab.x = dimension.x;
+                  self.fab.y = dimension.y;
+                  _context17.next = 5;
+                  return regeneratorRuntime.awrap(self.forEvent(self.fab, 'resize', function () {
+                    self.fab.fire('resize');
+                  }, true));
+
+                case 5:
+                case 'end':
+                  return _context17.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint(dimension) {
+          var self;
+          return regeneratorRuntime.async(function checkpoint$(_context18) {
+            while (1) {
+              switch (_context18.prev = _context18.next) {
+                case 0:
+                  self = this;
+
+                  assert.isOk(self.fab.x >= 0, 'x is non-negative');
+                  assert.isOk(self.fab.y >= 0, 'y is non-negative');
+                  assert.isOk(self.fab.x + 56 <= window.innerWidth, 'width is within innerWidth');
+                  assert.isOk(self.fab.y + 56 <= window.innerHeight, 'height is within innerHeight');
+                  self.fab.reset = false;
+                  self.fab.resetPosition();
+
+                case 7:
+                case 'end':
+                  return _context18.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return ResetFabPositionTest;
+    }(base);
+  };
+  basic.test = function (base) {
+    return function (_base8) {
+      _inherits(CloseDialogTest, _base8);
+
+      function CloseDialogTest() {
+        _classCallCheck(this, CloseDialogTest);
+
+        return _possibleConstructorReturn(this, (CloseDialogTest.__proto__ || Object.getPrototypeOf(CloseDialogTest)).apply(this, arguments));
+      }
+
+      _createClass(CloseDialogTest, [{
+        key: 'operation',
+        value: function operation() {
+          var self;
+          return regeneratorRuntime.async(function operation$(_context19) {
+            while (1) {
+              switch (_context19.prev = _context19.next) {
+                case 0:
+                  self = this;
+                  _context19.next = 3;
+                  return regeneratorRuntime.awrap(self.forEvent(self.fab, 'neon-animation-finish', function () {
+                    MockInteractions.tap(self.dialog.$.close);
+                  }, true));
+
+                case 3:
+                case 'end':
+                  return _context19.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint() {
+          return regeneratorRuntime.async(function checkpoint$(_context20) {
+            while (1) {
+              switch (_context20.prev = _context20.next) {
+                case 0:
                   assert.isNotOk(this.dialog.opened, 'dialog is not opened');
                   assert.isOk(this.fab.opened, 'fab is opened');
 
                 case 2:
                 case 'end':
-                  return _context10.stop();
+                  return _context20.stop();
               }
             }
           }, null, this);
@@ -315,40 +582,33 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       OpenDialogTest: '',
       DragFabTest: {
         OpenDialogTest: 'DragFabAndOpenDialogTest'
-      }
+      },
+      ResetFabPositionTest: ''
     },
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
       DragDialogTest: {
         CloseDialogTest: 'OpenAndDragAndCloseDialogTest'
-      }
+      },
+      MaximizeDialogTest: {
+        UnmaximizeDialogTest: {
+          DragDialogTest: {
+            CloseDialogTest: 'MaxUnmaxDragCloseDialogTest'
+          }
+        }
+      },
+      ResetDialogPositionTest: ''
+    },
+    MaxUnmaxDragCloseDialogTest: {
+      DragFabTest: 'MaxUnmaxDragCloseDialogAndDragFabTest'
     }
   };
 
   // TODO: Refine handlers
   var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
-  window.testSuites = window.testSuites || {};
 
   if (match) {
     // Runner
     basic.run(match[1], 'template#basic');
-  } else {
-    // Driver
-    testSuites[scope] = Suite.scopes[scope].test;
   }
-  (function _callee() {
-    var container, element, main, fab, dialog, panel, model, iconView, listView, storageView, origin;
-    return regeneratorRuntime.async(function _callee$(_context11) {
-      while (1) {
-        switch (_context11.prev = _context11.next) {
-          case 0:
-            return _context11.abrupt('return');
-
-          case 4:
-          case 'end':
-            return _context11.stop();
-        }
-      }
-    }, null, this);
-  })();
 } // basic scope
