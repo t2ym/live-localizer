@@ -603,12 +603,4 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       DragFabTest: 'MaxUnmaxDragCloseDialogAndDragFabTest'
     }
   };
-
-  // TODO: Refine handlers
-  var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
-
-  if (match) {
-    // Runner
-    dialog.run(match[1], 'template#container');
-  }
 } // dialog scope
