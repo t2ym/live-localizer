@@ -4,9 +4,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
 {
   // dialog scope
-  let scope = 'dialog';
-  let dialog = new Suite(scope, 'live-localizer dialog and fab tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
-  dialog.test = (base) => class OpenDialogTest extends base {
+  let scope = 'panel';
+  let panel = new Suite(scope, 'live-localizer panel tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  panel.test = Suite.scopes.dialog.classes.OpenDialogTest;
+  /*
+  panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
@@ -22,7 +24,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
   }
-  dialog.test = (base) => class DragDialogTest extends base {
+  panel.test = (base) => class DragDialogTest extends base {
     * iteration() {
       let dx = 10;
       let dy = 10;
@@ -64,7 +66,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  dialog.test = (base) => class DragFabTest extends base {
+  panel.test = (base) => class DragFabTest extends base {
     * iteration() {
       let dx = 10;
       let dy = 10;
@@ -96,7 +98,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  dialog.test = (base) => class MaximizeDialogTest extends base {
+  panel.test = (base) => class MaximizeDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'height-changed', () => { MockInteractions.tap(self.dialog.$.fullscreen); }, true);
@@ -106,7 +108,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.dialog.fullscreen, 'dialog is in fullscreen');
     }
   }
-  dialog.test = (base) => class UnmaximizeDialogTest extends base {
+  panel.test = (base) => class UnmaximizeDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'height-changed', () => { MockInteractions.tap(self.dialog.$['fullscreen-exit']); }, true);
@@ -116,7 +118,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isNotOk(this.dialog.fullscreen, 'dialog is not in fullscreen');
     }
   }
-  dialog.test = (base) => class ResetDialogPositionTest extends base {
+  panel.test = (base) => class ResetDialogPositionTest extends base {
     * iteration() {
       yield * [
         { name: 'reset fully overlapping dialog', x: -100, y: -100, width: 10000, height: 10000 },
@@ -142,7 +144,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
   }
-  dialog.test = (base) => class ResetFabPositionTest extends base {
+  panel.test = (base) => class ResetFabPositionTest extends base {
     * iteration() {
       yield * [
         { name: 'reset fab position from bottom left', x: -100, y: window.innerHeight + 100 },
@@ -165,7 +167,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.fab.resetPosition();
     }
   }
-  dialog.test = (base) => class CloseDialogTest extends base {
+  panel.test = (base) => class CloseDialogTest extends base {
     async operation() {
       let self = this;
       await self.forEvent(self.fab, 'neon-animation-finish', () => { MockInteractions.tap(self.dialog.$.close); }, true);
@@ -175,33 +177,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.fab.opened, 'fab is opened');
     }
   }
-  dialog.test = {
+  */
+  panel.test = {
     // test class mixins
     '': [],
     // test classes
-    InstantiateTest: {
-      OpenDialogTest: '',
-      DragFabTest: {
-        OpenDialogTest: 'DragFabAndOpenDialogTest'
-      },
-      ResetFabPositionTest: ''
-    },
-    OpenDialogTest: {
-      CloseDialogTest: 'OpenAndCloseDialogTest',
-      DragDialogTest: {
-        CloseDialogTest: 'OpenAndDragAndCloseDialogTest'
-      },
-      MaximizeDialogTest: {
-        UnmaximizeDialogTest: {
-          DragDialogTest: {
-            CloseDialogTest: 'MaxUnmaxDragCloseDialogTest'
-          }
-        }
-      },
-      ResetDialogPositionTest: ''
-    },
-    MaxUnmaxDragCloseDialogTest: {
-      DragFabTest: 'MaxUnmaxDragCloseDialogAndDragFabTest'
-    }
+    OpenDialogTest: 'OpenDialogTestAlias'
   };
-} // dialog scope
+} // panel scope
