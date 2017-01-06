@@ -58,19 +58,3 @@ class InstantiateTest extends LiveLocalizerSuite {
     assert.isOk(self.fab.opened, 'fab is opened');
   }
 }
-class OpenDialog extends InstantiateTest {
-  async operation() {
-    let self = this;
-    await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
-  }
-  async checkpoint() {
-    let self = this;
-    assert.isOk(self.dialog.opened, 'dialog is opened');
-    assert.isNotOk(self.fab.opened, 'fab is not opened');
-    // store dialog coordinates
-    self.origin = {};
-    [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
-      self.origin[prop] = self.dialog[prop];
-    });
-  }
-}
