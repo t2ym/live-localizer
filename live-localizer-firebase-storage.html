@@ -964,7 +964,8 @@ Security rules:
                 .then(function (file) {
                   if (it.signedIn && it.user && it.user.uid) {
                     it.path = '/users/' + it.user.uid + '/files/' + file.locale;
-                    it.file = file;
+                    // It is strange that file instanceof Object is false and file.hasOwnProperty is undefined while typeof file is 'object'
+                    it.file = Object.assign({}, file); // make sure file.hasOwnProperty is defined
                     it.$.document.setStoredValue(it.path, it.file)
                       .then(function () {
                         it.$.document.path = it.path;
