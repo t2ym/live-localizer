@@ -337,6 +337,9 @@ The element handles save and load operations of XLIFF on the browser storage bac
        * Trigger checking on auto-loading
        */
       onBundleSetFetched: function (e) {
+        if (!this.file) {
+          this.onHtmlLangMutationBindThis();
+        }
         if (!this.autoLoadStatus.bundleSetFetched) {
           this.autoLoadStatus.bundleSetFetched = true;
           this.checkAutoLoad(this.file, this.autoLoad);

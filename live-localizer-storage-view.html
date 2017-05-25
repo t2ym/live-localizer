@@ -83,7 +83,7 @@ Storage views can be specified in the light DOM with the following storage group
             <div>Cloud</div>
             <div class="flex"></div>
           </div>
-          <content select=".storage.cloud"></content>
+          <slot name="storage-cloud"></slot>
         </div>
       </div>
       <div id="browser" class="storage-group">
@@ -96,7 +96,7 @@ Storage views can be specified in the light DOM with the following storage group
           <live-localizer-locale-icon id="locale-icon" follow-selected on-tap="" on-badge-tap="onBadgeTap" model="{{model}}"
             tooltips='[ "Drag to Save", "Drag to Save" ]' drag-handle-mode="drag" drag-drop-groups="load-targets" drop-targets="save-targets"></live-localizer-locale-icon>
           <live-localizer-browser-storage id="browser-storage" model="{{model}}"></live-localizer-browser-storage>
-          <content select=".storage.browser"></content>
+          <slot name="storage-browser"></slot>
         </div>
       </div>
       <div id="device" class="storage-group">
@@ -107,7 +107,7 @@ Storage views can be specified in the light DOM with the following storage group
             <div class="flex"></div>
           </div>
           <live-localizer-local-file-storage id="file-storage" model="{{model}}"></live-localizer-local-file-storage>
-          <content select=".storage.device"></content>
+          <slot name="storage-device"></slot>
         </div>
       </div>
     </div>
@@ -144,8 +144,8 @@ Storage views can be specified in the light DOM with the following storage group
        */
       modelReady: function (model) {
         if (model && !this.isModelReady) {
-          [ '.storage.cloud', '.storage.browser', '.storage.device' ].forEach(function (selector) {
-            this.getContentChildren('content[select="' + selector + '"]').forEach(function (storage) {
+          [ 'storage-cloud', 'storage-browser', 'storage-device' ].forEach(function (name) {
+            this.getContentChildren((Polymer.Element ? 'slot' : 'content') + '[name="' + name + '"]').forEach(function (storage) {
               storage.model = this.model;
               this.model.storage[storage.id] = storage;
             }, this);

@@ -133,7 +133,7 @@ The element also contains the model element `<live-localizer-model>`, which does
       <paper-icon-button id="storageview-button" name="storageview" class="toolbar-item view-selector last" icon="cloud-circle" on-tap="onSelectView"></paper-icon-button>
       <paper-tooltip for="storageview-button" offset="0">Show Storage</paper-tooltip>
       <div class="toolbar-pad toolbar-item"></div>
-      <paper-icon-button id="load" class="toolbar-item" icon="file-upload"></paper-icon-button>
+      <paper-icon-button id="load" class="toolbar-item" icon="file-upload" on-tap="onFileLoad"></paper-icon-button>
       <paper-tooltip for="load" offset="0">Load XLIFF</paper-tooltip>
       <template is="dom-if" if="{{!serverUpdated}}">
         <paper-icon-button id="locales" class="toolbar-item" icon="language" on-tap="onLocales"></paper-icon-button>
@@ -149,7 +149,7 @@ The element also contains the model element `<live-localizer-model>`, which does
       <iron-pages class="panel-selector" role="panel" selected="[[panel]]" attr-for-selected="name">
         <live-localizer-locale-icon-view name="iconview" class="panel" id="icon" model="{{model}}" filelist="{{filelist}}" on-locale-badge-tap="onBadgeTap"></live-localizer-locale-icon-view>
         <live-localizer-list-view name="listview" class="panel" id="list" model="{{model}}" list-items="{{listItems}}"></live-localizer-list-view>
-        <live-localizer-storage-view name="storageview" class="panel" id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"><content></content></live-localizer-storage-view>
+        <live-localizer-storage-view name="storageview" class="panel" id="storage" model="{{model}}" on-locale-badge-tap="onBadgeTap"><slot slot="storage-cloud" name="storage-cloud"></slot></live-localizer-storage-view>
       </iron-pages>
     </div>
     <paper-tooltip id="updated" class="updated-tooltip" for="panelarea" offset="-40" manual-mode>App has been updated at server</paper-tooltip>
@@ -224,7 +224,6 @@ The element also contains the model element `<live-localizer-model>`, which does
       },
 
       listeners: {
-        'load.tap': 'onFileLoad',
         'iron-resize': 'onIronResize'
       },
 

@@ -37,7 +37,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         padding: 16px;
       }
     </style>
-    <div id="droparea" class="droparea layout vertical">
+    <div id="droparea" class="droparea layout vertical"
+      on-dragover="onDragOver"
+      on-drop="onDrop"
+      on-mouseenter="onDropAreaMouseenter">
       <div class="filelistarea layout horizontal wrap">
         <template is="dom-repeat" items="{{filelist}}">
           <live-localizer-locale-icon id="locale-icon-{{item.locale}}" file="{{item}}" on-tap="onLocaleIconTap" on-badge-tap="onBadgeTap" model="{{model}}"></live-localizer-locale-icon>
@@ -66,12 +69,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         model: {
           type: Object
         }
-      },
-
-      listeners: {
-        'droparea.dragover': 'onDragOver',
-        'droparea.drop': 'onDrop',
-        'droparea.mouseenter': 'onDropAreaMouseenter'
       },
 
       /**
