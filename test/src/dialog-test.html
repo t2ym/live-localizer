@@ -46,30 +46,32 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   <my-app></my-app>
 
-  <dom-if id="container" restamp>
-  <template is="dom-if" id="container" restamp>
-    <live-localizer>
-      <live-localizer-firebase-storage id="firebase-storage" slot="storage-cloud"
-        auth-provider="google"
-        auth-domain="live-localizer-demo.firebaseapp.com"
-        database-url="https://live-localizer-demo.firebaseio.com"
-        api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
-      </live-localizer-firebase-storage>
-    </live-localizer>
-  </template>
-  </dom-if>
+  <test-fixture id="fixture">
+    <template>
+      <live-localizer>
+        <live-localizer-firebase-storage id="firebase-storage" slot="storage-cloud"
+          auth-provider="google"
+          auth-domain="live-localizer-demo.firebaseapp.com"
+          database-url="https://live-localizer-demo.firebaseio.com"
+          api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+        </live-localizer-firebase-storage>
+      </live-localizer>
+    </template>
+  </test-fixture>
 
   <!-- <script src="../../node_modules/babel-polyfill/browser.js"></script> -->
   <script src="../../../scenarist/Suite.js"></script>
   <script src="common-test.js"></script>
   <script src="dialog-test.js"></script>
   <script>
-    let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+    addEventListener('WebComponentsReady', function () {
+      let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
 
-    if (match) {
-      // Runner
-      Suite.scopes.dialog.run(match[1], 'template#container');
-    }
+      if (match) {
+        // Runner
+        Suite.scopes.dialog.run(match[1], '#fixture');
+      }
+    });
   </script>
 </body>
 </html>

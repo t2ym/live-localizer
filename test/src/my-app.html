@@ -62,7 +62,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     </style>
 
-    <app-location route="{{route}}"></app-location>
+    <!-- Avoid app-location issue for disappearing query parameters in app-route#2.0.0
+      Possibly related issue: https://github.com/PolymerElements/app-route/issues/149
+      <app-location route="{{route}}"></app-location>
+    -->
     <app-route
         route="{{route}}"
         pattern="{{_resolveUrlPath(':page')}}"
@@ -84,7 +87,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <!-- Main content -->
       <app-header-layout has-scrolling-region>
 
-        <app-header condenses reveals effects="waterfall">
+        <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
             <div title>My App</div>
@@ -126,7 +129,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ],
 
       _routePageChanged: function(page) {
-        if (page === 'index.html' || page.match(/-test[.]html$/)) {
+        if (page === 'index.html' || (page && page.match(/-test[.]html$/))) {
           page = '';
         }
         this.page = page || 'view1';
@@ -143,7 +146,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _resolveUrlPath: function(name) {
         var url = document.createElement('a');
-        url.href = this.resolveUrl('.') + name;
+        url.href = this.resolveUrl('.') + (name && name.startsWith(':') ? '' : name);
         return url.pathname;
       }
 

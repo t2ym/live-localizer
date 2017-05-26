@@ -9,7 +9,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <title>live-localizer test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <!-- <script src="../node_modules/babel-polyfill/browser.js"></script> -->
     <script src="../../scenarist/Suite.js"></script>
@@ -19,8 +18,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   </head>
   <body>
     <script>
-      var hasShadow = Boolean(Element.prototype.createShadowRoot);
-      var nativeShadow = hasShadow && !window.ShadowDOMPolyfill;
       var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]mode=fast[^a-zA-Z0-9]?.*$/);
       var fast = match ? true : false;
       var suites = [];

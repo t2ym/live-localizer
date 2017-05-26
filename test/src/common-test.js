@@ -2,25 +2,26 @@
 @license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
+mocha.setup({ slow: 8000, timeout: 15000 });
 // global test classes
 class LiveLocalizerSuite extends Suite {
   static get reconnectable() { return false; }
   // TODO: Can setup be converted to operation?
   async setup() {
     await super.setup();
-    this.container = document.querySelector(this.target);
+    this.fixture = document.querySelector(this.target);
   }
   async teardown() {
     let self = this;
     await super.teardown();
-    await self.forEvent(self.container, 'dom-change', () => { self.container.if = false; }, true);
+    self.fixture.restore();
   }
 }
 class InstantiateTest extends LiveLocalizerSuite {
   async operation() {
     let self = this;
-    await self.forEvent(self.container, 'dom-change', () => { self.container.if = true; }, true);
-    self.element = document.querySelector('live-localizer');
+    this.fixture.create();
+    self.element = self.fixture.querySelector('live-localizer');
     await self.forEvent(self.element, 'bundle-set-fetched');
     self.main = Polymer.dom(self.element.root).querySelector('live-localizer-main');
     self.fab = Polymer.dom(self.main.root).querySelector('live-localizer-fab');
