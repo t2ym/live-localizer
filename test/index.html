@@ -25,7 +25,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         (fast ? [ '' ] : [ '', '-lazy' ]).forEach(function (type) {
           for (var scope in Suite.scopes) {
             Suite.scopes[scope].test.forEach(function (tests, index) {
-              suites.push(phase + '/' + scope + type + '-test.html' + '?TestSuites=' + index);
+              suites.push(phase + '/' + scope + type + '-test.html' + '#TestSuites=' + index);
             });
           }
         });
