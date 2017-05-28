@@ -129,6 +129,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
         var reloadUrl = window.sessionStorage.getItem('live-localizer-reload-url');
         if (reloadUrl) {
+          this.dialog.addEventListener('neon-animation-finish', function onNeonAnimationFinish(e) {
+            this.dialog.removeEventListener('neon-animation-finish', onNeonAnimationFinish);
+            this.dialog.fire('height-changed');
+          }.bind(this));
           this.opened = true;
           setTimeout(function () {
             this.$.hiddenLink.href = reloadUrl;
