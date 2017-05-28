@@ -87,7 +87,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <live-localizer-dialog 
       id="dialog"
       on-iron-overlay-closed="_dialogClosed">
-      <live-localizer-panel slot="dialog-content"><slot slot="storage-cloud" name="storage-cloud"></slot></live-localizer-panel>
+      <live-localizer-panel slot="dialog-content">
+        <slot slot="storage-cloud" name="storage-cloud"></slot>
+        <slot slot="storage-browser" name="storage-browser"></slot>
+        <slot slot="storage-device" name="storage-device"></slot>
+      </live-localizer-panel>
     </live-localizer-dialog>
     <a id="hiddenLink" class="hidden"></a>
   </template>
