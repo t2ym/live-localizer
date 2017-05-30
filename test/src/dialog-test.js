@@ -5,7 +5,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // dialog scope
   let scope = 'dialog';
-  let dialog = new Suite(scope, 'live-localizer dialog and fab tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  let dialog = new Suite(scope, 'live-localizer dialog and fab tests');
   dialog.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;

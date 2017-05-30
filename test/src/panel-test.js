@@ -3,10 +3,82 @@
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 */
 {
-  // dialog scope
+  // panel scope (subscope of dialog)
   let scope = 'panel';
-  let panel = new Suite(scope, 'live-localizer panel tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  let panel = new Suite(scope, 'live-localizer panel tests');
+  Suite.debug = true;
   panel.test = Suite.scopes.dialog.classes.OpenDialogTest;
+  panel.test = (base) => class PanelTooltipTest extends base {
+    * iteration() {
+      yield *[
+        { button: 'iconview-button', tooltip: 'Show Icons' },
+        { button: 'listview-button', tooltip: 'Show List' },
+        { button: 'storageview-button', tooltip: 'Show Storage' },
+        { button: 'load', tooltip: 'Load XLIFF' },
+        { button: 'locales', tooltip: 'Check Updates on Locales' },
+        { button: 'reload', tooltip: 'Reload App', serverUpdated: true }
+      ].map((parameters) => { parameters.name = 'tooltip for ' + parameters.button + ' button is "' + parameters.tooltip + '"'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      if (parameters.serverUpdated) {
+        await self.forEvent(self.panel, 'dom-change', () => { self.panel.serverUpdated = true; },
+          (element, type, event) => !!Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload'));
+      }
+      let button = self.panel.$[parameters.button] || Polymer.dom(self.panel.root).querySelector('#' + parameters.button);
+      let tooltip = Polymer.dom(self.panel.root).querySelector('paper-tooltip[for=' + parameters.button + ']');
+      await self.forEvent(tooltip, 'neon-animation-finish', () => {
+        button.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        button.dispatchEvent(new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === parameters.button;
+      });
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.tooltip.getAttribute('for'), parameters.button, 'paper-tooltip should be for ' + parameters.button);
+      assert.equal(this.tooltip.textContent.trim(), parameters.tooltip, 'tooltip should be "' + parameters.tooltip + '"');
+    }
+  }
+  // Must be after PanelTooltipTest
+  panel.test = (base) => class ReloadTooltipTest extends base {
+    async operation() {
+      let self = this;
+      self.tooltip = Polymer.dom(self.panel.root).querySelector('paper-tooltip#updated');
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'panelarea', 'paper-tooltip should be for panelarea');
+      assert.equal(this.tooltip.textContent.trim(), 'App has been updated at server', 'tooltip should be "App has been updated at server"');
+    }
+  }
+  panel.test = (base) => class ModelAlertTest extends base {
+    async operation() {
+      let self = this;
+      self.tooltip = Polymer.dom(self.panel.root).querySelector('paper-tooltip#alert');
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
+        self.model.checkXliffConvVersion(undefined);
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'panelarea';
+      });
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'panelarea', 'paper-tooltip should be for panelarea');
+      assert.equal(this.tooltip.textContent.trim(), 'Incompatible xliff-conv with no version information', 'tooltip should be "Incompatible xliff-conv with no version information"');
+    }
+  }
   /*
   panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -182,6 +254,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    OpenDialogTest: 'OpenDialogTestAlias'
+    OpenDialogTest: {
+      PanelTooltipTest: {
+        ReloadTooltipTest: {
+          ModelAlertTest: ''
+        }
+      }
+    }
   };
 } // panel scope
