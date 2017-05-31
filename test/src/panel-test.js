@@ -140,6 +140,22 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.fetched, 'model.fetched() via locales button');
     }
   }
+  panel.test = (base) => class ReloadButtonTest extends base {
+    async operation() {
+      let self = this;
+      await self.forEvent(self.panel, 'dom-change', () => { self.panel.serverUpdated = true; },
+        (element, type, event) => !!Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload'));
+      let button = Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload');
+      self.mockModel = self.model
+      self.mockModel.reload = function fetch () {
+        self.reloaded = true;
+      }
+      MockInteractions.tap(button);
+    }
+    async checkpoint(parameters) {
+      assert.isOk(this.reloaded, 'model.reload() via reload button');
+    }
+  }
   /*
   panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -323,7 +339,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
       PanelViewTest: 'PanelViewTests; Views for panel',
       FileLoadButtonTest: 'MockFileLoadButtonTest; File load button test (mock)',
-      LocalesButtonTest: 'MockLocalesButtonTest; Locales button test (mock)'
+      LocalesButtonTest: 'MockLocalesButtonTest; Locales button test (mock)',
+      ReloadButtonTest: 'MockReloadButtonTest; Reload button test (mock)'
     }
   };
 } // panel scope
