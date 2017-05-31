@@ -44,6 +44,22 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.icon.selected, 'Selected icon is selected');
     }
   }
+  // Must be after SelectLocaleIconTest
+  iconview.test = (base) => class MockSaveFileTest extends base {
+    async operation() {
+      let self = this;
+      let droparea = self.iconView.$.droparea;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-de');
+      self.mockStorage = self.model.storage['file-storage'];
+      self.mockStorage.save = function save(file) {
+        self.savedFile = file;
+      }
+      MockInteractions.tap(self.icon);
+    }
+    async checkpoint() {
+      assert.equal(this.savedFile.locale, 'de', 'Saved file locale should be "de"');
+    }
+  }
   iconview.test = (base) => class MockDropFileTest extends base {
     async operation() {
       let self = this;
@@ -402,7 +418,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test classes
     SelectIconView: {
       DropareaTooltipTest: 'DropareaTooltipTest; Show tooltip for droparea',
-      SelectLocaleIconTest: 'SelectLocaleIconTest; Switch to de locale by selecting de locale icon',
+      SelectLocaleIconTest: {
+        MockSaveFileTest: 'SelectAndSaveWithLocaleIconTest; Salect a locale and save file (mock)'
+      },
       MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)'
     }
   };
