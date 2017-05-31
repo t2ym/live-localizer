@@ -111,6 +111,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  panel.test = (base) => class FileLoadButtonTest extends base {
+    async operation() {
+      let self = this;
+      let button = self.panel.$.load;
+      self.mockStorage = self.model.storage['file-storage'];
+      self.mockStorage.load = function load (event) {
+        self.loadEvent = event;
+      }
+      MockInteractions.tap(button);
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.mockStorage.selected, true, 'fileStorage.selected is true');
+      assert.equal(this.loadEvent.type, 'tap', 'load file via a "tap" event');
+    }
+  }
   /*
   panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -292,7 +307,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           ModelAlertTest: 'PanelTooltipTests; Tooltips for panel'
         }
       },
-      PanelViewTest: 'PanelViewTests; Views for panel'
+      PanelViewTest: 'PanelViewTests; Views for panel',
+      FileLoadButtonTest: ''
     }
   };
 } // panel scope
