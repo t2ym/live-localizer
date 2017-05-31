@@ -8,6 +8,30 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   let iconview = new Suite(scope, 'live-localizer iconview tests');
   Suite.debug = true;
   iconview.test = Suite.scopes.panel.classes.SelectIconView;
+  iconview.test = (base) => class DropareaTooltipTest extends base {
+    async operation() {
+      let self = this;
+      let droparea = self.iconView.$.droparea;
+      let tooltip = Polymer.dom(self.iconView.root).querySelector('paper-tooltip[for=droparea]');
+      await self.forEvent(tooltip, 'neon-animation-finish', () => {
+        droparea.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'droparea';
+      });
+      await self.forEvent(tooltip, 'neon-animation-finish', () => {}, (element, type, event) => true);
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'droparea', 'paper-tooltip should be for droparea');
+      assert.equal(this.tooltip.textContent.trim(), 'Drag and drop XLIFF to load', 'tooltip should be "Drag and drop XLIFF to loadparameters.tooltip"');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -332,6 +356,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    SelectIconView: 'SelectIconViewTest'
+    SelectIconView: {
+      DropareaTooltipTest: 'DropareaTooltipTest; Show tooltip for droparea'
+    }
   };
 } // panel scope
