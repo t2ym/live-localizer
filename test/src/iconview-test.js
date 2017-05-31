@@ -44,6 +44,38 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.icon.selected, 'Selected icon is selected');
     }
   }
+  iconview.test = (base) => class MockDropFileTest extends base {
+    async operation() {
+      let self = this;
+      self.droparea = self.iconView.$.droparea;
+      self.mockStorage = self.model.storage['file-storage'];
+      self.mockStorage.load = function load (event) {
+        self.loadEvent = event;
+      }
+      await self.forEvent(self.droparea, 'dragover', () => {
+        self.droparea.dispatchEvent(new MouseEvent('dragover', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => event.type === 'dragover');
+      await self.forEvent(self.droparea, 'drop', () => {
+        self.droparea.dispatchEvent(new MouseEvent('drop', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => event.type === 'drop');
+    }
+    async checkpoint() {
+      assert.equal(this.mockStorage.selected, true, 'fileStorage.selected is true');
+      assert.equal(this.loadEvent.type, 'drop', 'load file via a "drop" event');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -370,7 +402,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test classes
     SelectIconView: {
       DropareaTooltipTest: 'DropareaTooltipTest; Show tooltip for droparea',
-      SelectLocaleIconTest: 'SelectLocaleIconTest; Switch to de locale by selecting de locale icon'
+      SelectLocaleIconTest: 'SelectLocaleIconTest; Switch to de locale by selecting de locale icon',
+      MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)'
     }
   };
 } // panel scope
