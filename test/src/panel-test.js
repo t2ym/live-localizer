@@ -79,6 +79,38 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltip.textContent.trim(), 'Incompatible xliff-conv with no version information', 'tooltip should be "Incompatible xliff-conv with no version information"');
     }
   }
+  panel.test = (base) => class PanelViewTest extends base {
+    * iteration() {
+      yield *[
+        { button: 'listview-button', view: 'listview' },
+        { button: 'detailview-button', view: 'detailview', missing: true },
+        { button: 'storageview-button', view: 'storageview' },
+        { button: 'iconview-button', view: 'iconview' }
+      ].map((parameters) => { parameters.name = 'view for ' + parameters.button + ' is ' + parameters.view + ' and ' + (parameters.missing ? 'missing' : 'shown'); return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      let button = self.panel.$[parameters.button];
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      if (parameters.missing) {
+        await self.forEvent(self.pages, 'iron-deselect', () => { MockInteractions.tap(button); }, (element, type, event) => self.pages.selected === parameters.view);
+      }
+      else {
+        await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(button); }, (element, type, event) => self.pages.selected === parameters.view);
+      }
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.pages.selected, parameters.view, parameters.view + ' is selected by ' + parameters.button);
+      let selectedViews = Polymer.dom(this.pages).querySelectorAll('.iron-selected');
+      if (parameters.missing) {
+        assert.equal(selectedViews.length, 0, 'No selected view for ' + parameters.view);
+      }
+      else {
+        assert.equal(selectedViews.length, 1, 'Only 1 selected view for ' + parameters.view);
+        assert.equal(selectedViews[0].getAttribute('name'), parameters.view, parameters.view + ' is selected');
+      }
+    }
+  }
   /*
   panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -259,7 +291,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         ReloadTooltipTest: {
           ModelAlertTest: 'PanelTooltipTests; Tooltips for panel'
         }
-      }
+      },
+      PanelViewTest: 'PanelViewTests; Views for panel'
     }
   };
 } // panel scope
