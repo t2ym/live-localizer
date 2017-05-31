@@ -126,6 +126,20 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.loadEvent.type, 'tap', 'load file via a "tap" event');
     }
   }
+  panel.test = (base) => class LocalesButtonTest extends base {
+    async operation() {
+      let self = this;
+      let button = Polymer.dom(self.panel.root).querySelector('paper-icon-button#locales');
+      self.mockModel = self.model
+      self.mockModel.fetch = function fetch () {
+        self.fetched = true;
+      }
+      MockInteractions.tap(button);
+    }
+    async checkpoint(parameters) {
+      assert.isOk(this.fetched, 'model.fetched() via locales button');
+    }
+  }
   /*
   panel.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -308,7 +322,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       },
       PanelViewTest: 'PanelViewTests; Views for panel',
-      FileLoadButtonTest: ''
+      FileLoadButtonTest: 'MockFileLoadButtonTest; File load button test (mock)',
+      LocalesButtonTest: 'MockLocalesButtonTest; Locales button test (mock)'
     }
   };
 } // panel scope
