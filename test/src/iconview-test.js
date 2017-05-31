@@ -32,6 +32,18 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltip.textContent.trim(), 'Drag and drop XLIFF to load', 'tooltip should be "Drag and drop XLIFF to loadparameters.tooltip"');
     }
   }
+  iconview.test = (base) => class SelectLocaleIconTest extends base {
+    async operation() {
+      let self = this;
+      let droparea = self.iconView.$.droparea;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-de');
+      await self.forEvent(self.model, 'html-lang-mutation', () => { MockInteractions.tap(self.icon); }, (element, type, event) => self.model.html.lang === 'de');
+    }
+    async checkpoint() {
+      assert.equal(this.model.html.lang, 'de', 'html.lang should be "de"');
+      assert.isOk(this.icon.selected, 'Selected icon is selected');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -357,7 +369,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     '': [],
     // test classes
     SelectIconView: {
-      DropareaTooltipTest: 'DropareaTooltipTest; Show tooltip for droparea'
+      DropareaTooltipTest: 'DropareaTooltipTest; Show tooltip for droparea',
+      SelectLocaleIconTest: 'SelectLocaleIconTest; Switch to de locale by selecting de locale icon'
     }
   };
 } // panel scope
