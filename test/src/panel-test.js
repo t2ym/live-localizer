@@ -6,7 +6,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // panel scope (subscope of dialog)
   let scope = 'panel';
   let panel = new Suite(scope, 'live-localizer panel tests');
-  Suite.debug = true;
   panel.test = Suite.scopes.dialog.classes.OpenDialogTest;
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -109,6 +108,45 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         assert.equal(selectedViews.length, 1, 'Only 1 selected view for ' + parameters.view);
         assert.equal(selectedViews[0].getAttribute('name'), parameters.view, parameters.view + ' is selected');
       }
+    }
+  }
+  panel.test = class SelectIconView extends panel.classes.OpenDialogTest {
+    async operation() {
+      let self = this;
+      let button = self.panel.$['iconview-button'];
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      if (self.pages.selected !== 'iconview') {
+        await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(button); }, (element, type, event) => self.pages.selected === 'iconview');
+      }
+    }
+    async checkpoint() {
+      assert.equal(Polymer.dom(this.pages).querySelector('.iron-selected').getAttribute('name'), 'iconview', 'iconview is shown');
+    }
+  }
+  panel.test = class SelectListView extends panel.classes.OpenDialogTest {
+    async operation() {
+      let self = this;
+      let button = self.panel.$['listview-button'];
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      if (self.pages.selected !== 'listview') {
+        await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(button); }, (element, type, event) => self.pages.selected === 'listview');
+      }
+    }
+    async checkpoint() {
+      assert.equal(Polymer.dom(this.pages).querySelector('.iron-selected').getAttribute('name'), 'listview', 'listview is shown');
+    }
+  }
+  panel.test = class SelectStorageView extends panel.classes.OpenDialogTest {
+    async operation() {
+      let self = this;
+      let button = self.panel.$['storageview-button'];
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      if (self.pages.selected !== 'storageview') {
+        await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(button); }, (element, type, event) => self.pages.selected === 'storageview');
+      }
+    }
+    async checkpoint() {
+      assert.equal(Polymer.dom(this.pages).querySelector('.iron-selected').getAttribute('name'), 'storageview', 'storageview is shown');
     }
   }
   panel.test = (base) => class FileLoadButtonTest extends base {
