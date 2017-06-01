@@ -162,6 +162,29 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.flag, (parameters.flag ? '/components/region-flags/png/' + parameters.flag + '.png' : parameters.flag), 'flag is "' + parameters.flag + '"');
     }
   }
+  iconview.test = (base) => class IconViewDragIconTest extends base {
+    * iteration() {
+      yield *[
+        { icon: 'en', mode: 'none' },
+        { icon: 'de', mode: 'none' }
+      ].map((parameters) => { parameters.name = 'dragHandleMode for ' + parameters.icon + ' locale icon is "' + parameters.mode + '"'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-' + parameters.icon);
+      self.icon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      await self.forEvent(self.icon, 'track', () => { MockInteractions.track(self.icon, 100, 100); }, (element, type, event) => event.detail.state === 'end');
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.icon.dragHandleMode, parameters.mode, 'dragHandleMode for ' + parameters.icon + ' locale icon is "' + parameters.mode + '"');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -494,7 +517,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)',
       IconViewBadgeTapTest: 'IconViewBadgeTapTest; Tap a badge to select locale and switch to listview',
       IconTooltipTest: 'IconTooltipTest; Show tooltips for selected/unselected locale icons',
-      IconFlagUnitTest: 'IconFlagUnitTest; Select their proper flags for locales'
+      IconFlagUnitTest: 'IconFlagUnitTest; Select their proper flags for locales',
+      IconViewDragIconTest: 'IconViewDragIconTest; dragHandleMode is "none" for locale icons in iconview'
     }
   };
 } // panel scope
