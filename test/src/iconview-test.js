@@ -92,6 +92,20 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.loadEvent.type, 'drop', 'load file via a "drop" event');
     }
   }
+  iconview.test = (base) => class IconViewBadgeTapTest extends base {
+    async operation() {
+      let self = this;
+      let droparea = self.iconView.$.droparea;
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-de');
+      self.badge = self.icon.$.badge;
+      await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(self.badge); }, (element, type, event) => self.pages.selected === 'listview');
+    }
+    async checkpoint() {
+      assert.isOk(this.icon.selected, 'de locale icon is selected');
+      assert.equal(this.pages.selected, 'listview', 'listview is shown');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -421,7 +435,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       SelectLocaleIconTest: {
         MockSaveFileTest: 'SelectAndSaveWithLocaleIconTest; Salect a locale and save file (mock)'
       },
-      MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)'
+      MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)',
+      IconViewBadgeTapTest: 'IconViewBadgeTapTest; Tap a badge to select locale and switch to listview'
     }
   };
 } // panel scope
