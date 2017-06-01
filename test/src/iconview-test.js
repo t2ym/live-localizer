@@ -106,6 +106,42 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.pages.selected, 'listview', 'listview is shown');
     }
   }
+  iconview.test = (base) => class IconTooltipTest extends base {
+    * iteration() {
+      yield *[
+        { icon: 'en', tooltip: 'Save XLIFF' },
+        { icon: 'de', tooltip: 'Switch Locale' }
+      ].map((parameters) => { parameters.name = 'tooltip for ' + parameters.icon + ' icon is "' + parameters.tooltip + '"'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-' + parameters.icon);
+      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
+      });
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.tooltip.textContent.trim(), parameters.tooltip, 'tooltip should be "' + parameters.tooltip + '"');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -436,7 +472,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         MockSaveFileTest: 'SelectAndSaveWithLocaleIconTest; Salect a locale and save file (mock)'
       },
       MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)',
-      IconViewBadgeTapTest: 'IconViewBadgeTapTest; Tap a badge to select locale and switch to listview'
+      IconViewBadgeTapTest: 'IconViewBadgeTapTest; Tap a badge to select locale and switch to listview',
+      IconTooltipTest: 'IconTooltipTest; Show tooltips for selected/unselected locale icons'
     }
   };
 } // panel scope
