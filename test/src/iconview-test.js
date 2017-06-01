@@ -142,6 +142,26 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltip.textContent.trim(), parameters.tooltip, 'tooltip should be "' + parameters.tooltip + '"');
     }
   }
+  iconview.test = (base) => class IconFlagUnitTest extends base {
+    * iteration() {
+      yield *[
+        { locale: 'zh-CN', flag: 'CN' },
+        { locale: 'zh-Hans', flag: 'CN' },
+        { locale: 'en-GB', flag: 'GB' },
+        { locale: 'en', flag: 'US' },
+        { locale: 'ja', flag: 'JP' },
+        { locale: 'xx', flag: '' }
+      ].map((parameters) => { parameters.name = 'flag for ' + parameters.locale + ' locale icon is "' + parameters.flag + '"'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-en');
+      self.flag = self.icon.flag(parameters.locale)
+    }
+    async checkpoint(parameters) {
+      assert.equal(this.flag, (parameters.flag ? '/components/region-flags/png/' + parameters.flag + '.png' : parameters.flag), 'flag is "' + parameters.flag + '"');
+    }
+  }
   /*
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {
@@ -473,7 +493,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       },
       MockDropFileTest: 'MockDropFileTest; Drop file on droparea (mock)',
       IconViewBadgeTapTest: 'IconViewBadgeTapTest; Tap a badge to select locale and switch to listview',
-      IconTooltipTest: 'IconTooltipTest; Show tooltips for selected/unselected locale icons'
+      IconTooltipTest: 'IconTooltipTest; Show tooltips for selected/unselected locale icons',
+      IconFlagUnitTest: 'IconFlagUnitTest; Select their proper flags for locales'
     }
   };
 } // panel scope
