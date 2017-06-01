@@ -143,7 +143,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _resolveUrlPath: function(name) {
         var url = document.createElement('a');
-        url.href = this.resolveUrl('.') + (name && name.startsWith(':') ? '' : name);
+        url.href = this.resolveUrl('.') + name;
         return url.pathname;
       }
 
