@@ -6,7 +6,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // iconview scope (subscope of panel)
   let scope = 'iconview';
   let iconview = new Suite(scope, 'live-localizer iconview tests');
-  Suite.debug = true;
+  iconview.htmlSuite = 'live-localizer';
   iconview.test = Suite.scopes.panel.classes.SelectIconView;
   iconview.test = (base) => class DropareaTooltipTest extends base {
     async operation() {

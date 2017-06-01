@@ -6,6 +6,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // panel scope (subscope of dialog)
   let scope = 'panel';
   let panel = new Suite(scope, 'live-localizer panel tests');
+  panel.htmlSuite = 'live-localizer';
   panel.test = Suite.scopes.dialog.classes.OpenDialogTest;
   panel.test = (base) => class PanelTooltipTest extends base {
     * iteration() {

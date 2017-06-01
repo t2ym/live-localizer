@@ -27,7 +27,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
   <link rel="import" href="my-app.html">
-  <link rel="import" href="../../live-localizer-lazy.html">
+  <link rel="import" href="../../live-localizer.html">
 
   <style>
 
@@ -67,11 +67,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   <script src="iconview-test.js"></script>
   <script>
     addEventListener('WebComponentsReady', function () {
-      let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+      let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*)&Scope=([_a-zA-Z0-9-]*).*$/);
 
       if (match) {
         // Runner
-        Suite.scopes.iconview.run(match[1], '#fixture');
+        Suite.scopes[match[2]].run(match[1], '#fixture');
       }
     });
   </script>
