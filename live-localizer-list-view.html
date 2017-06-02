@@ -357,6 +357,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               break;
             }
           }
+          if (i >= this.model.listItems.length) {
+            if (this.version1) {
+              this.$.list.selection.clear();
+            }
+            if (this.version2) {
+              this.$.list.selectedItems = [];
+            }
+          }
         }
         e.stopPropagation();
       },
