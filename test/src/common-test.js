@@ -16,6 +16,26 @@ class LiveLocalizerSuite extends Suite {
     await super.teardown();
     self.fixture.restore();
   }
+  /* async */ checkInterval(condition, interval, maxCount) {
+    return new Promise((resolve, reject) => {
+      if (condition()) {
+        resolve();
+      }
+      else {
+        let count = 0;
+        let intervalId = setInterval(() => {
+          if (condition()) {
+            clearInterval(intervalId);
+            resolve();
+          }
+          else if (++count >= maxCount) {
+            clearInterval(intervalId);
+            reject();
+          }
+        }, interval);
+      }
+    });
+  }
 }
 class InstantiateTest extends LiveLocalizerSuite {
   async operation() {
