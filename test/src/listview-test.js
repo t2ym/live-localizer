@@ -33,7 +33,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             self.list.selection.select(parameters.i);
           }
           if (self.listView.version2) {
-            self.list.selectedItems = [self.listView.listItems[parameters.i]];
+            self.list.activeItem = self.listView.listItems[parameters.i];
           }
         },
         (element, type, event) => true);
