@@ -8,6 +8,20 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   let storageview = new Suite(scope, 'live-localizer storageview tests');
   storageview.htmlSuite = 'live-localizer';
   storageview.test = Suite.scopes.panel.classes.SelectStorageView;
+  storageview.test = (base) => class StorageViewBadgeTapTest extends base {
+    async operation() {
+      let self = this;
+      self.pages = Polymer.dom(self.panel.$.panelarea).querySelector('iron-pages.panel-selector');
+      self.icon = self.storageView.$['locale-icon'];
+      self.badge = self.icon.$.badge;
+      await self.forEvent(self.pages, 'iron-select', () => { MockInteractions.tap(self.badge); }, (element, type, event) => self.pages.selected === 'listview');
+      let count = 0;
+      await self.checkInterval(() => count++ === 1, 200, 1); // let listview show all items
+    }
+    async checkpoint() {
+      assert.equal(this.pages.selected, 'listview', 'listview is shown');
+    }
+  }
   /*
   listview.test = (base) => class ListViewItemsTest extends base {
     async operation() {
@@ -593,6 +607,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    SelectStorageView: 'SelectStorageViewTest'
+    SelectStorageView: {
+      StorageViewBadgeTapTest: 'StorageViewBadgeTapTest; Tap badge in storageview to show listview'
+    }
   };
 } // panel scope
