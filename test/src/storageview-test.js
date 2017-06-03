@@ -22,6 +22,36 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.pages.selected, 'listview', 'listview is shown');
     }
   }
+  storageview.test = (base) => class StorageViewIconTooltipTest extends base {
+    async operation() {
+      let self = this;
+      self.icon = self.storageView.$['locale-icon'];
+      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
+      });
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.tooltip.textContent.trim(), 'Drag to Save', 'tooltip should be "Drag to Save"');
+    }
+  }
   /*
   listview.test = (base) => class ListViewItemsTest extends base {
     async operation() {
@@ -608,7 +638,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     '': [],
     // test classes
     SelectStorageView: {
-      StorageViewBadgeTapTest: 'StorageViewBadgeTapTest; Tap badge in storageview to show listview'
+      StorageViewIconTooltipTest: {
+        StorageViewBadgeTapTest: 'StorageViewBadgeTapTest; Tap badge in storageview to show listview'
+      }
     }
   };
 } // panel scope
