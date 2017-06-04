@@ -141,6 +141,92 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.icon.selected, 'Selected icon is selected');
     }
   }
+  browserstorage.test = (base) => class BrowserStorageSaveTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      let onDragAndDrop = (e) => {
+        self.dragDropEvent = e;
+        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
+      };
+      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
+      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      await self.forEvent(self.localeIcon, 'track', () => {
+        MockInteractions.track(self.localeIcon, 80, 0);
+      }, (element, type, event) => {
+        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.hovering = true;
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.dropping = true;
+        }
+        return event.detail.state === 'end';
+      });
+      self.tooltip = self.browserStorage.$.tooltip;
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        self.tooltipMessage = self.tooltip.textContent.trim();
+        return true;
+      });
+    }
+    async checkpoint() {
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
+      assert.equal(this.tooltipMessage, 'Loaded and then Saved XLIFF for de', 'tooltip is "Loaded and then Saved XLIFF for de"');
+    }
+  }
+  browserstorage.test = (base) => class BrowserStorageSelectedIconTooltipTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
+      });
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.tooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
+    }
+  }
   /*
   storageview.test = (base) => class StorageViewBadgeTapTest extends base {
     async operation() {
@@ -785,9 +871,13 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     SelectIconView: {
       CleanupBrowserStorageSuite: {
         SelectLocaleIcon: {
-          SelectStorageView: 'SelectLocaleAndStorageView'
+          SelectStorageView: {
+            BrowserStorageSaveTest: {
+              BrowserStorageSelectedIconTooltipTest: 'BrowserStorageSaveTest; Save to browser storage'
+            }
+          }
         }
       }
     }
   };
-} // panel scope
+} // browserstorage scope
