@@ -27,6 +27,18 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
   }
+  browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
+    }
+    async checkpoint() {
+      assert.isOk(this.browserStorage.isModelReady, 'browserStorage is initialized');
+      assert.equal(this.browserStorage.autoLoad, true, 'autoLoad is true');
+      assert.equal(this.browserStorage.autoSave, true, 'autoSave is true');
+    }
+  }
   /*
   storageview.test = (base) => class StorageViewBadgeTapTest extends base {
     async operation() {
@@ -657,7 +669,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     '': [],
     // test classes
     SelectStorageView: {
-      CleanupBrowserStorageSuite: 'CleanupBrowserStorageTest'
+      CleanupBrowserStorageSuite: {
+        InitializeBrowserStorageTest: 'InitializeBrowserStorageTest; Browser storage is initialized'
+      }
     }
   };
 } // panel scope
