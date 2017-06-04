@@ -459,7 +459,7 @@ BehaviorsStore.DraggableBehavior = {
           this.cancelAnimation();
           this.playAnimation('dropping', 'dropping');
         }
-        else {
+        else if (this.animationConfig.releasing) {
           this.dragState = 'releasing';
           this.cancelAnimation();
           this.animationConfig.releasing[0].transformFrom = 'translate(' + this.dx + 'px,' + this.dy + 'px)';
