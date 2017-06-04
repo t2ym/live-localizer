@@ -159,6 +159,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         clientY: 0,
         buttons: 1
       }));
+      self.hovering = false;
+      self.dropping = false;
       await self.forEvent(self.localeIcon, 'track', () => {
         MockInteractions.track(self.localeIcon, 80, 0);
       }, (element, type, event) => {
@@ -225,6 +227,59 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async checkpoint() {
       assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
       assert.equal(this.tooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
+    }
+  }
+  browserstorage.test = (base) => class BrowserStorageLoadTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.dragDropEvent = null;
+      let onDragAndDrop = (e) => {
+        self.dragDropEvent = e;
+        self.storageIcon.removeEventListener('drag-and-drop', onDragAndDrop);
+      };
+      self.storageIcon.addEventListener('drag-and-drop', onDragAndDrop);
+      self.storageIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      self.hovering = false;
+      self.dropping = false;
+      await self.forEvent(self.storageIcon, 'track', () => {
+        MockInteractions.track(self.storageIcon, -80, 0);
+      }, (element, type, event) => {
+        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
+          self.localeIcon.dispatchEvent(new MouseEvent('mouseenter', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.hovering = true;
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
+          self.localeIcon.dispatchEvent(new MouseEvent('mouseup', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.dropping = true;
+        }
+        return event.detail.state === 'end';
+      });
+      await self.checkInterval(() => self.dragDropEvent, 100, 20);
+    }
+    async checkpoint() {
+      assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is browser storage icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
     }
   }
   /*
@@ -873,7 +928,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         SelectLocaleIcon: {
           SelectStorageView: {
             BrowserStorageSaveTest: {
-              BrowserStorageSelectedIconTooltipTest: 'BrowserStorageSaveTest; Save to browser storage'
+              BrowserStorageSelectedIconTooltipTest: {
+                BrowserStorageLoadTest: 'BrowserStorageLoadTest; Load from browser storage'
+              }
             }
           }
         }
