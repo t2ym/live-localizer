@@ -229,6 +229,25 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
     }
   }
+  browserstorage.test = (base) => class DisableAutoSaveCheckbox extends base {
+    * iteration() {
+      yield *[
+        { label: 'Save', expected: { autoSave: false, autoLoad: true } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
+      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+    }
+    async checkpoint(parameters) {
+      for (let prop in parameters.expected) {
+        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
   browserstorage.test = (base) => class BrowserStorageLoadTest extends base {
     async operation() {
       let self = this;
@@ -280,6 +299,37 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async checkpoint() {
       assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is browser storage icon');
       assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
+    }
+  }
+  browserstorage.test = (base) => class BrowserStorageUnselectedDragTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.dragDropEvent = null;
+      let onDragAndDrop = (e) => {
+        self.dragDropEvent = e;
+        self.storageIcon.removeEventListener('drag-and-drop', onDragAndDrop);
+      };
+      self.storageIcon.addEventListener('drag-and-drop', onDragAndDrop);
+      self.storageIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      await self.forEvent(self.storageIcon, 'track', () => {
+        MockInteractions.track(self.storageIcon, -80, 0);
+      }, (element, type, event) => {
+        return event.detail.state === 'end';
+      });
+      let count = 10;
+      await self.checkInterval(() => count++ >= 10, 100, 20);
+    }
+    async checkpoint() {
+      assert.isNotOk(this.dragDropEvent, 'no drag and drop event');
     }
   }
   /*
@@ -927,9 +977,13 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       CleanupBrowserStorageSuite: {
         SelectLocaleIcon: {
           SelectStorageView: {
-            BrowserStorageSaveTest: {
-              BrowserStorageSelectedIconTooltipTest: {
-                BrowserStorageLoadTest: 'BrowserStorageLoadTest; Load from browser storage'
+            BrowserStorageUnselectedIconTooltipTest: {
+              BrowserStorageSaveTest: {
+                BrowserStorageSelectedIconTooltipTest: {
+                  DisableAutoSaveCheckbox: {
+                    BrowserStorageLoadTest: 'BrowserStorageLoadTest; Load from browser storage'
+                  }
+                }
               }
             }
           }
