@@ -111,7 +111,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  panel.test = class SelectIconView extends panel.classes.OpenDialogTest {
+  panel.test = (base) => class SelectIconView extends base {
     async operation() {
       let self = this;
       let button = self.panel.$['iconview-button'];
@@ -124,7 +124,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(Polymer.dom(this.pages).querySelector('.iron-selected').getAttribute('name'), 'iconview', 'iconview is shown');
     }
   }
-  panel.test = class SelectListView extends panel.classes.OpenDialogTest {
+  panel.test = (base) => class SelectListView extends base {
     async operation() {
       let self = this;
       let button = self.panel.$['listview-button'];
@@ -137,7 +137,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(Polymer.dom(this.pages).querySelector('.iron-selected').getAttribute('name'), 'listview', 'listview is shown');
     }
   }
-  panel.test = class SelectStorageView extends panel.classes.OpenDialogTest {
+  panel.test = (base) => class SelectStorageView extends base {
     async operation() {
       let self = this;
       let button = self.panel.$['storageview-button'];
@@ -208,7 +208,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       PanelViewTest: 'PanelViewTests; Views for panel',
       FileLoadButtonTest: 'MockFileLoadButtonTest; File load button test (mock)',
       LocalesButtonTest: 'MockLocalesButtonTest; Locales button test (mock)',
-      ReloadButtonTest: 'MockReloadButtonTest; Reload button test (mock)'
+      ReloadButtonTest: 'MockReloadButtonTest; Reload button test (mock)',
+      SelectIconView: '',
+      SelectListView: '',
+      SelectStorageView: ''
     }
   };
 } // panel scope

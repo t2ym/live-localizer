@@ -8,6 +8,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   let browserstorage = new Suite(scope, 'live-localizer browserstorage tests');
   browserstorage.htmlSuite = 'live-localizer';
   browserstorage.test = Suite.scopes.storageview.classes.SelectStorageView;
+  browserstorage.test = Suite.scopes.panel.classes.SelectIconView;
+  browserstorage.test = Suite.scopes.panel.mixins.SelectStorageView;
   browserstorage.test = (base) => class CleanupBrowserStorageSuite extends base {
     async setup() {
       await super.setup();
@@ -37,6 +39,106 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.browserStorage.isModelReady, 'browserStorage is initialized');
       assert.equal(this.browserStorage.autoLoad, true, 'autoLoad is true');
       assert.equal(this.browserStorage.autoSave, true, 'autoSave is true');
+    }
+  }
+  browserstorage.test = (base) => class AutoSaveLoadCheckboxTest extends base {
+    * iteration() {
+      yield *[
+        { label: 'Save', expected: { autoSave: false, autoLoad: true } },
+        { label: 'Load', expected: { autoSave: false, autoLoad: false } },
+        { label: 'Save', expected: { autoSave: true, autoLoad: false } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: true } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: false } },
+        { label: 'Save', expected: { autoSave: false, autoLoad: false } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
+      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+    }
+    async checkpoint(parameters) {
+      for (let prop in parameters.expected) {
+        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
+  // TODO: How to deteministically pre-configure autoSave/autoLoad on loading
+  browserstorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
+    }
+    async checkpoint() {
+      assert.isOk(this.browserStorage.isModelReady, 'browserStorage is configured');
+      assert.equal(this.browserStorage.autoLoad, false, 'autoLoad is false');
+      assert.equal(this.browserStorage.autoSave, false, 'autoSave is false');
+    }
+  }
+  browserstorage.test = (base) => class AutoSaveLoadCheckboxTest2 extends base {
+    * iteration() {
+      yield *[
+        { label: 'Save', expected: { autoSave: true, autoLoad: false } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: true } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
+      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+    }
+    async checkpoint(parameters) {
+      for (let prop in parameters.expected) {
+        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
+  browserstorage.test = (base) => class BrowserStorageUnselectedIconTooltipTest extends base {
+    async operation() {
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+      }, (element, type, event) => {
+        self.tooltip = Polymer.dom(event).rootTarget;
+        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+          buttons: 1
+        }));
+        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
+      });
+    }
+    async checkpoint() {
+      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.tooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
+    }
+  }
+  browserstorage.test = (base) => class SelectLocaleIcon extends base {
+    async operation() {
+      let self = this;
+      let droparea = self.iconView.$.droparea;
+      self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-de');
+      await self.forEvent(self.model, 'html-lang-mutation', () => { MockInteractions.tap(self.icon); }, (element, type, event) => self.model.html.lang === 'de');
+    }
+    async checkpoint() {
+      assert.equal(this.model.html.lang, 'de', 'html.lang should be "de"');
+      assert.isOk(this.icon.selected, 'Selected icon is selected');
     }
   }
   /*
@@ -670,7 +772,21 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test classes
     SelectStorageView: {
       CleanupBrowserStorageSuite: {
-        InitializeBrowserStorageTest: 'InitializeBrowserStorageTest; Browser storage is initialized'
+        InitializeBrowserStorageTest: {
+          AutoSaveLoadCheckboxTest: {
+            ConfiguredAutoSaveLoadTest: { // TODO: how to reload the app deterministically after AutoSaveLoadCheckboxTest
+              AutoSaveLoadCheckboxTest2: 'AutoSaveLoadCheckboxTest2; Toggle saved autoSave/autoLoad'
+            }
+          },
+          BrowserStorageUnselectedIconTooltipTest: 'BrowserStorageUnselectedIconTooltipTest; Tooltip for unselected browser storage icon is "Drop to Save"'
+        }
+      }
+    },
+    SelectIconView: {
+      CleanupBrowserStorageSuite: {
+        SelectLocaleIcon: {
+          SelectStorageView: 'SelectLocaleAndStorageView'
+        }
       }
     }
   };
