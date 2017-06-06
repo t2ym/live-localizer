@@ -13,6 +13,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   browserstorage.test = (base) => class CleanupBrowserStorageSuite extends base {
     async setup() {
       await super.setup();
+      if (this.hasToSkip) { return; }
       await this.cleanup();
     }
     /* async */ cleanup() {
@@ -31,11 +32,13 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.isOk(this.browserStorage.isModelReady, 'browserStorage is initialized');
       assert.equal(this.browserStorage.autoLoad, true, 'autoLoad is true');
       assert.equal(this.browserStorage.autoSave, true, 'autoSave is true');
@@ -53,32 +56,42 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
-      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.forEvent(self.browserStorage,
+        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
+        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
     }
     async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
       for (let prop in parameters.expected) {
         assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
     }
   }
-  // TODO: How to deteministically pre-configure autoSave/autoLoad on loading
+  browserstorage.test = (base) => class Reload extends base {
+    async operation() {
+      this.stepPhase();
+    }
+  }
   browserstorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.isOk(this.browserStorage.isModelReady, 'browserStorage is configured');
       assert.equal(this.browserStorage.autoLoad, false, 'autoLoad is false');
       assert.equal(this.browserStorage.autoSave, false, 'autoSave is false');
     }
   }
-  browserstorage.test = (base) => class AutoSaveLoadCheckboxTest2 extends base {
+  browserstorage.test = (base) => class ConfiguredAutoSaveLoadCheckboxTest extends base {
     * iteration() {
       yield *[
         { label: 'Save', expected: { autoSave: true, autoLoad: false } },
@@ -86,13 +99,17 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
-      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.forEvent(self.browserStorage,
+        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
+        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
     }
     async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
       for (let prop in parameters.expected) {
         assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
@@ -965,8 +982,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       CleanupBrowserStorageSuite: {
         InitializeBrowserStorageTest: {
           AutoSaveLoadCheckboxTest: {
-            ConfiguredAutoSaveLoadTest: { // TODO: how to reload the app deterministically after AutoSaveLoadCheckboxTest
-              AutoSaveLoadCheckboxTest2: 'AutoSaveLoadCheckboxTest2; Toggle saved autoSave/autoLoad'
+            Reload: {
+              ConfiguredAutoSaveLoadTest: {
+                ConfiguredAutoSaveLoadCheckboxTest: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Toggle configured Auto Save/Load checkboxes (2 phases)'
+              }
             }
           },
           BrowserStorageUnselectedIconTooltipTest: 'BrowserStorageUnselectedIconTooltipTest; Tooltip for unselected browser storage icon is "Drop to Save"'

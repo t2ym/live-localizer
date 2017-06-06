@@ -6,6 +6,20 @@ mocha.setup({ slow: 8000, timeout: 15000 });
 // global test classes
 class LiveLocalizerSuite extends Suite {
   static get reconnectable() { return false; }
+  get currentPhase() {
+    this.href = this.href || window.location.href;
+    let match = this.href.match(/^[^#]*#TestSuites=[^&]*&Scope=[a-zA-Z0-9_-]*&Phase=([0-9]*).*$/);
+    return match ? Number.parseInt(match[1]) : 0;
+  }
+  get operationPhase() {
+    return typeof this.phase === 'number' ? this.phase : 0;
+  }
+  get hasToSkip() {
+    return this.currentPhase !== this.operationPhase;
+  }
+  stepPhase() {
+    this.phase = typeof this.phase === 'number' ? this.phase + 1 : 1;
+  }
   // TODO: Can setup be converted to operation?
   async setup() {
     await super.setup();
