@@ -319,7 +319,32 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
-      await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.forEvent(self.browserStorage,
+        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
+        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
+  browserstorage.test = (base) => class DisableAutoLoadCheckbox extends base {
+    * iteration() {
+      yield *[
+        { label: 'Load', expected: { autoSave: false, autoLoad: false } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
+      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      await self.forEvent(self.browserStorage,
+        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
+        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
@@ -375,12 +400,17 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
         return event.detail.state === 'end';
       });
+      self.tooltip = self.browserStorage.$.tooltip;
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
       assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is browser storage icon');
       assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
+      assert.equal(this.tooltipMessage, 'Loaded XLIFF for de', 'tooltip is "Loaded XLIFF for de"');
     }
   }
   browserstorage.test = (base) => class BrowserStorageUnselectedDragTest extends base {
@@ -390,6 +420,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      MockInteractions.tap(self.storageIcon);
       self.dragDropEvent = null;
       let onDragAndDrop = (e) => {
         self.dragDropEvent = e;
@@ -1070,7 +1101,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   Reload: {
                     BrowserStorageSelectedIconTooltipTest: {
                       DisableAutoSaveCheckbox: {
-                        BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_1; Save to browser storage, Reload, and Load from browser storage'
+                        DisableAutoLoadCheckbox: {
+                          Reload: {
+                            BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                          }
+                        }
                       }
                     }
                   }
