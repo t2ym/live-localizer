@@ -148,6 +148,61 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
     }
   }
+  browserstorage.test = (base) => class BrowserStorageIneffectiveSaveTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      let onDragAndDrop = (e) => {
+        self.dragDropEvent = e;
+        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
+      };
+      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
+      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      self.hovering = false;
+      self.dropping = false;
+      await self.forEvent(self.localeIcon, 'track', () => {
+        MockInteractions.track(self.localeIcon, 80, 0);
+      }, (element, type, event) => {
+        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.hovering = true;
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.dropping = true;
+        }
+        return event.detail.state === 'end';
+      });
+      await self.forEvent(self.localeIcon, 'drag-and-drop', () => {}, (element, type, event) => true);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
+      assert.isNotOk(this.storageIcon.selected, 'storage icon is not selected');
+    }
+  }
   browserstorage.test = (base) => class SelectLocaleIcon extends base {
     async operation() {
       let self = this;
@@ -1000,7 +1055,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           },
-          BrowserStorageUnselectedIconTooltipTest: 'BrowserStorageUnselectedIconTooltipTest; Tooltip for unselected browser storage icon is "Drop to Save"'
+          BrowserStorageUnselectedIconTooltipTest: 'BrowserStorageUnselectedIconTooltipTest; Tooltip for unselected browser storage icon is "Drop to Save"',
+          BrowserStorageIneffectiveSaveTest: 'BrowserStorageIneffectiveSaveTest; Saving default locale is ineffective'
         }
       }
     },
