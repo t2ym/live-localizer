@@ -117,6 +117,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   browserstorage.test = (base) => class BrowserStorageUnselectedIconTooltipTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
@@ -142,6 +143,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
       assert.equal(this.tooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
     }
@@ -160,6 +162,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   browserstorage.test = (base) => class BrowserStorageSaveTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
@@ -210,6 +213,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
       assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
       assert.equal(this.tooltipMessage, 'Loaded and then Saved XLIFF for de', 'tooltip is "Loaded and then Saved XLIFF for de"');
@@ -217,6 +221,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   browserstorage.test = (base) => class BrowserStorageSelectedIconTooltipTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
@@ -242,6 +247,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
       assert.equal(this.tooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
     }
@@ -253,6 +259,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
@@ -260,6 +267,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       await self.forEvent(self.checkbox, 'iron-change', () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
     }
     async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
       for (let prop in parameters.expected) {
         assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
@@ -267,6 +275,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   browserstorage.test = (base) => class BrowserStorageLoadTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
@@ -314,12 +323,14 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is browser storage icon');
       assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
     }
   }
   browserstorage.test = (base) => class BrowserStorageUnselectedDragTest extends base {
     async operation() {
+      if (this.hasToSkip) { return; }
       let self = this;
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
@@ -346,6 +357,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       await self.checkInterval(() => count++ >= 10, 100, 20);
     }
     async checkpoint() {
+      if (this.hasToSkip) { return; }
       assert.isNotOk(this.dragDropEvent, 'no drag and drop event');
     }
   }
@@ -997,10 +1009,14 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         SelectLocaleIcon: {
           SelectStorageView: {
             BrowserStorageUnselectedIconTooltipTest: {
-              BrowserStorageSaveTest: {
-                BrowserStorageSelectedIconTooltipTest: {
-                  DisableAutoSaveCheckbox: {
-                    BrowserStorageLoadTest: 'BrowserStorageLoadTest; Load from browser storage'
+              BrowserStorageUnselectedDragTest: {
+                BrowserStorageSaveTest: {
+                  Reload: {
+                    BrowserStorageSelectedIconTooltipTest: {
+                      DisableAutoSaveCheckbox: {
+                        BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_1; Save to browser storage, Reload, and Load from browser storage'
+                      }
+                    }
                   }
                 }
               }
