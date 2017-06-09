@@ -10,41 +10,35 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   firebasestorage.test = Suite.scopes.storageview.classes.SelectStorageView;
   firebasestorage.test = Suite.scopes.panel.classes.SelectIconView;
   firebasestorage.test = Suite.scopes.panel.mixins.SelectStorageView;
-  /*
-  browserstorage.test = (base) => class CleanupBrowserStorageSuite extends base {
+  firebasestorage.test = (base) => class CleanupFirebaseAuthSuite extends base {
     async setup() {
       await super.setup();
       if (this.hasToSkip) { return; }
-      await this.cleanup();
+      this.cleanup();
     }
-    /* async * / cleanup() {
-      return new Promise((resolve, reject) => {
-        let match = window.location.pathname.match(/^(\/components\/live-localizer\/.*\/)[^\/]*$/);
-        if (!match) {
-          reject(new Error('Unrecognizable pathname ' + window.location.pathname));
+    cleanup() {
+      for (let key in localStorage) {
+        if (key.match(/^firebase:/)) {
+          localStorage.removeItem(key);
         }
-        let databaseName = 'LiveLocalizer' + match[1];
-        let req = indexedDB.deleteDatabase(databaseName);
-        req.onsuccess = () => resolve();
-        req.onerror = (e) => reject(e);
-        req.onblocked = (e) => reject(e);
-      });
+      }
     }
   }
-  browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
+  firebasestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
+      self.firebaseStorage = self.storageView.queryEffectiveChildren('live-localizer-firebase-storage#firebase-storage');
+      await self.checkInterval(() => self.firebaseStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
-      assert.isOk(this.browserStorage.isModelReady, 'browserStorage is initialized');
-      assert.equal(this.browserStorage.autoLoad, true, 'autoLoad is true');
-      assert.equal(this.browserStorage.autoSave, true, 'autoSave is true');
+      assert.isOk(this.firebaseStorage.isModelReady, 'firebaseStorage is initialized');
+      assert.equal(this.firebaseStorage.autoLoad, false, 'autoLoad is false');
+      assert.equal(this.firebaseStorage.autoSave, true, 'autoSave is true');
     }
   }
+  /*
   browserstorage.test = (base) => class AutoSaveLoadCheckboxTest extends base {
     * iteration() {
       yield *[
@@ -1254,6 +1248,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    SelectStorageView: 'SelectStorageViewTest'
+    SelectStorageView: {
+      CleanupFirebaseAuthSuite: {
+        InitializeFirebaseStorageTest: 'InitializeFirebaseStorageTest'
+      }
+    }
   };
 } // browserstorage scope
