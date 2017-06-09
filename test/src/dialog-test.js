@@ -101,6 +101,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       let self = this;
       await self.forEvent(self.dialog, 'height-changed', () => { MockInteractions.tap(self.dialog.$.fullscreen); }, true);
+      window.dispatchEvent(new MouseEvent('resize', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
     }
     async checkpoint() {
       assert.isOk(this.dialog.opened, 'dialog is opened');
