@@ -1229,10 +1229,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                     Reload: {
                       BrowserStorageSelectedIconTooltipTest: {
                         DisableAutoSaveCheckbox: {
-                          DisableAutoLoadCheckbox: {
-                            BrowserStorageSaveTest2: {
-                              Reload: {
-                                BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                          Reload: {
+                            DisableAutoLoadCheckbox: {
+                              BrowserStorageSaveTest2: {
+                                Reload: {
+                                  BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_3; Save to browser storage, Reload, and Load from browser storage'
+                                }
                               }
                             }
                           }
