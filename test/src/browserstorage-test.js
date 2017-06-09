@@ -231,15 +231,15 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             buttons: 1
           }));
           self.hovering = true;
-          self.storageIcon.dispatchEvent(new MouseEvent('mousemove', {
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.releasing) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseout', {
             bubbles: false,
             cancelable: true,
             clientX: 0,
             clientY: 0,
             buttons: 1
           }));
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.releasing) {
           self.storageIcon.dispatchEvent(new MouseEvent('mouseleave', {
             bubbles: false,
             cancelable: true,
