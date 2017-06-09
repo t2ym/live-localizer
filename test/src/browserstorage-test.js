@@ -203,6 +203,61 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isNotOk(this.storageIcon.selected, 'storage icon is not selected');
     }
   }
+  browserstorage.test = (base) => class BrowserStorageIneffectiveSaveTest2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      self.hovering = false;
+      self.releasing = false;
+      await self.forEvent(self.localeIcon, 'track', () => {
+        MockInteractions.track(self.localeIcon, 200, 0);
+      }, (element, type, event) => {
+        if (event.detail.state !== 'end' && !self.hovering && !self.releasing) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.hovering = true;
+          self.storageIcon.dispatchEvent(new MouseEvent('mousemove', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.releasing) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseleave', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.releasing = true;
+        }
+        return event.detail.state === 'end';
+      });
+      await self.forEvent(self.localeIcon, 'neon-animation-finish', () => {}, (element, type, event) => true);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isNotOk(this.storageIcon.selected, 'storage icon is not selected');
+    }
+  }
   browserstorage.test = (base) => class SelectLocaleIcon extends base {
     async operation() {
       let self = this;
@@ -1097,13 +1152,15 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           SelectStorageView: {
             BrowserStorageUnselectedIconTooltipTest: {
               BrowserStorageUnselectedDragTest: {
-                BrowserStorageSaveTest: {
-                  Reload: {
-                    BrowserStorageSelectedIconTooltipTest: {
-                      DisableAutoSaveCheckbox: {
-                        DisableAutoLoadCheckbox: {
-                          Reload: {
-                            BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                BrowserStorageIneffectiveSaveTest2: {
+                  BrowserStorageSaveTest: {
+                    Reload: {
+                      BrowserStorageSelectedIconTooltipTest: {
+                        DisableAutoSaveCheckbox: {
+                          DisableAutoLoadCheckbox: {
+                            Reload: {
+                              BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                            }
                           }
                         }
                       }
