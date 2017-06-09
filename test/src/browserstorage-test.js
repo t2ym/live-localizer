@@ -318,8 +318,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
       self.tooltip = self.browserStorage.$.tooltip;
       await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        self.tooltipMessage = self.tooltip.textContent.trim();
-        return true;
+        return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return !self.tooltip.textContent.trim();
       });
     }
     async checkpoint() {
@@ -327,6 +329,73 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
       assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
       assert.equal(this.tooltipMessage, 'Loaded and then Saved XLIFF for de', 'tooltip is "Loaded and then Saved XLIFF for de"');
+    }
+  }
+  browserstorage.test = (base) => class BrowserStorageSaveTest2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.browserStorage = self.storageView.$['browser-storage'];
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.tooltip = self.browserStorage.$.tooltip;
+      if (self.tooltip.textContent.trim()) {
+        await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+          return !self.tooltip.textContent.trim();
+        });
+      }
+      let onDragAndDrop = (e) => {
+        self.dragDropEvent = e;
+        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
+      };
+      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
+      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      }));
+      self.hovering = false;
+      self.dropping = false;
+      await self.forEvent(self.localeIcon, 'track', () => {
+        MockInteractions.track(self.localeIcon, 80, 0);
+      }, (element, type, event) => {
+        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.hovering = true;
+        }
+        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
+          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
+            bubbles: false,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0,
+            buttons: 1
+          }));
+          self.dropping = true;
+        }
+        return event.detail.state === 'end';
+      });
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return !self.tooltip.textContent.trim();
+      });
+      await self.checkInterval(() => self.dragDropEvent, 100, 20);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
+      assert.equal(this.tooltipMessage, 'Saved XLIFF for de', 'tooltip is "Saved XLIFF for de"');
     }
   }
   browserstorage.test = (base) => class BrowserStorageSelectedIconTooltipTest extends base {
@@ -458,6 +527,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.tooltip = self.browserStorage.$.tooltip;
       await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
         return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return !self.tooltip.textContent.trim();
       });
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
@@ -1158,8 +1230,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                       BrowserStorageSelectedIconTooltipTest: {
                         DisableAutoSaveCheckbox: {
                           DisableAutoLoadCheckbox: {
-                            Reload: {
-                              BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                            BrowserStorageSaveTest2: {
+                              Reload: {
+                                BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_2; Save to browser storage, Reload, and Load from browser storage'
+                              }
                             }
                           }
                         }
