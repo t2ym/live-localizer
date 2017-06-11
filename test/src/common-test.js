@@ -50,6 +50,81 @@ class LiveLocalizerSuite extends Suite {
       }
     });
   }
+  async showTooltip(tooltipFor, tooltip) {
+    let self = this;
+    let mouseEventInit = {
+      bubbles: false,
+      cancelable: true,
+      clientX: 0,
+      clientY: 0,
+      buttons: 1
+    };
+    await self.forEvent(tooltip, 'neon-animation-finish', () => {
+      tooltipFor.dispatchEvent(new MouseEvent('mouseenter', mouseEventInit));
+    }, (element, type, event) => {
+      tooltipFor.dispatchEvent(new MouseEvent('mouseleave', mouseEventInit));
+      return true;
+    });
+  }
+  async dragDrop(src, dest, dx, dy, action, waitFor, eventTarget, eventCondition) {
+    let self = this;
+    let mouseEventInit = {
+      bubbles: false,
+      cancelable: true,
+      clientX: 0,
+      clientY: 0,
+      buttons: 1
+    };
+    self.dragDropEvent = null;
+    let onDragAndDrop = (e) => {
+      self.dragDropEvent = e;
+      src.removeEventListener('drag-and-drop', onDragAndDrop);
+    };
+    switch (action) {
+    case 'release':
+      break;
+    case 'drop':
+    default:
+      src.addEventListener('drag-and-drop', onDragAndDrop);
+      break;
+    }
+    src.dispatchEvent(new MouseEvent('mouseover', mouseEventInit));
+    let step = 0;
+    let steps;
+    switch (action) {
+    case 'noop':
+      steps = [];
+      break;
+    case 'release':
+      steps = [ [ 'mouseenter' ], [ 'mouseout', 'mouseleave' ] ];
+      break;
+    case 'drop':
+    default:
+      steps = [ [ 'mouseenter' ], [ 'mouseup' ] ];
+      break;
+    }
+    await self.forEvent(src, 'track', () => {
+      MockInteractions.track(src, dx, dy);
+    }, (element, type, event) => {
+      if (event.detail.state !== 'end') {
+        if (step < steps.length) {
+          steps[step].forEach((event) => {
+            dest.dispatchEvent(new MouseEvent(event, mouseEventInit));
+          });
+          step++;
+        }
+      }
+      return event.detail.state === 'end';
+    });
+    switch (waitFor) {
+    case 'drag-and-drop':
+    case 'neon-animation-finish':
+      await self.forEvent(eventTarget || src, waitFor, () => {}, eventCondition || ((element, type, event) => true));
+      break;
+    default:
+      break;
+    }
+  }
 }
 class InstantiateTest extends LiveLocalizerSuite {
   async operation() {

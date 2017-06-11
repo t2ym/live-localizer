@@ -122,25 +122,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-      }, (element, type, event) => {
-        self.tooltip = Polymer.dom(event).rootTarget;
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
-      });
+      await self.showTooltip(self.icon.$.card, self.tooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -155,46 +137,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.dropping = false;
-      await self.forEvent(self.localeIcon, 'track', () => {
-        MockInteractions.track(self.localeIcon, 80, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.dropping = true;
-        }
-        return event.detail.state === 'end';
-      });
-      await self.forEvent(self.localeIcon, 'drag-and-drop', () => {}, (element, type, event) => true);
+      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'drag-and-drop');
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -210,48 +153,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.releasing = false;
-      await self.forEvent(self.localeIcon, 'track', () => {
-        MockInteractions.track(self.localeIcon, 200, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.releasing) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.releasing) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseout', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseleave', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.releasing = true;
-        }
-        return event.detail.state === 'end';
-      });
-      await self.forEvent(self.localeIcon, 'neon-animation-finish', () => {}, (element, type, event) => true);
+      await self.dragDrop(self.localeIcon, self.storageIcon, 200, 0, 'release', 'neon-animation-finish');
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -277,51 +179,17 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.dropping = false;
-      await self.forEvent(self.localeIcon, 'track', () => {
-        MockInteractions.track(self.localeIcon, 80, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.dropping = true;
-        }
-        return event.detail.state === 'end';
-      });
       self.tooltip = self.browserStorage.$.tooltip;
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return self.tooltipMessage = self.tooltip.textContent.trim();
-      });
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return !self.tooltip.textContent.trim();
+      self.tooltipMessage = '';
+      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
+        let message = self.tooltip.textContent.trim();
+        if (self.tooltipMessage) {
+          return !message;
+        }
+        else {
+          self.tooltipMessage = message;
+          return false;
+        }
       });
     }
     async checkpoint() {
@@ -344,50 +212,16 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           return !self.tooltip.textContent.trim();
         });
       }
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.dropping = false;
-      await self.forEvent(self.localeIcon, 'track', () => {
-        MockInteractions.track(self.localeIcon, 80, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
+      self.tooltipMessage = '';
+      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
+        let message = self.tooltip.textContent.trim();
+        if (self.tooltipMessage) {
+          return !message;
         }
-        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.dropping = true;
+        else {
+          self.tooltipMessage = message;
+          return false;
         }
-        return event.detail.state === 'end';
-      });
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return self.tooltipMessage = self.tooltip.textContent.trim();
-      });
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return !self.tooltip.textContent.trim();
       });
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
@@ -405,25 +239,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-      }, (element, type, event) => {
-        self.tooltip = Polymer.dom(event).rootTarget;
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
-      });
+      await self.showTooltip(self.icon.$.card, self.tooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -484,52 +300,17 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      self.dragDropEvent = null;
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.storageIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.storageIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.storageIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.dropping = false;
-      await self.forEvent(self.storageIcon, 'track', () => {
-        MockInteractions.track(self.storageIcon, -80, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
-          self.localeIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
-          self.localeIcon.dispatchEvent(new MouseEvent('mouseup', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.dropping = true;
-        }
-        return event.detail.state === 'end';
-      });
       self.tooltip = self.browserStorage.$.tooltip;
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return self.tooltipMessage = self.tooltip.textContent.trim();
-      });
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
-        return !self.tooltip.textContent.trim();
+      self.tooltipMessage = '';
+      await self.dragDrop(self.storageIcon, self.localeIcon, -80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
+        let message = self.tooltip.textContent.trim();
+        if (self.tooltipMessage) {
+          return !message;
+        }
+        else {
+          self.tooltipMessage = message;
+          return false;
+        }
       });
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
@@ -548,24 +329,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       MockInteractions.tap(self.storageIcon);
-      self.dragDropEvent = null;
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.storageIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.storageIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.storageIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      await self.forEvent(self.storageIcon, 'track', () => {
-        MockInteractions.track(self.storageIcon, -80, 0);
-      }, (element, type, event) => {
-        return event.detail.state === 'end';
-      });
+      await self.dragDrop(self.storageIcon, self.localeIcon, -80, 0, 'noop');
       let count = 10;
       await self.checkInterval(() => count++ >= 10, 100, 20);
     }
