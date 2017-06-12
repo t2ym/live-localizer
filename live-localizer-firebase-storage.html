@@ -446,7 +446,7 @@ Security rules:
                   this.$.settings.setStoredValue(settingsPath, settings)
                     .then(function () {
                       this.isSettingsInitialized = true;
-                    });
+                    }.bind(this));
                 }
                 else {
                   this.autoSave = settings.autoSave;
