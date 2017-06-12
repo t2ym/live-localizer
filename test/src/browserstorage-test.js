@@ -34,7 +34,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
@@ -58,7 +57,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
       await self.forEvent(self.browserStorage,
@@ -81,7 +79,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
@@ -101,7 +98,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
       await self.forEvent(self.browserStorage,
@@ -119,7 +115,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
       await self.showTooltip(self.icon.$.card, self.tooltip);
@@ -134,7 +129,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'drag-and-drop');
@@ -150,7 +144,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       await self.dragDrop(self.localeIcon, self.storageIcon, 200, 0, 'release', 'neon-animation-finish');
@@ -176,7 +169,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
@@ -203,7 +195,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
@@ -236,7 +227,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
       await self.showTooltip(self.icon.$.card, self.tooltip);
@@ -256,7 +246,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
       await self.forEvent(self.browserStorage,
@@ -279,7 +268,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
       self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
       await self.forEvent(self.browserStorage,
@@ -297,7 +285,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
@@ -325,7 +312,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       MockInteractions.tap(self.storageIcon);
