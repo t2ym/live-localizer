@@ -26,26 +26,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           (element, type, event) => !!Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload'));
       }
       let button = self.panel.$[parameters.button] || Polymer.dom(self.panel.root).querySelector('#' + parameters.button);
-      let tooltip = Polymer.dom(self.panel.root).querySelector('paper-tooltip[for=' + parameters.button + ']');
-      await self.forEvent(tooltip, 'neon-animation-finish', () => {
-        button.dispatchEvent(new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-      }, (element, type, event) => {
-        self.tooltip = Polymer.dom(event).rootTarget;
-        button.dispatchEvent(new MouseEvent('mouseleave', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === parameters.button;
-      });
+      self.tooltip = Polymer.dom(self.panel.root).querySelector('paper-tooltip[for=' + parameters.button + ']');
+      await self.showTooltip(button, self.tooltip);
     }
     async checkpoint(parameters) {
       assert.equal(this.tooltip.getAttribute('for'), parameters.button, 'paper-tooltip should be for ' + parameters.button);
