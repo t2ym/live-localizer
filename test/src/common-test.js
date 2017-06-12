@@ -164,7 +164,7 @@ class InstantiateTest extends LiveLocalizerSuite {
     assert.equal(self.iconView.is, 'live-localizer-locale-icon-view');
     assert.equal(self.listView.is, 'live-localizer-list-view');
     assert.equal(self.storageView.is, 'live-localizer-storage-view');
-    assert.equal(self.browserStorage, 'live-localizer-browser-storage');
+    assert.equal(self.browserStorage.is, 'live-localizer-browser-storage');
     // dialog status
     assert.isNotOk(self.dialog.opened, 'dialog is not opened');
     assert.isOk(self.fab.opened, 'fab is opened');

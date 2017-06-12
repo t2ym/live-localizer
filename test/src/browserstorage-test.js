@@ -29,6 +29,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         req.onblocked = (e) => reject(e);
       });
     }
+    async operation() {
+      let self = this;
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+    }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
     async operation() {
@@ -115,9 +120,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.showTooltip(self.icon.$.card, self.tooltip);
+      self.tooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
+      await self.showTooltip(self.storageIcon.$.card, self.tooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -129,8 +133,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'drag-and-drop');
     }
     async checkpoint() {
@@ -144,8 +146,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       await self.dragDrop(self.localeIcon, self.storageIcon, 200, 0, 'release', 'neon-animation-finish');
     }
     async checkpoint() {
@@ -169,8 +169,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
       self.tooltipMessage = '';
       await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
@@ -195,8 +193,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
       if (self.tooltip.textContent.trim()) {
         await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
@@ -227,9 +223,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.showTooltip(self.icon.$.card, self.tooltip);
+      self.tooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
+      await self.showTooltip(self.storageIcon.$.card, self.tooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -285,8 +280,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
       self.tooltipMessage = '';
       await self.dragDrop(self.storageIcon, self.localeIcon, -80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
@@ -312,8 +305,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       MockInteractions.tap(self.storageIcon);
       await self.dragDrop(self.storageIcon, self.localeIcon, -80, 0, 'noop');
       let count = 10;
@@ -345,20 +336,22 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     },
     SelectIconView: {
       CleanupBrowserStorageSuite: {
-        SelectLocaleIcon: {
-          SelectStorageView: {
-            BrowserStorageUnselectedIconTooltipTest: {
-              BrowserStorageUnselectedDragTest: {
-                BrowserStorageIneffectiveSaveTest2: {
-                  BrowserStorageSaveTest: {
-                    Reload: {
-                      BrowserStorageSelectedIconTooltipTest: {
-                        DisableAutoSaveCheckbox: {
-                          Reload: {
-                            DisableAutoLoadCheckbox: {
-                              BrowserStorageSaveTest2: {
-                                Reload: {
-                                  BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_3; Save to browser storage, Reload, and Load from browser storage'
+        InitializeBrowserStorageTest: {
+          SelectLocaleIcon: {
+            SelectStorageView: {
+              BrowserStorageUnselectedIconTooltipTest: {
+                BrowserStorageUnselectedDragTest: {
+                  BrowserStorageIneffectiveSaveTest2: {
+                    BrowserStorageSaveTest: {
+                      Reload: {
+                        BrowserStorageSelectedIconTooltipTest: {
+                          DisableAutoSaveCheckbox: {
+                            Reload: {
+                              DisableAutoLoadCheckbox: {
+                                BrowserStorageSaveTest2: {
+                                  Reload: {
+                                    BrowserStorageLoadTest: 'BrowserStorageLoadTest_phase_3; Save to browser storage, Reload, and Load from browser storage'
+                                  }
                                 }
                               }
                             }
