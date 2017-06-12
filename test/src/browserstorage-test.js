@@ -35,6 +35,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
       self.tooltip = self.browserStorage.$.tooltip;
       self.iconTooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
+      self.checkboxes = Array.prototype.reduce.call(Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox'),
+        (acc, curr) => { acc[curr.textContent.trim()] = curr; return acc; }, {});
     }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
@@ -64,8 +66,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      self.checkbox = self.checkboxes[parameters.label];
       await self.forEvent(self.browserStorage,
         (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
@@ -105,8 +106,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      self.checkbox = self.checkboxes[parameters.label];
       await self.forEvent(self.browserStorage,
         (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
@@ -239,8 +239,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      self.checkbox = self.checkboxes[parameters.label];
       await self.forEvent(self.browserStorage,
         (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
@@ -261,8 +260,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
+      self.checkbox = self.checkboxes[parameters.label];
       await self.forEvent(self.browserStorage,
         (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
