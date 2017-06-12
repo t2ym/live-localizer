@@ -38,6 +38,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.checkboxes = Array.prototype.reduce.call(Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox'),
         (acc, curr) => { acc[curr.textContent.trim()] = curr; return acc; }, {});
     }
+    async toggleCheckbox(checkbox) {
+      let self = this;
+      await self.forEvent(self.browserStorage,
+        (checkbox.textContent.trim() === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
+        () => { MockInteractions.tap(checkbox); }, (element, type, event) => true);
+    }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
     async operation() {
@@ -66,10 +72,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.checkbox = self.checkboxes[parameters.label];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
@@ -106,10 +109,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.checkbox = self.checkboxes[parameters.label];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
@@ -239,10 +239,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.checkbox = self.checkboxes[parameters.label];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
@@ -260,10 +257,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.checkbox = self.checkboxes[parameters.label];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
