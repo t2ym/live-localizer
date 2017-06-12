@@ -33,6 +33,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       let self = this;
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
+      self.tooltip = self.browserStorage.$.tooltip;
+      self.iconTooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
     }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
@@ -120,13 +122,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.tooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
-      await self.showTooltip(self.storageIcon.$.card, self.tooltip);
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
-      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
-      assert.equal(this.tooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
     }
   }
   browserstorage.test = (base) => class BrowserStorageIneffectiveSaveTest extends base {
@@ -169,7 +170,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.tooltip = self.browserStorage.$.tooltip;
       self.tooltipMessage = '';
       await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
         let message = self.tooltip.textContent.trim();
@@ -193,7 +193,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.tooltip = self.browserStorage.$.tooltip;
       if (self.tooltip.textContent.trim()) {
         await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
           return !self.tooltip.textContent.trim();
@@ -223,13 +222,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.tooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
-      await self.showTooltip(self.storageIcon.$.card, self.tooltip);
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
-      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
-      assert.equal(this.tooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
     }
   }
   browserstorage.test = (base) => class DisableAutoSaveCheckbox extends base {
@@ -280,7 +278,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.tooltip = self.browserStorage.$.tooltip;
       self.tooltipMessage = '';
       await self.dragDrop(self.storageIcon, self.localeIcon, -80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
         let message = self.tooltip.textContent.trim();
