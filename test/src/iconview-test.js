@@ -117,25 +117,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       let self = this;
       self.icon = Polymer.dom(self.iconView.root).querySelector('live-localizer-locale-icon#locale-icon-' + parameters.icon);
       self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-      }, (element, type, event) => {
-        self.tooltip = Polymer.dom(event).rootTarget;
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
-      });
+      await self.showTooltip(self.icon.$.card, self.tooltip);
     }
     async checkpoint(parameters) {
       assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
