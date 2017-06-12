@@ -44,6 +44,19 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         (checkbox.textContent.trim() === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(checkbox); }, (element, type, event) => true);
     }
+    get tooltipMessageGetter() {
+      let self = this;
+      return (element, type, event) => {
+        let message = self.tooltip.textContent.trim();
+        if (self.tooltipMessage) {
+          return !message;
+        }
+        else {
+          self.tooltipMessage = message;
+          return false;
+        }
+      }
+    }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
     async operation() {
@@ -171,16 +184,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       if (this.hasToSkip) { return; }
       let self = this;
       self.tooltipMessage = '';
-      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
-        let message = self.tooltip.textContent.trim();
-        if (self.tooltipMessage) {
-          return !message;
-        }
-        else {
-          self.tooltipMessage = message;
-          return false;
-        }
-      });
+      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, self.tooltipMessageGetter);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -199,16 +203,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         });
       }
       self.tooltipMessage = '';
-      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
-        let message = self.tooltip.textContent.trim();
-        if (self.tooltipMessage) {
-          return !message;
-        }
-        else {
-          self.tooltipMessage = message;
-          return false;
-        }
-      });
+      await self.dragDrop(self.localeIcon, self.storageIcon, 80, 0, 'drop', 'neon-animation-finish', self.tooltip, self.tooltipMessageGetter);
       await self.checkInterval(() => self.dragDropEvent, 100, 20);
     }
     async checkpoint() {
