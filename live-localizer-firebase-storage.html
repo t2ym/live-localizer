@@ -436,6 +436,7 @@ Security rules:
             this.$.settings.setStoredValue(settingsPath, settings)
               .then(function () {
                 this.$.settings.path = settingsPath;
+                this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
               }.bind(this));
           }
           else {
@@ -446,15 +447,21 @@ Security rules:
                   this.$.settings.setStoredValue(settingsPath, settings)
                     .then(function () {
                       this.isSettingsInitialized = true;
+                      this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
                     }.bind(this));
                 }
                 else {
                   this.autoSave = settings.autoSave;
                   this.autoLoad = settings.autoLoad;
                   this.isSettingsInitialized = true;
+                  this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
                 }
               }.bind(this));
           }
+        }
+        else if (this.isAttached) {
+          // Note: Not flushed but an event is required
+          this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
         }
       },
 
