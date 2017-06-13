@@ -25,6 +25,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
     async operation() {
       let self = this;
+      self.localeIcon = self.storageView.$['locale-icon'];
+      self.storageIcon = Polymer.dom(self.firebaseStorage.root).querySelector('live-localizer-storage-icon');
+      self.iconTooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
       self.checkboxes = Array.prototype.reduce.call(Polymer.dom(self.firebaseStorage.root).querySelectorAll('paper-checkbox'),
         (acc, curr) => { acc[curr.textContent.trim()] = curr; return acc; }, {});
     }
@@ -70,9 +73,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         { label: 'Sign in anonymously', expected: { autoSave: true, autoLoad: true, anonymous: true } },
         { label: 'Load', expected: { autoSave: true, autoLoad: false, anonymous: true } },
         { label: 'Load', expected: { autoSave: true, autoLoad: true, anonymous: true } },
-        { label: 'Save', expected: { autoSave: false, autoLoad: true, anonymous: true } },
-        { label: 'Load', expected: { autoSave: false, autoLoad: false, anonymous: true } },
-        { label: 'Save', expected: { autoSave: true, autoLoad: false, anonymous: true } }
+        { label: 'Save', expected: { autoSave: false, autoLoad: true, anonymous: true } }
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
@@ -87,138 +88,126 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
-  /*
-  browserstorage.test = (base) => class Reload extends base {
+  firebasestorage.test = (base) => class SignInAnonymously extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      MockInteractions.tap(self.firebaseStorage.$['firebase-storage-icon']);
+      await self.checkInterval(() => self.firebaseStorage.signedIn, 200, 20);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isOk(this.firebaseStorage.signedIn, 'Signed in');
+      assert.isOk(this.firebaseStorage.user, 'user is configured');
+      assert.isOk(this.firebaseStorage.user.isAnonymous, 'user is anonymous');
+    }
+  }
+  firebasestorage.test = (base) => class Reload extends base {
     async operation() {
       this.stepPhase();
     }
   }
-  browserstorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {
+  firebasestorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      await self.checkInterval(() => self.browserStorage.isModelReady, 200, 10); // wait for isModelReady
+      await self.checkInterval(() => self.firebaseStorage.signedIn, 200, 20); // wait for signedIn
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 20); // wait for settings
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
-      assert.isOk(this.browserStorage.isModelReady, 'browserStorage is configured');
-      assert.equal(this.browserStorage.autoLoad, false, 'autoLoad is false');
-      assert.equal(this.browserStorage.autoSave, false, 'autoSave is false');
+      assert.isOk(this.firebaseStorage.isModelReady, 'firebaseStorage is configured');
+      assert.isOk(this.firebaseStorage.signedIn, 'firebaseStorage is configured');
+      assert.isOk(this.firebaseStorage.user, 'user signed in');
+      assert.isOk(this.firebaseStorage.user.isAnonymous, 'user is anonymous');
+      assert.equal(this.firebaseStorage.autoLoad, true, 'autoLoad is true');
+      assert.equal(this.firebaseStorage.autoSave, false, 'autoSave is false');
     }
   }
-  browserstorage.test = (base) => class ConfiguredAutoSaveLoadCheckboxTest extends base {
+  firebasestorage.test = (base) => class ConfiguredAutoSaveLoadCheckboxTest extends base {
     * iteration() {
       yield *[
-        { label: 'Save', expected: { autoSave: true, autoLoad: false } },
-        { label: 'Load', expected: { autoSave: true, autoLoad: true } }
+        { label: 'Save', expected: { autoSave: true, autoLoad: true } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: false } }
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
       for (let prop in parameters.expected) {
-        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+        assert.equal(this.firebaseStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
     }
   }
-  browserstorage.test = (base) => class BrowserStorageUnselectedIconTooltipTest extends base {
+  firebasestorage.test = (base) => class FirebaseStorageSignedOutAnonymousIconTooltipTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      self.icon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      self.tooltip = Polymer.dom(self.icon.root).querySelector('paper-tooltip[for=card]');
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-      }, (element, type, event) => {
-        self.tooltip = Polymer.dom(event).rootTarget;
-        self.icon.$.card.dispatchEvent(new MouseEvent('mouseleave', {
-          bubbles: true,
-          cancelable: true,
-          clientX: 0,
-          clientY: 0,
-          buttons: 1
-        }));
-        return self.tooltip.is === 'paper-tooltip' && self.tooltip.for === 'card';
-      });
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
-      assert.equal(this.tooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
-      assert.equal(this.tooltip.textContent.trim(), 'Drop to Save', 'tooltip should be "Drop to Save"');
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Sign in anonymously', 'tooltip should be "Sign in anonymously"');
     }
   }
-  browserstorage.test = (base) => class BrowserStorageIneffectiveSaveTest extends base {
+  firebasestorage.test = (base) => class FirebaseStorageSignedInAnonymousIconTooltipTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      self.localeIcon = self.storageView.$['locale-icon'];
-      self.storageIcon = Polymer.dom(self.browserStorage.root).querySelector('live-localizer-storage-icon');
-      let onDragAndDrop = (e) => {
-        self.dragDropEvent = e;
-        self.localeIcon.removeEventListener('drag-and-drop', onDragAndDrop);
-      };
-      self.localeIcon.addEventListener('drag-and-drop', onDragAndDrop);
-      self.localeIcon.dispatchEvent(new MouseEvent('mouseover', {
-        bubbles: true,
-        cancelable: true,
-        clientX: 0,
-        clientY: 0,
-        buttons: 1
-      }));
-      self.hovering = false;
-      self.dropping = false;
-      await self.forEvent(self.localeIcon, 'track', () => {
-        MockInteractions.track(self.localeIcon, 80, 0);
-      }, (element, type, event) => {
-        if (event.detail.state !== 'end' && !self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseenter', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.hovering = true;
-        }
-        if (event.detail.state !== 'end' && self.hovering && !self.dropping) {
-          self.storageIcon.dispatchEvent(new MouseEvent('mouseup', {
-            bubbles: false,
-            cancelable: true,
-            clientX: 0,
-            clientY: 0,
-            buttons: 1
-          }));
-          self.dropping = true;
-        }
-        return event.detail.state === 'end';
-      });
-      await self.forEvent(self.localeIcon, 'drag-and-drop', () => {}, (element, type, event) => true);
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Click to Sign out', 'tooltip should be "Click to Sign out"');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageSignedInAnonymousUserTooltipTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.userTooltip = self.firebaseStorage.$.usertooltip;
+      await self.showTooltip(self.firebaseStorage.$.user, self.userTooltip);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.userTooltip.getAttribute('for'), 'user', 'paper-tooltip should be for user');
+      assert.equal(this.userTooltip.textContent.trim(), 'Storage will be lost on sign out', 'tooltip should be "Storage will be lost on sign out"');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageIneffectiveSaveTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -100, 'drop', 'drag-and-drop');
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
       assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
-      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is browser storage icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is firebase storage icon');
       assert.isNotOk(this.storageIcon.selected, 'storage icon is not selected');
     }
   }
+  firebasestorage.test = (base) => class FirebaseStorageDefaultLangIneffectiveSaveTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -100, 'drop', 'drag-and-drop');
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is firebase storage icon');
+      assert.isOk(this.storageIcon.selected, 'storage icon is selected');
+      assert.equal(this.firebaseStorage.$.tooltip.textContent.trim(), '', 'tooltip should be empty');
+    }
+  }
+  /*
   browserstorage.test = (base) => class BrowserStorageIneffectiveSaveTest2 extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -1272,7 +1261,23 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     SelectStorageView: {
       CleanupFirebaseAuthSuite: {
         InitializeFirebaseStorageTest: {
-          CheckboxTest: 'FirebaseStorageCheckboxTest'
+          CheckboxTest: {
+            SignInAnonymously: {
+              Reload: {
+                ConfiguredAutoSaveLoadTest: {
+                  FirebaseStorageSignedInAnonymousIconTooltipTest: {
+                    FirebaseStorageSignedInAnonymousUserTooltipTest: {
+                      FirebaseStorageDefaultLangIneffectiveSaveTest: {
+                        ConfiguredAutoSaveLoadCheckboxTest: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
+          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest'
         }
       }
     }
