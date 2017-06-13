@@ -123,8 +123,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.checkInterval(() => self.firebaseStorage.signedIn, 200, 20); // wait for signedIn
-      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 20); // wait for settings
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 40); // wait for settings
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
