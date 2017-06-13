@@ -23,12 +23,33 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
       }
     }
+    async operation() {
+      let self = this;
+      self.checkboxes = Array.prototype.reduce.call(Polymer.dom(self.firebaseStorage.root).querySelectorAll('paper-checkbox'),
+        (acc, curr) => { acc[curr.textContent.trim()] = curr; return acc; }, {});
+    }
+    async toggleCheckbox(checkbox) {
+      let self = this;
+      let flushEvent = {
+        'Load': 'firebase-storage-settings-flushed',
+        'Save': 'firebase-storage-settings-flushed',
+        'Sign in anonymously': ''
+      }[checkbox.textContent.trim()];
+      if (flushEvent) {
+        await self.forEvent(self.firebaseStorage, flushEvent,
+          () => { MockInteractions.tap(checkbox); }, (element, type, event) => true);
+      }
+      else {
+        MockInteractions.tap(checkbox);
+      }
+      let count = 1;
+      await self.checkInterval(() => count-- > 0, 200, 1); // wait for CSS animation (140ms) to finish
+    }
   }
   firebasestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.firebaseStorage = self.storageView.queryEffectiveChildren('live-localizer-firebase-storage#firebase-storage');
       await self.checkInterval(() => self.firebaseStorage.isModelReady, 200, 10); // wait for isModelReady
     }
     async checkpoint() {
@@ -38,35 +59,35 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.firebaseStorage.autoSave, true, 'autoSave is true');
     }
   }
-  /*
-  browserstorage.test = (base) => class AutoSaveLoadCheckboxTest extends base {
+  firebasestorage.test = (base) => class CheckboxTest extends base {
     * iteration() {
       yield *[
-        { label: 'Save', expected: { autoSave: false, autoLoad: true } },
-        { label: 'Load', expected: { autoSave: false, autoLoad: false } },
-        { label: 'Save', expected: { autoSave: true, autoLoad: false } },
-        { label: 'Load', expected: { autoSave: true, autoLoad: true } },
-        { label: 'Load', expected: { autoSave: true, autoLoad: false } },
-        { label: 'Save', expected: { autoSave: false, autoLoad: false } }
+        // Initial state: { autoSave: true, autoLoad: false, anonymous: true }
+        { label: 'Sign in anonymously', expected: { autoSave: true, autoLoad: false, anonymous: false } },
+        { label: 'Save', expected: { autoSave: false, autoLoad: false, anonymous: false } },
+        { label: 'Load', expected: { autoSave: false, autoLoad: true, anonymous: false } },
+        { label: 'Save', expected: { autoSave: true, autoLoad: true, anonymous: false } },
+        { label: 'Sign in anonymously', expected: { autoSave: true, autoLoad: true, anonymous: true } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: false, anonymous: true } },
+        { label: 'Load', expected: { autoSave: true, autoLoad: true, anonymous: true } },
+        { label: 'Save', expected: { autoSave: false, autoLoad: true, anonymous: true } },
+        { label: 'Load', expected: { autoSave: false, autoLoad: false, anonymous: true } },
+        { label: 'Save', expected: { autoSave: true, autoLoad: false, anonymous: true } }
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.browserStorage = self.storageView.$['browser-storage'];
-      let checkboxes = Polymer.dom(self.browserStorage.root).querySelectorAll('paper-checkbox');
-      self.checkbox = Array.prototype.filter.call(checkboxes, (item) => item.textContent.trim() === parameters.label)[0];
-      await self.forEvent(self.browserStorage,
-        (parameters.label === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
-        () => { MockInteractions.tap(self.checkbox); }, (element, type, event) => true);
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
     }
     async checkpoint(parameters) {
       if (this.hasToSkip) { return; }
       for (let prop in parameters.expected) {
-        assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+        assert.equal(this.firebaseStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
     }
   }
+  /*
   browserstorage.test = (base) => class Reload extends base {
     async operation() {
       this.stepPhase();
@@ -1250,7 +1271,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test classes
     SelectStorageView: {
       CleanupFirebaseAuthSuite: {
-        InitializeFirebaseStorageTest: 'InitializeFirebaseStorageTest'
+        InitializeFirebaseStorageTest: {
+          CheckboxTest: 'FirebaseStorageCheckboxTest'
+        }
       }
     }
   };
