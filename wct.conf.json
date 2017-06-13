@@ -1,7 +1,4 @@
 {
-  "mochaOptions": {
-    "timeout": "30000"
-  },
   "plugins": {
     "local": {
       "browsers": [
