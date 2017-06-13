@@ -102,6 +102,18 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.firebaseStorage.user.isAnonymous, 'user is anonymous');
     }
   }
+  firebasestorage.test = (base) => class SignOutAnonymousUser extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      MockInteractions.tap(self.firebaseStorage.$['firebase-storage-icon']);
+      await self.checkInterval(() => !self.firebaseStorage.signedIn, 200, 20);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isNotOk(this.firebaseStorage.signedIn, 'Signed out');
+    }
+  }
   firebasestorage.test = (base) => class Reload extends base {
     async operation() {
       this.stepPhase();
@@ -1268,7 +1280,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   FirebaseStorageSignedInAnonymousIconTooltipTest: {
                     FirebaseStorageSignedInAnonymousUserTooltipTest: {
                       FirebaseStorageDefaultLangIneffectiveSaveTest: {
-                        ConfiguredAutoSaveLoadCheckboxTest: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes'
+                        ConfiguredAutoSaveLoadCheckboxTest: {
+                          SignOutAnonymousUser: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes, Sign out'
+                        }
                       }
                     }
                   }
