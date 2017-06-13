@@ -44,7 +44,7 @@ class LiveLocalizerSuite extends Suite {
           }
           else if (++count >= maxCount) {
             clearInterval(intervalId);
-            reject();
+            reject(new Error('condition = ' + condition.toString() + ' count = ' + count + ' maxCount = ' + maxCount));
           }
         }, interval);
       }
@@ -65,6 +65,19 @@ class LiveLocalizerSuite extends Suite {
       tooltipFor.dispatchEvent(new MouseEvent('mouseleave', mouseEventInit));
       return true;
     });
+  }
+  get tooltipMessageGetter() {
+    let self = this;
+    return (element, type, event) => {
+      let message = self.tooltip.textContent.trim();
+      if (self.tooltipMessage) {
+        return !message;
+      }
+      else {
+        self.tooltipMessage = message;
+        return false;
+      }
+    }
   }
   async dragDrop(src, dest, dx, dy, action, waitFor, eventTarget, eventCondition) {
     let self = this;

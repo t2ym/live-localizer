@@ -44,19 +44,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         (checkbox.textContent.trim() === 'Load' ? 'browser-storage-autoload-flushed' : 'browser-storage-autosave-flushed'),
         () => { MockInteractions.tap(checkbox); }, (element, type, event) => true);
     }
-    get tooltipMessageGetter() {
-      let self = this;
-      return (element, type, event) => {
-        let message = self.tooltip.textContent.trim();
-        if (self.tooltipMessage) {
-          return !message;
-        }
-        else {
-          self.tooltipMessage = message;
-          return false;
-        }
-      }
-    }
   }
   browserstorage.test = (base) => class InitializeBrowserStorageTest extends base {
     async operation() {

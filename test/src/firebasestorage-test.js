@@ -29,6 +29,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.localeIcon = self.storageView.$['locale-icon'];
       self.storageIcon = Polymer.dom(self.firebaseStorage.root).querySelector('live-localizer-storage-icon');
       self.iconTooltip = Polymer.dom(self.storageIcon.root).querySelector('paper-tooltip[for=card]');
+      self.tooltip = self.firebaseStorage.$.tooltip;
       self.checkboxes = Array.prototype.reduce.call(Polymer.dom(self.firebaseStorage.root).querySelectorAll('paper-checkbox'),
         (acc, curr) => { acc[curr.textContent.trim()] = curr; return acc; }, {});
     }
@@ -75,6 +76,42 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         { label: 'Load', expected: { autoSave: true, autoLoad: false, anonymous: true } },
         { label: 'Load', expected: { autoSave: true, autoLoad: true, anonymous: true } },
         { label: 'Save', expected: { autoSave: false, autoLoad: true, anonymous: true } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.firebaseStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
+  firebasestorage.test = (base) => class DisableAutoSaveCheckbox extends base {
+    * iteration() {
+      yield *[
+        { label: 'Save', expected: { autoSave: false, autoLoad: false } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.firebaseStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
+  firebasestorage.test = (base) => class EnableAutoLoadCheckbox extends base {
+    * iteration() {
+      yield *[
+        { label: 'Load', expected: { autoSave: false, autoLoad: true } }
       ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
     }
     async operation(parameters) {
@@ -196,7 +233,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -100, 'drop', 'drag-and-drop');
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -120, 'drop', 'drag-and-drop');
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -209,7 +246,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -100, 'drop', 'drag-and-drop');
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -120, 'drop', 'drag-and-drop');
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -217,6 +254,91 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is firebase storage icon');
       assert.isOk(this.storageIcon.selected, 'storage icon is selected');
       assert.equal(this.firebaseStorage.$.tooltip.textContent.trim(), '', 'tooltip should be empty');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageSignedOutDragTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'noop');
+      let count = 10;
+      await self.checkInterval(() => count++ >= 10, 100, 20);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isNotOk(this.dragDropEvent, 'no drag and drop event');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageIneffectiveSaveTest2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.dragDrop(self.localeIcon, self.storageIcon, 150, -150, 'release', 'neon-animation-finish');
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isNotOk(this.storageIcon.selected, 'storage icon is not selected');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageSaveTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.tooltipMessage = '';
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, -120, 'drop', 'neon-animation-finish', self.tooltip, self.tooltipMessageGetter);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is firebase storage icon');
+      assert.equal(this.tooltipMessage, 'Saved XLIFF for de', 'tooltip is "Saved XLIFF for de"');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageSelectedIconTooltipTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Drag to Load Click to Sign out', 'tooltip should be "Drag to Load Click to Sign out"');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageInit extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 40);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isOk(this.firebaseStorage.isSettingsInitialized, 'settings is initialized');
+    }
+  }
+  firebasestorage.test = (base) => class FirebaseStorageLoadTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.tooltipMessage = '';
+      await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
+        let message = self.tooltip.textContent.trim();
+        if (self.tooltipMessage) {
+          return !message;
+        }
+        else {
+          self.tooltipMessage = message;
+          return false;
+        }
+      });
+      await self.checkInterval(() => self.dragDropEvent, 200, 40);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is firebase storage icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
+      assert.equal(this.tooltipMessage, 'Loaded XLIFF for de', 'tooltip is "Loaded XLIFF for de"');
     }
   }
   /*
@@ -1299,7 +1421,31 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       CleanupFirebaseAuthSuite: {
         InitializeFirebaseStorageTest: {
           SelectLocaleIcon: {
-            SelectStorageView: 'SelectStorageViewTest'
+            SelectStorageView: {
+              FirebaseStorageSignedOutDragTest: {
+                FirebaseStorageIneffectiveSaveTest2: {
+                  SignInAnonymously: {
+                    FirebaseStorageSaveTest: {
+                      Reload: {
+                        FirebaseStorageSelectedIconTooltipTest: {
+                          DisableAutoSaveCheckbox: {
+                            EnableAutoLoadCheckbox: {
+                              Reload: {
+                                FirebaseStorageInit: {
+                                  FirebaseStorageLoadTest: {
+                                    SignOutAnonymousUser: 'SaveReloadLoadTest_phase_2; Sign in anonymously, Save, Reload, Load, Sign out'
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
