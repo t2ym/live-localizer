@@ -10,6 +10,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   firebasestorage.test = Suite.scopes.storageview.classes.SelectStorageView;
   firebasestorage.test = Suite.scopes.panel.classes.SelectIconView;
   firebasestorage.test = Suite.scopes.panel.mixins.SelectStorageView;
+  firebasestorage.test = Suite.scopes.browserstorage.mixins.SelectLocaleIcon;
   firebasestorage.test = (base) => class CleanupFirebaseAuthSuite extends base {
     async setup() {
       await super.setup();
@@ -1293,6 +1294,15 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest'
         }
       }
+    },
+    SelectIconView: {
+      CleanupFirebaseAuthSuite: {
+        InitializeFirebaseStorageTest: {
+          SelectLocaleIcon: {
+            SelectStorageView: 'SelectStorageViewTest'
+          }
+        }
+      }
     }
   };
-} // browserstorage scope
+} // firebasestorage scope
