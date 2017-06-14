@@ -132,13 +132,15 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       if (this.hasToSkip) { return; }
       let self = this;
       MockInteractions.tap(self.firebaseStorage.$['firebase-storage-icon']);
-      await self.checkInterval(() => self.firebaseStorage.signedIn, 200, 20);
+      await self.checkInterval(() => self.firebaseStorage.signedIn, 200, 120);
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 120);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
       assert.isOk(this.firebaseStorage.signedIn, 'Signed in');
       assert.isOk(this.firebaseStorage.user, 'user is configured');
       assert.isOk(this.firebaseStorage.user.isAnonymous, 'user is anonymous');
+      assert.isOk(this.firebaseStorage.isSettingsInitialized, 'settings is initialized');
     }
   }
   firebasestorage.test = (base) => class SignOutAnonymousUser extends base {
@@ -146,7 +148,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       if (this.hasToSkip) { return; }
       let self = this;
       MockInteractions.tap(self.firebaseStorage.$['firebase-storage-icon']);
-      await self.checkInterval(() => !self.firebaseStorage.signedIn, 200, 20);
+      await self.checkInterval(() => !self.firebaseStorage.signedIn, 200, 120);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -157,8 +159,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 250); // wait for settings
-      await self.checkInterval(() => self.firebaseStorage.autoLoad, 200, 40);
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 50); // wait for settings
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -166,6 +167,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.firebaseStorage.signedIn, 'firebaseStorage is configured');
       assert.isOk(this.firebaseStorage.user, 'user signed in');
       assert.isOk(this.firebaseStorage.user.isAnonymous, 'user is anonymous');
+      assert.isOk(this.firebaseStorage.isSettingsInitialized, 'settings is initialized');
       assert.equal(this.firebaseStorage.autoLoad, true, 'autoLoad is true');
       assert.equal(this.firebaseStorage.autoSave, false, 'autoSave is false');
     }
