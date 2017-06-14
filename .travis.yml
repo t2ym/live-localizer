@@ -1,0 +1,24 @@
+language: node_js
+branches:
+  except:
+  - gh-pages
+sudo: true
+dist: trusty
+before_script:
+  - npm install -g bower t2ym/polymer-cli#wct6-plugin t2ym/web-component-tester-istanbul#0.10.1-wct6.11
+  - export PATH=$PWD/node_modules/.bin:$PATH
+  - polymer install --variants
+env:
+  global:
+node_js: stable
+addons:
+  firefox: latest
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+  sauce_connect: true
+script:
+  - xvfb-run polymer test
+  - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi
