@@ -7,6 +7,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   let scope = 'dialog';
   let dialog = new Suite(scope, 'live-localizer dialog and fab tests');
   dialog.htmlSuite = 'live-localizer';
+  dialog.test = Suite.scopes.common.classes.InstantiateTest;
   dialog.test = (base) => class OpenDialogTest extends base {
     async operation() {
       let self = this;
