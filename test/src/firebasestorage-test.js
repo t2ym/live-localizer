@@ -157,7 +157,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 40); // wait for settings
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 250); // wait for settings
+      await self.checkInterval(() => self.firebaseStorage.autoLoad, 200, 40);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
