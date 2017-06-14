@@ -320,6 +320,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
+      await self.checkInterval(() => { console.log(self.firebaseStorage.label); return self.firebaseStorage.label === 'bundle.de.xlf'; }, 200, 200);
       self.tooltipMessage = '';
       await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
         let message = self.tooltip.textContent.trim();
@@ -331,7 +332,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           return false;
         }
       });
-      await self.checkInterval(() => self.dragDropEvent, 200, 250);
+      await self.checkInterval(() => { console.log(self.dragDropEvent); return self.dragDropEvent }, 200, 150);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }

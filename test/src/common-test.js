@@ -95,6 +95,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.dragDropEvent = null;
       let onDragAndDrop = (e) => {
         self.dragDropEvent = e;
+        console.log('self.dragDropEvent = ', e);
         src.removeEventListener('drag-and-drop', onDragAndDrop);
       };
       switch (action) {
