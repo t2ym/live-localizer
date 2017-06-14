@@ -189,6 +189,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(self.fab.opened, 'fab is opened');
     }
   }
+  common.test = (base) => class Reload extends base {
+    async operation() {
+      this.stepPhase();
+    }
+  }
   common.test = {
     LiveLocalizerSuite: {
       InstantiateTest: ''

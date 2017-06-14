@@ -11,6 +11,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   firebasestorage.test = Suite.scopes.panel.classes.SelectIconView;
   firebasestorage.test = Suite.scopes.panel.mixins.SelectStorageView;
   firebasestorage.test = Suite.scopes.browserstorage.mixins.SelectLocaleIcon;
+  firebasestorage.test = Suite.scopes.common.mixins.Reload;
   firebasestorage.test = (base) => class CleanupFirebaseAuthSuite extends base {
     async setup() {
       await super.setup();
@@ -150,11 +151,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async checkpoint() {
       if (this.hasToSkip) { return; }
       assert.isNotOk(this.firebaseStorage.signedIn, 'Signed out');
-    }
-  }
-  firebasestorage.test = (base) => class Reload extends base {
-    async operation() {
-      this.stepPhase();
     }
   }
   firebasestorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {

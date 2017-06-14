@@ -10,6 +10,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   browserstorage.test = Suite.scopes.storageview.classes.SelectStorageView;
   browserstorage.test = Suite.scopes.panel.classes.SelectIconView;
   browserstorage.test = Suite.scopes.panel.mixins.SelectStorageView;
+  browserstorage.test = Suite.scopes.common.mixins.Reload;
   browserstorage.test = (base) => class CleanupBrowserStorageSuite extends base {
     async setup() {
       await super.setup();
@@ -79,11 +80,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       for (let prop in parameters.expected) {
         assert.equal(this.browserStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
       }
-    }
-  }
-  browserstorage.test = (base) => class Reload extends base {
-    async operation() {
-      this.stepPhase();
     }
   }
   browserstorage.test = (base) => class ConfiguredAutoSaveLoadTest extends base {
