@@ -52,6 +52,7 @@
     "gulp-sort": "^2.0.0",
     "gulp-util": "^3.0.7",
     "json-stringify-safe": "^5.0.1",
+    "lcov-result-merger": "^1.2.0",
     "run-sequence": "^1.2.2",
     "strip-bom": "^3.0.0",
     "through2": "^2.0.1",
