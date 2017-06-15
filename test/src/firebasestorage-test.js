@@ -127,6 +127,24 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  firebasestorage.test = (base) => class DisableAnonymousCheckbox extends base {
+    * iteration() {
+      yield *[
+        { label: 'Sign in anonymously', expected: { autoSave: true, autoLoad: false, anonymous: false } },
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.firebaseStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
   firebasestorage.test = (base) => class SignInAnonymously extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -341,6 +359,101 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltipMessage, 'Loaded XLIFF for de', 'tooltip is "Loaded XLIFF for de"');
     }
   }
+  firebasestorage.test = (base) => class MockSignInTest extends base {
+    * iteration() {
+      yield *[
+        {
+          authProvider: 'google',
+          expected: {
+            iconTooltip: 'Sign in with Google',
+            userLabel: 'mockuser@gmail.com',
+            userTooltip: 'Signed in with Google',
+            userIcon: 'favicon_google:google'
+          }
+        },
+        {
+          authProvider: 'twitter',
+          expected: {
+            iconTooltip: 'Sign in with Twitter',
+            userLabel: '@mockuser',
+            userTooltip: 'Signed in with Twitter',
+            userIcon: 'twitter_icon:twitter'
+          }
+        },
+        {
+          authProvider: 'github',
+          expected: {
+            iconTooltip: 'Sign in with GitHub',
+            userLabel: 'mockuser@gmail.com',
+            userTooltip: 'Signed in with GitHub',
+            userIcon: 'github_icon:github'
+          }
+        },
+        {
+          authProvider: 'facebook',
+          expected: {
+            iconTooltip: 'Sign in with Facebook',
+            userLabel: 'mockuser@gmail.com',
+            userTooltip: 'Signed in with Facebook',
+            userIcon: 'account_avatar:profile'
+          }
+        }
+      ].map((parameters) => { parameters.name = 'Sign in with ' + parameters.authProvider; return parameters });
+    }
+    async operation(parameters) {
+      let self = this;
+      self.mockStorage = self.firebaseStorage;
+      self.mockAuth = self.mockStorage.$.auth;
+      self.mockAuth.signInWithPopup = async function (authProvider) {
+        await self.mockAuth.signInAnonymously();
+        await self.checkInterval(() => self.mockStorage.isSettingsInitialized, 200, 100);
+        let user = {
+          email: 'mockuser@gmail.com',
+          displayName: 'mockuser',
+          isAnonymous: false
+        };
+        for (let prop in self.mockStorage.user) {
+          switch (prop) {
+          case 'email':
+          case 'displayName':
+          case 'isAnonymous':
+            break;
+          default:
+            user[prop] = self.mockStorage.user[prop];
+            break;
+          }
+        }
+        self.mockStorage._user = self.mockStorage.user;
+        self.mockStorage.user = user;
+        self.mockStorage.anonymous = false;
+        self.setMockUser = true;
+      }
+      self.setMockUser = false;
+      self.mockStorage.anonymous = false;
+      self.mockStorage.authProvider = parameters.authProvider;
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
+      self.iconTooltipMessage = self.iconTooltip.textContent.trim();
+      MockInteractions.tap(self.storageIcon);
+      await self.checkInterval(() => self.mockStorage.isSettingsInitialized, 200, 100);
+      await self.checkInterval(() => self.mockStorage.signedIn, 200, 100);
+      await self.checkInterval(() => self.setMockUser, 200, 100);
+      self.userLabel = self.mockStorage.$.user.textContent.trim();
+      self.userIcon = Polymer.dom(self.mockStorage.$.user).querySelector('iron-icon').icon;
+      await self.showTooltip(self.mockStorage.$.user, self.mockStorage.$.usertooltip);
+      self.userTooltipMessage = self.mockStorage.$.usertooltip.textContent.trim();
+      await self.forEvent(self.mockStorage.$.usertooltip, 'neon-animation-finish', () => {}, (element, type, event) => true);
+      self.mockStorage.user = self.mockStorage._user;
+      MockInteractions.tap(self.storageIcon);
+      await self.checkInterval(() => !self.mockStorage.signedIn, 200, 100);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.iconTooltipMessage, parameters.expected.iconTooltip, 'tooltip should be "' + parameters.expected.iconTooltip + '"');
+      assert.equal(this.userLabel, parameters.expected.userLabel, 'user label should be "' + parameters.expected.userLabel + '"');
+      assert.equal(this.userTooltipMessage, parameters.expected.userTooltip, 'user tooltip should be "' + parameters.expected.userTooltip + '"');
+      assert.equal(this.userIcon, parameters.expected.userIcon, 'user icon should be "' + parameters.expected.userIcon + '"');
+    }
+  }
   firebasestorage.test = {
     // test class mixins
     '': [],
@@ -366,7 +479,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           },
           FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
-          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest'
+          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
+          DisableAnonymousCheckbox: {
+            MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
+          }
         }
       }
     },
