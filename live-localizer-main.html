@@ -3,6 +3,7 @@
 Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../neon-animation/web-animations.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="live-localizer-fab.html">
@@ -86,7 +87,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <live-localizer-dialog 
       id="dialog"
       on-iron-overlay-closed="_dialogClosed">
-      <live-localizer-panel><content></content></live-localizer-panel>
+      <live-localizer-panel slot="dialog-content">
+        <slot slot="storage-cloud" name="storage-cloud"></slot>
+        <slot slot="storage-browser" name="storage-browser"></slot>
+        <slot slot="storage-device" name="storage-device"></slot>
+      </live-localizer-panel>
     </live-localizer-dialog>
     <a id="hiddenLink" class="hidden"></a>
   </template>
@@ -124,6 +129,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         }
         var reloadUrl = window.sessionStorage.getItem('live-localizer-reload-url');
         if (reloadUrl) {
+          this.dialog.addEventListener('neon-animation-finish', function onNeonAnimationFinish(e) {
+            this.dialog.removeEventListener('neon-animation-finish', onNeonAnimationFinish);
+            this.dialog.fire('height-changed');
+          }.bind(this));
           this.opened = true;
           setTimeout(function () {
             this.$.hiddenLink.href = reloadUrl;

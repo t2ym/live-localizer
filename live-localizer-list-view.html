@@ -119,7 +119,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
 
     </style>
-    <vaadin-grid id="list" class="gridlistarea" items="{{listItems}}" selection-mode="single" active-item="{{activeItem}}">
+    <vaadin-grid id="list" class="gridlistarea" items="{{listItems}}" selection-mode="single" active-item="{{activeItem}}"
+      on-selected-items-changed="onListSelection">
 
       <template is="dom-if" if="[[version1]]">
         <table>
@@ -262,10 +263,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         'modelReady(model)'
       ],
 
-      listeners: {
-        'list.selected-items-changed': 'onListSelection'
-      },
-
       /**
        * observer of `this.model`
        *
@@ -358,6 +355,14 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 this.$.list.selectedItems = [this.model.listItems[i]];
               }
               break;
+            }
+          }
+          if (i >= this.model.listItems.length) {
+            if (this.version1) {
+              this.$.list.selection.clear();
+            }
+            if (this.version2) {
+              this.$.list.selectedItems = [];
             }
           }
         }

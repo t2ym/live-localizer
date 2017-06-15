@@ -55,7 +55,10 @@ The element handles save and load operations of XLIFF on local file storage.
         display: none;
       }
     </style>
-    <div id="droparea" class="droparea layout horizontal">
+    <div id="droparea" class="droparea layout horizontal"
+      on-dragover="onDragOver"
+      on-drop="onDrop"
+      on-mouseenter="onDropAreaMouseenter">
       <live-localizer-storage-icon
         id="file-storage-icon"
         selected="{{selected}}"
@@ -79,7 +82,7 @@ The element handles save and load operations of XLIFF on local file storage.
     <paper-tooltip id="droptooltip" for="droparea" offset="-1" manual-mode>Drag and drop XLIFF to select</paper-tooltip>
     <paper-tooltip id="tooltip" for="droparea" offset="-40" manual-mode>{{tooltip}}</paper-tooltip>
     <a id="anchor" class="hidden-anchor" target="_blank"></a>
-    <input id="fileLoad" type="file" class="hidden-input">
+    <input id="fileLoad" type="file" class="hidden-input" on-change="onFileChange">
   </template>
   <script>
   (function () {
@@ -180,13 +183,6 @@ The element handles save and load operations of XLIFF on local file storage.
         'updateLabel(selected,files.splices)',
         'updateWatcher(selected,watcherEnabled,watchPort)'
       ],
-
-      listeners: {
-        'droparea.dragover': 'onDragOver',
-        'droparea.drop': 'onDrop',
-        'droparea.mouseenter': 'onDropAreaMouseenter',
-        'fileLoad.change': 'onFileChange'
-      },
 
       /**
        * ready callback

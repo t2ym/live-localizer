@@ -105,7 +105,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         display: none;
       }
     </style>
-    <div id="handle" class="layout vertical handle">
+    <div id="handle" class="layout vertical handle" on-mouseover="_onMouseover">
       <div class="top-handle layout horizontal">
         <div class="left-handle" drag-handle-mode="upper-left"></div>
         <div class="flex" drag-handle-mode="upper"></div>
@@ -118,11 +118,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             <div class="titlebar layout horizontal">
               <div class="title-pad"></div>
               <div class="flex title" drag-handle-mode="position">[[dialogTitle]]</div>
-              <paper-icon-button id="fullscreen" class="icon-button" icon="fullscreen" drag-handle-mode="none"></paper-icon-button>
-              <paper-icon-button id="fullscreen-exit" class="icon-button" icon="fullscreen-exit" drag-handle-mode="none"></paper-icon-button>
-              <paper-icon-button id="close" class="icon-button" icon="close" drag-handle-mode="none"></paper-icon-button>
+              <paper-icon-button id="fullscreen" class="icon-button" icon="fullscreen" drag-handle-mode="none" on-tap="_onFullscreenButton"></paper-icon-button>
+              <paper-icon-button id="fullscreen-exit" class="icon-button" icon="fullscreen-exit" drag-handle-mode="none" on-tap="_onFullscreenButton"></paper-icon-button>
+              <paper-icon-button id="close" class="icon-button" icon="close" drag-handle-mode="none" on-tap="_onCloseButton"></paper-icon-button>
             </div>
-            <div id="content" class="dialog-content" drag-handle-mode="none"><content></content></div>
+            <div id="content" class="dialog-content" drag-handle-mode="none"><slot name="dialog-content"></slot></div>
           </div>
         </div>
         <div class="right-handle" drag-handle-mode="middle-right"></div>
@@ -197,10 +197,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
       listeners: {
         'neon-animation-finish': '_onNeonAnimationFinish',
-        'handle.mouseover': '_onMouseover',
-        'close.tap': '_onCloseButton',
-        'fullscreen.tap': '_onFullscreenButton',
-        'fullscreen-exit.tap': '_onFullscreenButton',
         'height-changed': '_adjustHeight'
       },
 

@@ -343,6 +343,7 @@ Note:
       attached: function () {
         if (this.model) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.model.addEventListener('bundle-set-fetched', this.onHtmlLangMutationBindThis);
           this.isModelReady = true;
         }
       },
@@ -357,6 +358,7 @@ Note:
       modelReady: function (model) {
         if (model && !this.isModelReady) {
           this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.model.addEventListener('bundle-set-fetched', this.onHtmlLangMutationBindThis);
           this.isModelReady = true;
         }
         if (!model) {
@@ -372,6 +374,7 @@ Note:
       detached: function () {
         if (this.model) {
           this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.model.removeEventListener('bundle-set-fetched', this.onHtmlLangMutationBindThis);
           this.isModelReady = false;
         }
       },
@@ -403,7 +406,9 @@ Note:
        * @param {Object} model `<live-localizer-model>` object
        */
       updateSelected: function (file, model) {
-        this.selected = model.isSelected(file.locale);
+        if (model && file && file.locale) {
+          this.selected = model.isSelected(file.locale);
+        }
       },
 
       /**

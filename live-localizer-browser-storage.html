@@ -227,12 +227,15 @@ The element handles save and load operations of XLIFF on the browser storage bac
        */
       updateAutoSaveSetting: function (autoSave) {
         if (this.isAttached && this.isAutoSaveInitialized) {
+          var it = this;
           this.storage.settings.put({ name: 'autoSave', value: autoSave })
             .then(function () {
               //console.log('store autoSave = ' + autoSave);
+              it.fire('browser-storage-autosave-flushed', { value: autoSave });
             })
             .catch(function (error) {
               //console.log('error in autoSave = ' + autoSave, error);
+              it.fire('browser-storage-autosave-flushed', { value: autoSave, error: error });
             });
         }
       },
@@ -244,12 +247,15 @@ The element handles save and load operations of XLIFF on the browser storage bac
        */
       updateAutoLoadSetting: function (autoLoad) {
         if (this.isAttached && this.isAutoLoadInitialized) {
+          var it = this;
           this.storage.settings.put({ name: 'autoLoad', value: autoLoad })
             .then(function () {
               //console.log('store autoLoad = ' + autoLoad);
+              it.fire('browser-storage-autoload-flushed', { value: autoLoad });
             })
             .catch(function (error) {
               //console.log('error in autoLoad = ' + autoLoad, error);
+              it.fire('browser-storage-autoload-flushed', { value: autoLoad, error: error });
             });
         }
       },
@@ -337,6 +343,9 @@ The element handles save and load operations of XLIFF on the browser storage bac
        * Trigger checking on auto-loading
        */
       onBundleSetFetched: function (e) {
+        if (!this.file) {
+          this.onHtmlLangMutationBindThis();
+        }
         if (!this.autoLoadStatus.bundleSetFetched) {
           this.autoLoadStatus.bundleSetFetched = true;
           this.checkAutoLoad(this.file, this.autoLoad);

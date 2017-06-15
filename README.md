@@ -1,3 +1,7 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/t2ym/live-localizer)
+[![Bower](https://img.shields.io/bower/v/live-localizer.svg)](https://www.webcomponents.org/element/t2ym/live-localizer)
+[![npm](https://img.shields.io/npm/v/live-localizer.svg)](https://www.npmjs.com/package/live-localizer)
+
 # Live Localizer
 
 Live Localizer widget for Polymer [i18n-behavior](https://github.com/t2ym/i18n-behavior) (work in progress)

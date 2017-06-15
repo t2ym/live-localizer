@@ -436,6 +436,7 @@ Security rules:
             this.$.settings.setStoredValue(settingsPath, settings)
               .then(function () {
                 this.$.settings.path = settingsPath;
+                this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
               }.bind(this));
           }
           else {
@@ -446,15 +447,21 @@ Security rules:
                   this.$.settings.setStoredValue(settingsPath, settings)
                     .then(function () {
                       this.isSettingsInitialized = true;
-                    });
+                      this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
+                    }.bind(this));
                 }
                 else {
                   this.autoSave = settings.autoSave;
                   this.autoLoad = settings.autoLoad;
                   this.isSettingsInitialized = true;
+                  this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
                 }
               }.bind(this));
           }
+        }
+        else if (this.isAttached) {
+          // Note: Not flushed but an event is required
+          this.fire('firebase-storage-settings-flushed', { signedIn: this.signedIn });
         }
       },
 
@@ -958,31 +965,36 @@ Security rules:
         var it = this;
         file.text = null;
         return new Promise(function (resolve, reject) {
-          it.model.setXliff(file, function (result) {
-            if (result && result.text) {
-              it.loadFile(result, true, true)
-                .then(function (file) {
-                  if (it.signedIn && it.user && it.user.uid) {
-                    it.path = '/users/' + it.user.uid + '/files/' + file.locale;
-                    // It is strange that file instanceof Object is false and file.hasOwnProperty is undefined while typeof file is 'object'
-                    it.file = Object.assign({}, file); // make sure file.hasOwnProperty is defined
-                    it.$.document.setStoredValue(it.path, it.file)
-                      .then(function () {
-                        it.$.document.path = it.path;
-                        //console.log('Saved document ' + file.locale);
-                        if (!it.tooltip) {
-                          it.tooltip = 'Saved XLIFF for ' + file.locale;
-                        }
-                        it.$.tooltip.show();
-                        setTimeout(function () {
-                          it.$.tooltip.hide();
-                          it.tooltip = '';
-                        }, 3000);
-                      });
-                  }
-                });
-            }
-          });
+          if (file.locale === it.model.defaultLang) {
+            resolve(); // default lang cannot be saved
+          }
+          else {
+            it.model.setXliff(file, function (result) {
+              if (result && result.text) {
+                it.loadFile(result, true, true)
+                  .then(function (file) {
+                    if (it.signedIn && it.user && it.user.uid) {
+                      it.path = '/users/' + it.user.uid + '/files/' + file.locale;
+                      // It is strange that file instanceof Object is false and file.hasOwnProperty is undefined while typeof file is 'object'
+                      it.file = Object.assign({}, file); // make sure file.hasOwnProperty is defined
+                      it.$.document.setStoredValue(it.path, it.file)
+                        .then(function () {
+                          it.$.document.path = it.path;
+                          //console.log('Saved document ' + file.locale);
+                          if (!it.tooltip) {
+                            it.tooltip = 'Saved XLIFF for ' + file.locale;
+                          }
+                          it.$.tooltip.show();
+                          setTimeout(function () {
+                            it.$.tooltip.hide();
+                            it.tooltip = '';
+                          }, 3000);
+                        });
+                    }
+                  });
+              }
+            });
+          }
         });
       }
 
