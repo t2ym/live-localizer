@@ -161,6 +161,32 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.firebaseStorage.isSettingsInitialized, 'settings is initialized');
     }
   }
+  firebasestorage.test = (base) => class ShowAuthErrorTooltip extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.firebaseStorage.$.auth.fire('error', { code: '12345', message: 'error message body' });
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return self.errorTooltipMessage = self.tooltip.textContent.trim();
+      });
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.errorTooltipMessage, 'Error: 12345 error message body', 'error tooltip is "Error: 12345 error message body"');
+    }
+  }
+  firebasestorage.test = (base) => class EmptyAuthErrorTooltip extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.firebaseStorage.$.auth.fire('error', { code: '', message: 'error message body' });
+      await self.checkInterval(() => !self.firebaseStorage.tooltip, 200, 100);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.firebaseStorage.tooltip, '', 'error tooltip is empty');
+    }
+  }
   firebasestorage.test = (base) => class SignOutAnonymousUser extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -482,7 +508,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
           FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
           DisableAnonymousCheckbox: {
             MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
-          }
+          },
+          ShowAuthErrorTooltip: 'ShowAuthErrorTooltipTest; Show auth error tooltip message (Mock)',
+          EmptyAuthErrorTooltip: 'EmptyAuthErrorTooltipTest; Empty auth error tooltip message (Mock)'
         }
       }
     },
