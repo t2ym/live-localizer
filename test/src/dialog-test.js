@@ -184,6 +184,17 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.fab.opened, 'fab is opened');
     }
   }
+  dialog.test = (base) => class ReattachTest extends base {
+    async operation() {
+      let self = this;
+      self.parent = self.element.parentNode;
+      self.parent.removeChild(self.element);
+      self.parent.appendChild(self.element);
+    }
+    async checkpoint() {
+      assert.equal(this.element.parentNode, this.parent, 'element is reattached');
+    }
+  }
   dialog.test = {
     // test class mixins
     '': [],
@@ -193,7 +204,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       DragFabTest: {
         OpenDialogTest: 'DragFabAndOpenDialogTest'
       },
-      ResetFabPositionTest: ''
+      ResetFabPositionTest: '',
+      ReattachTest: ''
     },
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
