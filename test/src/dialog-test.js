@@ -7,6 +7,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   let scope = 'dialog';
   let dialog = new Suite(scope, 'live-localizer dialog and fab tests');
   dialog.htmlSuite = 'live-localizer';
+  dialog.test = Suite.scopes.common.classes.LiveLocalizerSuite;
   dialog.test = Suite.scopes.common.classes.InstantiateTest;
   dialog.test = (base) => class OpenDialogTest extends base {
     async operation() {
@@ -195,6 +196,43 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.element.parentNode, this.parent, 'element is reattached');
     }
   }
+  dialog.test = (base) => class LoadFailureTest extends base {
+    async operation() {
+      let self = this;
+      let mainLink = Array.prototype.filter.call(document.querySelectorAll('link[rel=import]'), (link) => link.href.match(/live-localizer-lazy[.]html/));
+      this.fixture.create();
+      self.element = self.fixture.querySelector('live-localizer');
+      if (mainLink.length === 1) {
+        self.lazy = true;
+        await self.checkInterval(() => {
+          let lazyLinks = Array.prototype.filter.call(document.querySelectorAll('link[rel=import][async]'), (link) => link.href.match(/live-localizer-main[.]html/));
+          if (lazyLinks.length === 1) {
+            lazyLinks[0].dispatchEvent(new Event('error'));
+            return true;
+          }
+          else {
+            return false;
+          }
+        }, 1, 2000);
+      }
+      else {
+        await self.forEvent(self.element, 'bundle-set-fetched');
+      }
+      self.main = Polymer.dom(self.element.root).querySelector('live-localizer-main');
+    }
+    async checkpoint() {
+      let self = this;
+      // element existence
+      assert.isOk(self.element, 'live-localizer exists');
+      assert.isOk(self.main, 'live-localizer-main exists');
+      if (self.lazy) {
+        assert.isNotOk(self.main.is, 'live-localizer-main is not imported');
+      }
+      else {
+        assert.equal(self.main.is, 'live-localizer-main', 'live-localizer-main is instantiated');
+      }
+    }
+  }
   dialog.test = {
     // test class mixins
     '': [],
@@ -223,6 +261,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     },
     MaxUnmaxDragCloseDialogTest: {
       DragFabTest: 'MaxUnmaxDragCloseDialogAndDragFabTest'
+    },
+    LiveLocalizerSuite: {
+      LoadFailureTest: 'LazyLoadFailureTest'
     }
   };
 } // dialog scope
