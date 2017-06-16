@@ -185,9 +185,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(self.storageView.is, 'live-localizer-storage-view');
       assert.equal(self.browserStorage.is, 'live-localizer-browser-storage');
       assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage');
-      // dialog status
-      assert.isNotOk(self.dialog.opened, 'dialog is not opened');
-      assert.isOk(self.fab.opened, 'fab is opened');
     }
   }
   common.test = (base) => class Reload extends base {
