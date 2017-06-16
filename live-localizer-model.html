@@ -564,7 +564,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
       reload: function () {
         window.sessionStorage.setItem('live-localizer-reload-url', window.location.href); // interpreted by live-localizer.attach()
         window.history.pushState({}, '', this.startUrl);
-        window.location.reload(true);
+        (this._reload || window.location.reload).call(window.location, true);
       },
 
       /**
