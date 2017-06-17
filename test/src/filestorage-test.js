@@ -331,7 +331,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
       // configure watcher to fetch file from WCT
       self.fileStorage.watchPort = window.location.port;
-      self.fileStorage.watchPath = window.location.pathname + 'xliff/';
+      self.fileStorage.watchPath = window.location.pathname.replace(/[\/][^\/]*$/, '/') + 'xliff/';
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -357,7 +357,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.tooltipMessage.match(/^Watching http:/), 'tooltip should be "Watching http..."');
     }
   }
-  /*
   filestorage.test = (base) => class FileStorageWatchingFileTooltip2 extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -366,8 +365,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return; // Assuming the test host is localhost
       }
       self.tooltipMessage = '';
-      await self.forEvent(self.tooltip, 'neon-animation-finish', () => { self.fileStorage.lastModified = 0; }, (element, type, event) => {
-        return self.tooltipMessage = self.tooltip.textContent.trim();
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => { self.fileStorage.lastModified = (new Date(0)).toUTCString(); }, (element, type, event) => {
+        self.tooltipMessage = self.tooltip.textContent.trim();
+        console.log(self.tooltipMessage);
+        return self.tooltipMessage && self.tooltipMessage.match(/^Detected Change in /);
       });
     }
     async checkpoint() {
@@ -375,9 +376,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       if (window.location.hostname !== 'localhost') {
         return; // Assuming the test host is localhost
       }
-      assert.isOk(this.tooltipMessage.match(/^Watching http:/), 'tooltip should be "Watching http..."');
+      assert.isOk(this.tooltipMessage.match(/^Detected Change in /), 'tooltip should be "Detected Change in http..."');
     }
   }
+  /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -846,7 +848,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             FileStorageConfigureWatcher: {
               EnableWatcherCheckbox: {
                 MockFileStorageUploadTest: {
-                  FileStorageWatchingFileTooltip: 'FileStorageWatcherTest; Watch local file at localhost'
+                  FileStorageWatchingFileTooltip: {
+                    FileStorageWatchingFileTooltip2: 'FileStorageWatcherTest; Watch local file at localhost'
+                  }
                 }
               }
             }
