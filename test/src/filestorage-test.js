@@ -60,6 +60,18 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  filestorage.test = (base) => class FileStorageUnselectedIconTooltipTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Select XLIFF', 'tooltip should be "Select XLIFF"');
+    }
+  }
   /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
@@ -538,7 +550,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test classes
     SelectStorageView: {
       FileStorageSuite: {
-        CheckboxTest: 'FileStorageCheckboxTest'
+        CheckboxTest: {
+          FileStorageUnselectedIconTooltipTest: 'UnselectedIconTooltipTest'
+        }
       }
     }
   };
