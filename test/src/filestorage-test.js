@@ -72,6 +72,18 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.iconTooltip.textContent.trim(), 'Select XLIFF', 'tooltip should be "Select XLIFF"');
     }
   }
+  filestorage.test = (base) => class FileStorageSelectedIconTooltipTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.iconTooltip.getAttribute('for'), 'card', 'paper-tooltip should be for card');
+      assert.equal(this.iconTooltip.textContent.trim(), 'Drag to Load', 'tooltip should be "Drag to Load"');
+    }
+  }
   filestorage.test = (base) => class MockFileStorageSaveTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -568,7 +580,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       FileStorageSuite: {
         SelectLocaleIcon: {
           SelectStorageView: {
-            MockFileStorageSaveTest: 'MockFileStorageSaveTest'
+            MockFileStorageSaveTest: {
+              FileStorageSelectedIconTooltipTest: 'FileStorageSaveTest; Save to local file (Mock)'
+            }
           }
         }
       }
