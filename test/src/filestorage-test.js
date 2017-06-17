@@ -312,16 +312,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       delete self._xhr;
       self.mockFile = new Blob([self.mockXliff], { type: 'application/x-xliff+xml' });
       self.mockFile.name = mockXliffName;
-      /*
-      self.mockChangeEvent = {
-        type: 'change',
-        target: {
-          files: [self.mockFile]
-        },
-        preventDefault: () => {}
-      };
-      self.fileStorage.onFileChange(self.mockChangeEvent); // Note: input.files = new FileList([self.mockFile]) is illegal
-      */
       self.mockDropEvent = new MouseEvent('drop', mouseEventInit);
       self.mockDropEvent.dataTransfer = { files: [self.mockFile] };
       self.droparea.dispatchEvent(self.mockDropEvent);
@@ -332,7 +322,62 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.fileStorage.label, 'bundle.de.xlf', 'local file is dropped (mock)');
     }
   }
+  filestorage.test = (base) => class FileStorageConfigureWatcher extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      // configure watcher to fetch file from WCT
+      self.fileStorage.watchPort = window.location.port;
+      self.fileStorage.watchPath = window.location.pathname + 'xliff/';
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+    }
+  }
+  filestorage.test = (base) => class FileStorageWatchingFileTooltip extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      self.tooltipMessage = '';
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
+        return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      assert.isOk(this.tooltipMessage.match(/^Watching http:/), 'tooltip should be "Watching http..."');
+    }
+  }
   /*
+  filestorage.test = (base) => class FileStorageWatchingFileTooltip2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      self.tooltipMessage = '';
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => { self.fileStorage.lastModified = 0; }, (element, type, event) => {
+        return self.tooltipMessage = self.tooltip.textContent.trim();
+      });
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      assert.isOk(this.tooltipMessage.match(/^Watching http:/), 'tooltip should be "Watching http..."');
+    }
+  }
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -798,7 +843,13 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 FileStorageLoadTest: 'FileStorageDropLoadTest; Drop local file, Load from a copy of the dropped file (Mock)'
               }
             },
-            EnableWatcherCheckbox: ''
+            FileStorageConfigureWatcher: {
+              EnableWatcherCheckbox: {
+                MockFileStorageUploadTest: {
+                  FileStorageWatchingFileTooltip: 'FileStorageWatcherTest; Watch local file at localhost'
+                }
+              }
+            }
           }
         }
       }
