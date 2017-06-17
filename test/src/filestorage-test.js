@@ -79,6 +79,25 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  filestorage.test = (base) => class EnableWatcherCheckbox extends base {
+    * iteration() {
+      yield *[
+        // Initial state: { prefix: false, watcherEnabled: false }
+        { label: 'Watch and Load XLIFF', expected: { prefix: false, watcherEnabled: true } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.fileStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
   filestorage.test = (base) => class FileStorageUnselectedIconTooltipTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -778,7 +797,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               MockFileStorageDropTest: {
                 FileStorageLoadTest: 'FileStorageDropLoadTest; Drop local file, Load from a copy of the dropped file (Mock)'
               }
-            }
+            },
+            EnableWatcherCheckbox: ''
           }
         }
       }
