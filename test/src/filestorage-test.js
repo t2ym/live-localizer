@@ -255,6 +255,64 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.tooltipMessage, 'Drag and drop XLIFF to select', 'drop tooltip should be "Drag and drop XLIFF to select"');
     }
   }
+  filestorage.test = (base) => class MockFileStorageDropTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      let mouseEventInit = {
+        bubbles: false,
+        cancelable: true,
+        clientX: 0,
+        clientY: 0,
+        buttons: 1
+      };
+      self.droparea = self.fileStorage.$.droparea;
+      self.droparea.dispatchEvent(new MouseEvent('dragover', mouseEventInit));
+      let mockXliffName = 'bundle.de.xlf';
+      self._xhr = new XMLHttpRequest();
+      await new Promise((resolve, reject) => {
+        let onLoad = function (e) {
+          self.mockXliff = self._xhr.responseText;
+          self._xhr.removeEventListener('load', onLoad);
+          self._xhr.removeEventListener('error', onLoad);
+          resolve(self.mockXliff);
+        }
+        let onError = function (e) {
+          self.mockXliff = '';
+          self._xhr.removeEventListener('load', onLoad);
+          self._xhr.removeEventListener('error', onLoad);
+          reject(e);
+        }
+        self._xhr.addEventListener('load', onLoad);
+        self._xhr.addEventListener('error', onError);
+        self.mockXliffUrl = './xliff/' + mockXliffName;
+        self._xhr.open('GET', self.mockXliffUrl);
+        self.mockXliff = undefined;
+        self._xhr.send();
+      });
+      delete self._xhr;
+      self.mockFile = new Blob([self.mockXliff], { type: 'application/x-xliff+xml' });
+      self.mockFile.name = mockXliffName;
+      /*
+      self.mockChangeEvent = {
+        type: 'change',
+        target: {
+          files: [self.mockFile]
+        },
+        preventDefault: () => {}
+      };
+      self.fileStorage.onFileChange(self.mockChangeEvent); // Note: input.files = new FileList([self.mockFile]) is illegal
+      */
+      self.mockDropEvent = new MouseEvent('drop', mouseEventInit);
+      self.mockDropEvent.dataTransfer = { files: [self.mockFile] };
+      self.droparea.dispatchEvent(self.mockDropEvent);
+      await self.checkInterval(() => self.fileStorage.label === mockXliffName, 200, 200);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.fileStorage.label, 'bundle.de.xlf', 'local file is dropped (mock)');
+    }
+  }
   /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
@@ -716,7 +774,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             MockFileStorageUploadTest: {
               FileStorageLoadTest: 'FileStorageUploadLoadTest; Upload local file, Load from a copy of the uploaded file (Mock)'
             },
-            FileStorageDropTooltipTest: 'FileStorageDropTooltipTest'
+            FileStorageDropTooltipTest: {
+              MockFileStorageDropTest: {
+                FileStorageLoadTest: 'FileStorageDropLoadTest; Drop local file, Load drom a copy of the dropped file (Mock)'
+              }
+            }
           }
         }
       }
