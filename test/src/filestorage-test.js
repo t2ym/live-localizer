@@ -189,6 +189,58 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.fileStorage.label, 'Local File', 'file storage icon label is "Local File"');
     }
   }
+  filestorage.test = (base) => class MockFileStorageUploadTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.mockFileLoader = self.fileStorage.$.fileLoad;
+      self.mockFileLoader.click = function () {
+        self.fileLoaderClicked = true;
+      }
+      self.fileLoaderClicked = false;
+      MockInteractions.tap(self.storageIcon);
+      await self.checkInterval(() => self.fileLoaderClicked, 200, 100);
+      let mockXliffName = 'bundle.de.xlf';
+      self._xhr = new XMLHttpRequest();
+      await new Promise((resolve, reject) => {
+        let onLoad = function (e) {
+          self.mockXliff = self._xhr.responseText;
+          self._xhr.removeEventListener('load', onLoad);
+          self._xhr.removeEventListener('error', onLoad);
+          resolve(self.mockXliff);
+        }
+        let onError = function (e) {
+          self.mockXliff = '';
+          self._xhr.removeEventListener('load', onLoad);
+          self._xhr.removeEventListener('error', onLoad);
+          reject(e);
+        }
+        self._xhr.addEventListener('load', onLoad);
+        self._xhr.addEventListener('error', onError);
+        self.mockXliffUrl = './xliff/' + mockXliffName;
+        self._xhr.open('GET', self.mockXliffUrl);
+        self.mockXliff = undefined;
+        self._xhr.send();
+      });
+      delete self._xhr;
+      self.mockFile = new Blob([self.mockXliff], { type: 'application/x-xliff+xml' });
+      self.mockFile.name = mockXliffName;
+      self.mockChangeEvent = {
+        type: 'change',
+        target: {
+          files: [self.mockFile]
+        },
+        preventDefault: () => {}
+      };
+      self.fileStorage.onFileChange(self.mockChangeEvent); // Note: input.files = new FileList([self.mockFile]) is illegal
+      await self.checkInterval(() => self.fileStorage.label === mockXliffName, 200, 200);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.isOk(this.fileLoaderClicked, 'local file selection dialog is opened (mock)');
+      assert.equal(this.fileStorage.label, 'bundle.de.xlf', 'local file is uploaded (mock)');
+    }
+  }
   /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
@@ -646,6 +698,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               MockFileStorageSaveTest2: {
                 FileStorageLoadTest2: 'FileStorageSaveLoadTest2; Save to prefixed local file, Load from a copy of the saved file (Mock)'
               }
+            },
+            MockFileStorageUploadTest: {
+              FileStorageLoadTest: 'FileStorageUploadLoadTest; Upload local file, Load from a copy of the uploaded file (Mock)'
             }
           }
         }
