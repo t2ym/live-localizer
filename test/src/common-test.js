@@ -137,6 +137,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       switch (waitFor) {
       case 'drag-and-drop':
       case 'neon-animation-finish':
+      case 'load-xliff':
         await self.forEvent(eventTarget || src, waitFor, () => {}, eventCondition || ((element, type, event) => true));
         break;
       default:

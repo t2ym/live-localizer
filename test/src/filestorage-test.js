@@ -107,6 +107,26 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.downloadBlobUrl.match(/^blob:http/), 'download blob url is set');
     }
   }
+  filestorage.test = (base) => class FileStorageLoadTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.checkInterval(() => { console.log(self.fileStorage.label); return self.fileStorage.label === 'bundle.de.xlf'; }, 200, 200);
+      self.loadEvent = undefined;
+      await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'load-xliff', self.model, (element, type, event) => {
+        self.loadEvent = event; return true;
+      });
+      await self.checkInterval(() => { console.log(self.dragDropEvent); return self.dragDropEvent }, 200, 150);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is file storage icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
+      assert.equal(this.loadEvent.type, 'load-xliff', 'load-xliff event is fired');
+      assert.equal(this.loadEvent.detail.locale, 'de', 'load-xliff locale is de');
+      assert.equal(this.fileStorage.label, 'Local File', 'file storage icon label is "Local File"');
+    }
+  }
   /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
@@ -376,31 +396,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.firebaseStorage.isSettingsInitialized, 'settings is initialized');
     }
   }
-  filestorage.test = (base) => class FirebaseStorageLoadTest extends base {
-    async operation() {
-      if (this.hasToSkip) { return; }
-      let self = this;
-      await self.checkInterval(() => { console.log(self.firebaseStorage.label); return self.firebaseStorage.label === 'bundle.de.xlf'; }, 200, 200);
-      self.tooltipMessage = '';
-      await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'neon-animation-finish', self.tooltip, (element, type, event) => {
-        let message = self.tooltip.textContent.trim();
-        if (self.tooltipMessage) {
-          return !message;
-        }
-        else {
-          self.tooltipMessage = message;
-          return false;
-        }
-      });
-      await self.checkInterval(() => { console.log(self.dragDropEvent); return self.dragDropEvent }, 200, 150);
-    }
-    async checkpoint() {
-      if (this.hasToSkip) { return; }
-      assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is firebase storage icon');
-      assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
-      assert.equal(this.tooltipMessage, 'Loaded XLIFF for de', 'tooltip is "Loaded XLIFF for de"');
-    }
-  }
   filestorage.test = (base) => class MockSignInTest extends base {
     * iteration() {
       yield *[
@@ -581,7 +576,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         SelectLocaleIcon: {
           SelectStorageView: {
             MockFileStorageSaveTest: {
-              FileStorageSelectedIconTooltipTest: 'FileStorageSaveTest; Save to local file (Mock)'
+              FileStorageSelectedIconTooltipTest: {
+                FileStorageLoadTest: 'FileStorageSaveLoadTest; Save to local file, Load from a copy of the saved file (Mock)'
+              }
             }
           }
         }
