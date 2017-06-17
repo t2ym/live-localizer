@@ -60,6 +60,25 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  filestorage.test = (base) => class EnableTimestampPrefix extends base {
+    * iteration() {
+      yield *[
+        // Initial state: { prefix: false, watcherEnabled: false }
+        { label: 'Save with Timestamp', expected: { prefix: true, watcherEnabled: false } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.fileStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
   filestorage.test = (base) => class FileStorageUnselectedIconTooltipTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -107,11 +126,54 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.downloadBlobUrl.match(/^blob:http/), 'download blob url is set');
     }
   }
+  filestorage.test = (base) => class MockFileStorageSaveTest2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.mockAnchor = self.fileStorage.$.anchor;
+      self.mockAnchor.click = function () {
+        self.downloadFileName = self.mockAnchor.download;
+        self.downloadBlobUrl = self.mockAnchor.href;
+        self.anchorClicked = true;
+      }
+      self.anchorClicked = false;
+      await self.dragDrop(self.localeIcon, self.storageIcon, 0, 120, 'drop', 'neon-animation-finish', self.localeIcon, (element, type, event) => true);
+      await self.checkInterval(() => self.anchorClicked, 200, 100);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.localeIcon, 'drag source is locale icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.storageIcon, 'drag destination is local file storage icon');
+      assert.isOk(this.downloadFileName.match(/^[0-9]*-bundle.de.xlf$/), 'download file name is prefixed "[0-9]*-bundle.de.xlf"');
+      assert.isOk(this.downloadBlobUrl, 'download blob url is set');
+      assert.isOk(this.downloadBlobUrl.match(/^blob:http/), 'download blob url is set');
+    }
+  }
   filestorage.test = (base) => class FileStorageLoadTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
       await self.checkInterval(() => { console.log(self.fileStorage.label); return self.fileStorage.label === 'bundle.de.xlf'; }, 200, 200);
+      self.loadEvent = undefined;
+      await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'load-xliff', self.model, (element, type, event) => {
+        self.loadEvent = event; return true;
+      });
+      await self.checkInterval(() => { console.log(self.dragDropEvent); return self.dragDropEvent }, 200, 150);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.dragDropEvent.detail.src, this.storageIcon, 'drag source is file storage icon');
+      assert.equal(this.dragDropEvent.detail.dest, this.localeIcon, 'drag destination is locale icon');
+      assert.equal(this.loadEvent.type, 'load-xliff', 'load-xliff event is fired');
+      assert.equal(this.loadEvent.detail.locale, 'de', 'load-xliff locale is de');
+      assert.equal(this.fileStorage.label, 'Local File', 'file storage icon label is "Local File"');
+    }
+  }
+  filestorage.test = (base) => class FileStorageLoadTest2 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.checkInterval(() => { console.log(self.fileStorage.label); return !!self.fileStorage.label.match(/^[0-9]*-bundle.de.xlf$/); }, 200, 200);
       self.loadEvent = undefined;
       await self.dragDrop(self.storageIcon, self.localeIcon, 0, 120, 'drop', 'load-xliff', self.model, (element, type, event) => {
         self.loadEvent = event; return true;
@@ -578,6 +640,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             MockFileStorageSaveTest: {
               FileStorageSelectedIconTooltipTest: {
                 FileStorageLoadTest: 'FileStorageSaveLoadTest; Save to local file, Load from a copy of the saved file (Mock)'
+              }
+            },
+            EnableTimestampPrefix: {
+              MockFileStorageSaveTest2: {
+                FileStorageLoadTest2: 'FileStorageSaveLoadTest2; Save to prefixed local file, Load from a copy of the saved file (Mock)'
               }
             }
           }
