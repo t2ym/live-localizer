@@ -160,6 +160,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.storageView = Polymer.dom(self.panel.root).querySelector('live-localizer-storage-view');
       self.browserStorage = self.storageView.$['browser-storage'];
       self.firebaseStorage = self.storageView.queryEffectiveChildren('live-localizer-firebase-storage#firebase-storage');
+      self.fileStorage = self.storageView.$['file-storage'];
     }
     async checkpoint() {
       let self = this;
@@ -185,6 +186,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(self.storageView.is, 'live-localizer-storage-view');
       assert.equal(self.browserStorage.is, 'live-localizer-browser-storage');
       assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage');
+      assert.equal(self.fileStorage.is, 'live-localizer-local-file-storage');
     }
   }
   common.test = (base) => class Reload extends base {
