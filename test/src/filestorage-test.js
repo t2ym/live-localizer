@@ -241,6 +241,20 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(this.fileStorage.label, 'bundle.de.xlf', 'local file is uploaded (mock)');
     }
   }
+  filestorage.test = (base) => class FileStorageDropTooltipTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      self.dropTooltip = self.fileStorage.$.droptooltip;
+      await self.showTooltip(self.fileStorage.$.droparea, self.dropTooltip);
+      self.tooltipMessage = self.dropTooltip.textContent.trim();
+      await self.forEvent(self.dropTooltip, 'neon-animation-finish', () => {}, (element, type, event) => true);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      assert.equal(this.tooltipMessage, 'Drag and drop XLIFF to select', 'drop tooltip should be "Drag and drop XLIFF to select"');
+    }
+  }
   /*
   filestorage.test = (base) => class InitializeFirebaseStorageTest extends base {
     async operation() {
@@ -701,7 +715,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             },
             MockFileStorageUploadTest: {
               FileStorageLoadTest: 'FileStorageUploadLoadTest; Upload local file, Load from a copy of the uploaded file (Mock)'
-            }
+            },
+            FileStorageDropTooltipTest: 'FileStorageDropTooltipTest'
           }
         }
       }
