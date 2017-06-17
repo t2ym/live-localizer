@@ -776,7 +776,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             },
             FileStorageDropTooltipTest: {
               MockFileStorageDropTest: {
-                FileStorageLoadTest: 'FileStorageDropLoadTest; Drop local file, Load drom a copy of the dropped file (Mock)'
+                FileStorageLoadTest: 'FileStorageDropLoadTest; Drop local file, Load from a copy of the dropped file (Mock)'
               }
             }
           }
