@@ -351,7 +351,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
       // configure watcher to fetch file from WCT
       self.fileStorage.watchPort = window.location.port;
-      self.fileStorage.watchPath = window.location.pathname.replace(/[\/][^\/]*$/, '/') + 'xliff/';
+      self.fileStorage.watchPath = window.location.pathname.replace(/[\/][^\/]*$/, '/') + 'updated-xliff/';
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
@@ -507,6 +507,26 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.isOk(this.tooltipMessage.match(/^File Not Found for /), 'tooltip should be "File Not Found for http..."');
     }
   }
+  filestorage.test = (base) => class FileStorageBadgeTest extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      await self.checkInterval(() => self.fileStorage.badgeLabel === '1', 200, 100);
+      await self.checkInterval(() => self.localeIcon.$.badge.label === '16', 200, 100);
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      assert.equal(this.fileStorage.badgeLabel, '1', 'local file storage icon badge label should be "1"');
+      assert.equal(this.fileStorage.badgeColor, 'yellow', 'local file storage icon badge color should be yellow');
+      assert.equal(this.localeIcon.$.badge.label, '16', 'locale icon badge label should be "16"');
+    }
+  }
   filestorage.test = {
     // test class mixins
     '': [],
@@ -545,7 +565,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 MockFileStorageUploadTest: {
                   FileStorageWatchingFileTooltip: {
                     FileStorageWatchingFileTooltip2: {
-                      DisableWatcherCheckbox: 'FileStorageWatcherTest; Watch local file at localhost'
+                      FileStorageBadgeTest: {
+                        DisableWatcherCheckbox: 'FileStorageWatcherTest; Watch local file at localhost'
+                      }
                     }
                   }
                 }
