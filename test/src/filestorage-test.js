@@ -98,6 +98,26 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       }
     }
   }
+  filestorage.test = (base) => class DisableWatcherCheckbox extends base {
+    * iteration() {
+      yield *[
+        // Initial state: { prefix: false, watcherEnabled: true }
+        { label: 'Watch and Load XLIFF', expected: { prefix: false, watcherEnabled: false } }
+      ].map((parameters) => { parameters.name = parameters.label + ' checkbox is toggled'; return parameters });
+    }
+    async operation(parameters) {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      await self.toggleCheckbox(self.checkboxes[parameters.label]);
+      await self.checkInterval(() => !self.fileStorage.watching, 200, 100);
+    }
+    async checkpoint(parameters) {
+      if (this.hasToSkip) { return; }
+      for (let prop in parameters.expected) {
+        assert.equal(this.fileStorage[prop], parameters.expected[prop], prop + ' is ' + parameters.expected[prop]);
+      }
+    }
+  }
   filestorage.test = (base) => class FileStorageUnselectedIconTooltipTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -957,7 +977,9 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               EnableWatcherCheckbox: {
                 MockFileStorageUploadTest: {
                   FileStorageWatchingFileTooltip: {
-                    FileStorageWatchingFileTooltip2: 'FileStorageWatcherTest; Watch local file at localhost'
+                    FileStorageWatchingFileTooltip2: {
+                      DisableWatcherCheckbox: 'FileStorageWatcherTest; Watch local file at localhost'
+                    }
                   }
                 }
               }
