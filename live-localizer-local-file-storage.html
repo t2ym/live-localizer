@@ -517,7 +517,7 @@ The element handles save and load operations of XLIFF on local file storage.
         var blob;
         switch (e.type) {
         case 'load':
-          if (this.xhr.responseText) {
+          if (this.xhr.responseText && this.xhr.status < 400) {
             if (this.lastModified) {
               if (this.xhr.responseText.match(/<\/xliff>\s*$/g)) {
                 blob = new Blob([this.xhr.responseText], { type: 'application/x-xliff+xml' });
