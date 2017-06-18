@@ -349,6 +349,21 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       if (this.hasToSkip) { return; }
     }
   }
+  filestorage.test = (base) => class FileStorageConfigureWatcherIncompleteXliff extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      // configure watcher to fetch file from WCT
+      self.fileStorage.watchPort = window.location.port;
+      self.fileStorage.watchPath = window.location.pathname.replace(/[\/][^\/]*$/, '/') + 'incomplete-xliff/';
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+    }
+  }
   filestorage.test = (base) => class FileStorageWatchingFileTooltip extends base {
     async operation() {
       if (this.hasToSkip) { return; }
@@ -411,6 +426,28 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return; // Assuming the test host is localhost
       }
       assert.isOk(this.tooltipMessage.match(/^Error in watching /), 'tooltip should be "Error in watching http..."');
+    }
+  }
+  filestorage.test = (base) => class FileStorageWatchingFileTooltip4 extends base {
+    async operation() {
+      if (this.hasToSkip) { return; }
+      let self = this;
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      self.tooltipMessage = '';
+      await self.forEvent(self.tooltip, 'neon-animation-finish', () => { self.fileStorage.lastModified = (new Date(0)).toUTCString(); }, (element, type, event) => {
+        self.tooltipMessage = self.tooltip.textContent.trim();
+        console.log(self.tooltipMessage);
+        return self.tooltipMessage && self.tooltipMessage.match(/^Incomplete XLIFF found at /);
+      });
+    }
+    async checkpoint() {
+      if (this.hasToSkip) { return; }
+      if (window.location.hostname !== 'localhost') {
+        return; // Assuming the test host is localhost
+      }
+      assert.isOk(this.tooltipMessage.match(/^Incomplete XLIFF found at /), 'tooltip should be "Incomplete XLIFF found at http..."');
     }
   }
   /*
@@ -891,7 +928,14 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             FileStorageConfigureWatcherError: {
               EnableWatcherCheckbox: {
                 MockFileStorageUploadTest: {
-                  FileStorageWatchingFileTooltip3: 'FileStorageWatcherNotFoundTest; Unresponsive local file watcher'
+                  FileStorageWatchingFileTooltip3: 'FileStorageWatcherUnresponsiveTest; Unresponsive local file watcher'
+                }
+              }
+            },
+            FileStorageConfigureWatcherIncompleteXliff: {
+              EnableWatcherCheckbox: {
+                MockFileStorageUploadTest: {
+                  FileStorageWatchingFileTooltip4: 'FileStorageWatcherIncompleteXliffTest; Incomplete local file XLIFF from watcher'
                 }
               }
             }
