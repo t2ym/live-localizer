@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/t2ym/live-localizer.svg?branch=master)](https://travis-ci.org/t2ym/live-localizer)
-[![Coverage Status](https://coveralls.io/repos/github/t2ym/live-localizer/badge.svg?branch=master)](https://coveralls.io/github/t2ym/live-localizer?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/t2ym/live-localizer/badge.svg?branch=master&_version=0.0.76)](https://coveralls.io/github/t2ym/live-localizer?branch=master)
 [![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/t2ym/live-localizer)
 [![Bower](https://img.shields.io/bower/v/live-localizer.svg)](https://www.webcomponents.org/element/t2ym/live-localizer)
 [![npm](https://img.shields.io/npm/v/live-localizer.svg)](https://www.npmjs.com/package/live-localizer)
@@ -284,9 +284,6 @@ The dependent components except for region flag images can be bundled with `poly
 ## TODOs
 
 - Code cleanup/optimization/refactoring
-- Automated tests
-- Documentation
-- Fix issues
 
 ## Plans
 
