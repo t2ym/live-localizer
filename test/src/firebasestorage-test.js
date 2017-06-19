@@ -191,6 +191,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
+      let count = 20;
+      await self.checkInterval(() => count-- === 0, 100, 20);
       MockInteractions.tap(self.firebaseStorage.$['firebase-storage-icon']);
       await self.checkInterval(() => !self.firebaseStorage.signedIn, 200, 120);
     }
@@ -469,6 +471,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.userTooltipMessage = self.mockStorage.$.usertooltip.textContent.trim();
       await self.forEvent(self.mockStorage.$.usertooltip, 'neon-animation-finish', () => {}, (element, type, event) => true);
       self.mockStorage.user = self.mockStorage._user;
+      let count = 20;
+      await self.checkInterval(() => count-- === 0, 100, 20);
       MockInteractions.tap(self.storageIcon);
       await self.checkInterval(() => !self.mockStorage.signedIn, 200, 100);
     }
