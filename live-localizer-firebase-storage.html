@@ -533,6 +533,13 @@ Security rules:
         this.error = null;
         if (this.signedIn) {
           console.log('sign out');
+          // Fix #69. Destroy the client documents so that they do not flush client caches after the client signs out
+          if (this.$.settings.path) {
+            this.$.settings.destroy();
+          }
+          if (this.$.document.path) {
+            this.$.document.destroy();
+          }
           this.$.auth.signOut();
         }
         else {
