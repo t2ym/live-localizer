@@ -118,7 +118,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             this.$.loadericon.classList.remove('rotating');
             this.$.loadericon.setAttribute('fill', 'orangered');
             this.$.placeholder.setAttribute('title', 'Failed to load Live Localizer');
-            console.error('Failed to load ' + e.target.href, e);
+            console.log('Failed to load ' + e.target.href, e);
           }, true);
         }
       }
