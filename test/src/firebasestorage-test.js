@@ -165,7 +165,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.firebaseStorage.$.auth.fire('error', { code: '12345', message: 'error message body' });
+      if (HTMLImports.useNative) {
+        self.firebaseStorage.$.auth.fire('error', { code: '12345', message: 'error message body' });
+      }
+      else { // Firefox throws an error on polyfilled dispatchEvent. Resort to call the event handler directly.
+        self.firebaseStorage.showError({ type: 'error', detail: { code: '12345', message: 'error message body' }});
+      }
       await self.forEvent(self.tooltip, 'neon-animation-finish', () => {}, (element, type, event) => {
         return self.errorTooltipMessage = self.tooltip.textContent.trim();
       });
@@ -179,7 +184,12 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      self.firebaseStorage.$.auth.fire('error', { code: '', message: 'error message body' });
+      if (HTMLImports.useNative) {
+        self.firebaseStorage.$.auth.fire('error', { code: '', message: 'error message body' });
+      }
+      else { // Firefox throws an error on polyfilled dispatchEvent. Resort to call the event handler directly.
+        self.firebaseStorage.showError({ type: 'error', detail: { code: '', message: 'error message body' }});
+      }
       await self.checkInterval(() => !self.firebaseStorage.tooltip, 200, 100);
     }
     async checkpoint() {
