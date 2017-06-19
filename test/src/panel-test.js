@@ -181,25 +181,21 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         return;
       }
       await self.forEvent(self.dialog, 'neon-animation-finish', () => { MockInteractions.tap(self.fab); }, true);
+      await self.checkInterval(() => self.model.lastModified, 200, 100);
+      self.model.lastModified = (new Date(0)).toUTCString(); // Make the next fetch result updated
+      await self.checkInterval(() => self.model.serverUpdated, 1000, 70);
     }
     async checkpoint() {
       if (this.hasToSkip) { return; }
       let self = this;
       assert.isOk(self.dialog.opened, 'dialog is opened');
       assert.isNotOk(self.fab.opened, 'fab is not opened');
-      // store dialog coordinates
-      self.origin = {};
-      [ 'x', 'y', 'width', 'height' ].forEach(function (prop) {
-        self.origin[prop] = self.dialog[prop];
-      });
     }
   }
   panel.test = (base) => class ReloadButtonTest extends base {
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
-      await self.forEvent(self.panel, 'dom-change', () => { self.panel.serverUpdated = true; },
-        (element, type, event) => !!Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload'));
       self.reloadButton = Polymer.dom(self.panel.root).querySelector('paper-icon-button#reload');
       self.reloaded = false;
       self.mockModel = self.model;
