@@ -280,6 +280,7 @@ gulp.task('fetch-xliff', function (callback) {
 });
 
 var firebase = require('firebase');
+var admin = require('firebase-admin');
 
 /*
   watch-xliff task to watch changes on XLIFF files in Firebase
@@ -327,9 +328,11 @@ gulp.task('watch-xliff', function (callback) {
   var detectedChanges = 0;
   gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Watching changes on Firebase...'));
   gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.cyan('gulp unwatch-xliff') + gutil.colors.yellow(' to stop the task'));
+  var serviceAccount = require(config.service_account);
   firebase.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    //serviceAccount: config.service_account, // deprecated
     databaseURL: config.database_url,
-    serviceAccount: config.service_account, // must be out of the web root
     databaseAuthVariableOverride: {
       uid: 'xliff-watcher'
     }
