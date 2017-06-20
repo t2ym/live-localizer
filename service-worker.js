@@ -13,7 +13,10 @@
 
 'use strict';
 
-var cacheName = 'sw-' + (self.registration ? self.registration.scope : '');
+var cacheName = 'wct-sw-' + (self.registration ? self.registration.scope : '');
+// Clean cache on every request with this pattern
+var entryUrlPattern = /^https?:\/\/[^:]*:[0-9]*\/components\/live-localizer\/test\/?(index(-es5)?[.]html)?(\?.*)?$/;
+var cleaning = false; // true during cleaning cache; no caching if true
 
 // The install handler takes care of precaching the resources we always need.
 self.addEventListener('install', event => {
@@ -36,27 +39,33 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', function(event) {
   if (event.request.method === 'GET') {
-    if (event.request.url.startsWith(self.location.origin)) {
-      event.respondWith(
-        caches.match(event.request).then(cachedResponse => {
-          if (cachedResponse) {
-            //console.log('respond with cache ', cachedResponse.url);
-            return cachedResponse;
-          }
+    if (!cleaning && event.request.url.startsWith(self.location.origin)) {
+      if (event.request.url.match(entryUrlPattern)) {
+        cleaning = true;
+        event.waitUntil(
+          caches.delete(cacheName).then(() => {
+            cleaning = false;
+          })
+        );
+      }
+      else {
+        event.respondWith(
+          caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
 
-          return caches.open(cacheName).then(cache => {
-            return fetch(event.request).then(response => {
-              // Put a copy of the response in the runtime cache.
-              return cache.put(event.request, response.clone()).then(() => {
-                return response;
+            return caches.open(cacheName).then(cache => {
+              return fetch(event.request).then(response => {
+                // Put a copy of the response in the runtime cache.
+                return cache.put(event.request, response.clone()).then(() => {
+                  return response;
+                });
               });
             });
-          });
-        })
-      );
-    }
-    else {
-      //console.log('skipping ', event.request.url);
+          })
+        );
+      }
     }
   }
 });
