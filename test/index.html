@@ -28,7 +28,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   <body>
     <script>
       var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]mode=fast[^a-zA-Z0-9]?.*$/);
-      var fast = match ? true : false;
+      var fast = true;// match ? true : false;
       var suites = [];
       [ 'src' ].forEach(function (buildPhase) {
         (fast ? [ '' ] : [ '', '-lazy' ]).forEach(function (type) {
