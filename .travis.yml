@@ -24,5 +24,5 @@ addons:
 script:
   - xvfb-run wct --expanded --skip-plugin=local --plugin=sauce
   - rm -rf bower-1.x.json bower_components-1.x
-  - xvfb-run wct --eapanded --skip-plugin=sauce --plugin=local --configFile wct.config-firefox.json
+  - xvfb-run wct --eapanded --skip-plugin=sauce --plugin=local --configFile=wct.config-firefox.json
   - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi
