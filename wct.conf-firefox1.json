@@ -5,21 +5,6 @@
         "firefox"
       ]
     },
-    "sauce": {
-      "disabled": true,
-      "browsers": [
-        {
-          "browserName":  "chrome",
-          "platform":     "Windows 10",
-          "version":      ""
-        },
-        {
-          "browserName":  "firefox",
-          "platform":     "Windows 10",
-          "version":      ""
-        }
-      ]
-    },
     "istanbul": {
       "dir": "test/coverage-report-firefox1",
       "reporters": ["text-summary", "lcov"],
