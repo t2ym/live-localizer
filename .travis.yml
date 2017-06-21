@@ -2,7 +2,7 @@ language: node_js
 branches:
   except:
   - gh-pages
-sudo: false
+sudo: true
 dist: trusty
 before_script:
   - npm install -g bower t2ym/polymer-cli#wct6-plugin t2ym/web-component-tester-istanbul#0.10.1-wct6.11
@@ -23,4 +23,12 @@ addons:
   sauce_connect: true
 script:
   - xvfb-run wct --expanded --skip-plugin=local --plugin=sauce
+  - mv bower_components-1.x tmp_bower_components-1.x
+  - mv bower-1.x.json tmp_bower-1.x.json
+  - xvfb-run wct --expanded --configFile=wct.conf-firefox2.json
+  - mv bower_components tmp_bower_components
+  - mv bower.json tmp_bower.json
+  - mv tmp_bower_components-1.x bower_components
+  - mv tmp_bower-1.x.json bower.json
+  - xvfb-run wct --expanded --configFile=wct.conf-firefox1.json
   - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi

@@ -2,7 +2,7 @@
   "plugins": {
     "local": {
       "browsers": [
-        "chrome"
+        "firefox"
       ]
     },
     "sauce": {
@@ -12,11 +12,16 @@
           "browserName":  "chrome",
           "platform":     "Windows 10",
           "version":      ""
+        },
+        {
+          "browserName":  "firefox",
+          "platform":     "Windows 10",
+          "version":      ""
         }
       ]
     },
     "istanbul": {
-      "dir": "test/coverage-report",
+      "dir": "test/coverage-report-firefox2",
       "reporters": ["text-summary", "lcov"],
       "include": [
         "**/draggable-behavior.html",
