@@ -34,7 +34,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <script>
       var match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]mode=fast[^a-zA-Z0-9]?.*$/);
       var fast = true;// match ? true : false;
-      var suites = [];
+      var suites = [ 'service-worker-ready.html' ];
       [ 'src' ].forEach(function (buildPhase) {
         (fast ? [ '' ] : [ '', '-lazy' ]).forEach(function (type) {
           for (var scope in Suite.scopes) {
@@ -62,6 +62,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
       // Load and run all tests (.html, .js):
       console.log('suites = ', suites);
+      suites.push('service-worker-cleanup.html');
       WCT.loadSuites(suites);
     </script>
   </body>

@@ -1,0 +1,28 @@
+<!doctype html>
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<html>
+  <head>
+    <title>live-localizer test</title>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script>
+      suite('Service Worker', () => {
+        if (navigator.serviceWorker &&
+            (window.location.hostname === 'localhost' || window.location.protocol === 'https:')) {
+          test('Service Worker is not registered', async () => {
+            let registration = await navigator.serviceWorker.getRegistration('/');
+            assert.isNotOk(registration, 'Incompatible or uninitialized Service Worker is found');
+          });
+        }
+        else {
+          test('Service Worker is not available', () => {});
+        }
+      });
+    </script>
+  </head>
+  <body>
+    Service Worker is not registered
+  </body>
+</html>
