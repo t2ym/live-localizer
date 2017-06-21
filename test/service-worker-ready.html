@@ -1,0 +1,48 @@
+<!doctype html>
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<html>
+  <head>
+    <title>live-localizer test</title>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script>
+      suite('Service Worker', () => {
+        if (navigator.serviceWorker &&
+            (window.location.hostname === 'localhost' || window.location.protocol === 'https:')) {
+          test('Service Worker is ready', async () => {
+            this.timeout = 10000;
+            let registration = await navigator.serviceWorker.getRegistration('/');
+            if (registration) {
+              await new Promise((resolve) => {
+                registration.addEventListener('statechange', function onStateChange(e) {
+                  if (registration.active) {
+                    registration.removeEventListener('statechange', onStateChange);
+                    resolve();
+                  }
+                });
+                let intervalId = setInterval(() => {
+                  if (registration.active) {
+                    clearInterval(intervalId);
+                    resolve();
+                  }
+                }, 1000);
+              });
+              console.log(registration);
+            }
+
+            assert.isOk(registration, 'Service Worker is found');
+            assert.isOk(registration.active, 'Service Worker is activated');
+          });
+        }
+        else {
+          test('Service Worker is not available', () => {});
+        }
+      });
+    </script>
+  </head>
+  <body>
+    Waiting for Service Worker activation
+  </body>
+</html>

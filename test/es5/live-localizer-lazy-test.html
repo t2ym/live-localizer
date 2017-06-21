@@ -23,30 +23,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   <meta name="theme-color" content="#fff">
 
   <script src="../../../web-component-tester/browser.js"></script>
-  <script>
-
-    // setup Polymer options
-    window.Polymer = {lazyRegister: true, dom: 'shadow'};
-
-    // load webcomponents polyfills
-    (function() {
-      if ('registerElement' in document
-          && 'import' in document.createElement('link')
-          && 'content' in document.createElement('template')) {
-        // browser has web components
-      } else {
-        // polyfill web components
-        var e = document.createElement('script');
-        e.src = '../../../webcomponentsjs/webcomponents-lite.min.js';
-        document.head.appendChild(e);
-      }
-    })();
-
-  </script>
+  <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
   <link rel="import" href="my-app.html">
-  <link rel="import" href="../../live-localizer.html">
+  <link rel="import" href="../../live-localizer-lazy.html">
 
   <style>
 
@@ -65,28 +46,30 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 
   <my-app></my-app>
 
-  <template is="dom-if" id="container" restamp>
-    <live-localizer>
-      <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
-        auth-provider="google"
-        auth-domain="live-localizer-demo.firebaseapp.com"
-        database-url="https://live-localizer-demo.firebaseio.com"
-        api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
-      </live-localizer-firebase-storage>
-    </live-localizer>
-  </template>
+  <test-fixture id="fixture">
+    <template>
+      <live-localizer>
+        <live-localizer-firebase-storage id="firebase-storage" class="storage cloud"
+          auth-provider="google"
+          auth-domain="live-localizer-demo.firebaseapp.com"
+          database-url="https://live-localizer-demo.firebaseio.com"
+          api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+        </live-localizer-firebase-storage>
+      </live-localizer>
+    </template>
+  </test-fixture>
 
   <script src="../../node_modules/babel-polyfill/browser.js"></script>
-  <script src="../../../scenarist/Suite.min.js"></script>
-  <script src="common-test.js"></script>
-  <script src="dialog-test.js"></script>
+  <link rel="import" href="import-suites.html">
   <script>
-    let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*).*$/);
+    addEventListener('WebComponentsReady', function () {
+      let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*)&Scope=([_a-zA-Z0-9-]*).*$/);
 
-    if (match) {
-      // Runner
-      Suite.scopes.dialog.run(match[1], 'template#container');
-    }
+      if (match) {
+        // Runner
+        Suite.scopes[match[2]].run(match[1], '#fixture');
+      }
+    });
   </script>
 </body>
 </html>

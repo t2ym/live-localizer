@@ -13,7 +13,10 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 {
   // dialog scope
   var scope = 'dialog';
-  var dialog = new Suite(scope, 'live-localizer dialog and fab tests with ' + (window.location.href.indexOf('?dom=shadow') >= 0 ? 'Shadow DOM' : 'Shady DOM'));
+  var dialog = new Suite(scope, 'live-localizer dialog and fab tests');
+  dialog.htmlSuite = 'live-localizer';
+  dialog.test = Suite.scopes.common.classes.LiveLocalizerSuite;
+  dialog.test = Suite.scopes.common.classes.InstantiateTest;
   dialog.test = function (base) {
     return function (_base) {
       _inherits(OpenDialogTest, _base);
@@ -279,6 +282,15 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   }, true));
 
                 case 3:
+                  window.dispatchEvent(new MouseEvent('resize', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: 0,
+                    clientY: 0,
+                    buttons: 1
+                  }));
+
+                case 4:
                 case 'end':
                   return _context9.stop();
               }
@@ -574,6 +586,152 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       return CloseDialogTest;
     }(base);
   };
+  dialog.test = function (base) {
+    return function (_base9) {
+      _inherits(ReattachTest, _base9);
+
+      function ReattachTest() {
+        _classCallCheck(this, ReattachTest);
+
+        return _possibleConstructorReturn(this, (ReattachTest.__proto__ || Object.getPrototypeOf(ReattachTest)).apply(this, arguments));
+      }
+
+      _createClass(ReattachTest, [{
+        key: 'operation',
+        value: function operation() {
+          var self;
+          return regeneratorRuntime.async(function operation$(_context21) {
+            while (1) {
+              switch (_context21.prev = _context21.next) {
+                case 0:
+                  self = this;
+
+                  self.parent = self.element.parentNode;
+                  self.parent.removeChild(self.element);
+                  self.parent.appendChild(self.element);
+
+                case 4:
+                case 'end':
+                  return _context21.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint() {
+          return regeneratorRuntime.async(function checkpoint$(_context22) {
+            while (1) {
+              switch (_context22.prev = _context22.next) {
+                case 0:
+                  assert.equal(this.element.parentNode, this.parent, 'element is reattached');
+
+                case 1:
+                case 'end':
+                  return _context22.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return ReattachTest;
+    }(base);
+  };
+  dialog.test = function (base) {
+    return function (_base10) {
+      _inherits(LoadFailureTest, _base10);
+
+      function LoadFailureTest() {
+        _classCallCheck(this, LoadFailureTest);
+
+        return _possibleConstructorReturn(this, (LoadFailureTest.__proto__ || Object.getPrototypeOf(LoadFailureTest)).apply(this, arguments));
+      }
+
+      _createClass(LoadFailureTest, [{
+        key: 'operation',
+        value: function operation() {
+          var self, mainLink;
+          return regeneratorRuntime.async(function operation$(_context23) {
+            while (1) {
+              switch (_context23.prev = _context23.next) {
+                case 0:
+                  self = this;
+                  mainLink = Array.prototype.filter.call(document.querySelectorAll('link[rel=import]'), function (link) {
+                    return link.href.match(/live-localizer-lazy[.]html/);
+                  });
+
+                  this.fixture.create();
+                  self.element = self.fixture.querySelector('live-localizer');
+
+                  if (!(mainLink.length === 1)) {
+                    _context23.next = 10;
+                    break;
+                  }
+
+                  self.lazy = true;
+                  _context23.next = 8;
+                  return regeneratorRuntime.awrap(self.checkInterval(function () {
+                    var lazyLinks = Array.prototype.filter.call(document.querySelectorAll('link[rel=import][async]'), function (link) {
+                      return link.href.match(/live-localizer-main[.]html/);
+                    });
+                    if (lazyLinks.length === 1) {
+                      lazyLinks[0].dispatchEvent(new Event('error'));
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  }, 1, 2000));
+
+                case 8:
+                  _context23.next = 12;
+                  break;
+
+                case 10:
+                  _context23.next = 12;
+                  return regeneratorRuntime.awrap(self.forEvent(self.element, 'bundle-set-fetched'));
+
+                case 12:
+                  self.main = Polymer.dom(self.element.root).querySelector('live-localizer-main');
+
+                case 13:
+                case 'end':
+                  return _context23.stop();
+              }
+            }
+          }, null, this);
+        }
+      }, {
+        key: 'checkpoint',
+        value: function checkpoint() {
+          var self;
+          return regeneratorRuntime.async(function checkpoint$(_context24) {
+            while (1) {
+              switch (_context24.prev = _context24.next) {
+                case 0:
+                  self = this;
+                  // element existence
+
+                  assert.isOk(self.element, 'live-localizer exists');
+                  assert.isOk(self.main, 'live-localizer-main exists');
+                  if (self.lazy) {
+                    assert.isNotOk(self.main.is, 'live-localizer-main is not imported');
+                  } else {
+                    assert.equal(self.main.is, 'live-localizer-main', 'live-localizer-main is instantiated');
+                  }
+
+                case 4:
+                case 'end':
+                  return _context24.stop();
+              }
+            }
+          }, null, this);
+        }
+      }]);
+
+      return LoadFailureTest;
+    }(base);
+  };
   dialog.test = {
     // test class mixins
     '': [],
@@ -583,7 +741,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       DragFabTest: {
         OpenDialogTest: 'DragFabAndOpenDialogTest'
       },
-      ResetFabPositionTest: ''
+      ResetFabPositionTest: '',
+      ReattachTest: ''
     },
     OpenDialogTest: {
       CloseDialogTest: 'OpenAndCloseDialogTest',
@@ -601,6 +760,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     },
     MaxUnmaxDragCloseDialogTest: {
       DragFabTest: 'MaxUnmaxDragCloseDialogAndDragFabTest'
+    },
+    LiveLocalizerSuite: {
+      LoadFailureTest: 'LazyLoadFailureTest'
     }
   };
 } // dialog scope
