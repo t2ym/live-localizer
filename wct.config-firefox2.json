@@ -1,0 +1,37 @@
+{
+  "plugins": {
+    "local": {
+      "browsers": [
+        "firefox"
+      ]
+    },
+    "istanbul": {
+      "dir": "test/coverage-report-firefox2",
+      "reporters": ["text-summary", "lcov"],
+      "include": [
+        "**/draggable-behavior.html",
+        "**/firebase-storage-icons.html",
+        "**/import-dexie.html",
+        "**/live-localizer-browser-storage.html",
+        "**/live-localizer-dialog.html",
+        "**/live-localizer-fab.html",
+        "**/live-localizer-firebase-storage.html",
+        "**/live-localizer-lazy.html",
+        "**/live-localizer-list-view.html",
+        "**/live-localizer-local-file-storage.html",
+        "**/live-localizer-locale-icon-view.html",
+        "**/live-localizer-locale-icon.html",
+        "**/live-localizer-main.html",
+        "**/live-localizer-model.html",
+        "**/live-localizer-panel.html",
+        "**/live-localizer-storage-icon.html",
+        "**/live-localizer-storage-view.html",
+        "**/live-localizer.html"
+      ],
+      "exclude": [
+        "/bower_components/**/*",
+        "/test/**/*"
+      ]
+    }
+  }
+}
