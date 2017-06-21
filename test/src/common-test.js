@@ -27,10 +27,6 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // TODO: Can setup be converted to operation?
     async setup() {
       await super.setup();
-      if (!HTMLImports.useNative) {
-        let count = 1;
-        await this.checkInterval(() => count-- === 0, 1000, 2);
-      }
       this.fixture = document.querySelector(this.target);
     }
     async teardown() {
