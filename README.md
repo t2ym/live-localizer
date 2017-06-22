@@ -188,8 +188,8 @@ http-server "%1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 :end
 ```
 
-Script to Launch local HTTPS server on Mac: [`https-local-server.sh`](https://gist.githubusercontent.com/t2ym/b633f6a92e72e64e03ab8ad53e14e912/raw/1071a8b24a9cb6adcda69c61af46e74d77dcdfa8/https-local-server.sh) FOLDER_TO_CONTAIN_XLIFF
-```
+Script to Launch local HTTPS server on Mac: [`https-local-server.sh`](https://gist.githubusercontent.com/t2ym/b633f6a92e72e64e03ab8ad53e14e912/raw/096fda8f229b64f5b6c9dfde64bd9ca1870d6608/https-local-server.sh) FOLDER_TO_CONTAIN_XLIFF
+```sh
 #!/bin/sh
 
 if [ "$1" = "" ]; then
@@ -208,8 +208,6 @@ mkdir -p newcerts
 rm -f index.txt
 touch index.txt
 echo 01 >serial
-echo y >yy
-echo y >>yy
 if [ ! -e localhostCA.key ]; then
   openssl genrsa 2048 >localhostCA.key
 fi
@@ -225,11 +223,31 @@ if [ ! -e localhost.key ]; then
   openssl genrsa 2048 >localhost.key
 fi
 if [ ! -e localhost.csr ]; then
-  openssl req -new -key localhost.key -subj "/C=JP/ST=Tokyo/O=i18n-behavior/OU=Live Localizer/CN=localhost" -out localhost.csr
+cat > localhost_csr.txt <<-EOF
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = SAN
+distinguished_name = dn
+
+[dn]
+C=JP
+ST=Tokyo
+O=i18n-behavior
+OU=Live Localizer
+CN=localhost
+
+[SAN]
+subjectAltName=DNS:localhost
+EOF
+  openssl req -config localhost_csr.txt -new -sha256 -key localhost.key -out localhost.csr
+  openssl req -text -noout -in localhost.csr
 fi
 cd ..
 if [ ! -e demoCA/localhost.crt ]; then
-  openssl ca -md sha256 -days 3650 -cert demoCA/localhostCA.crt -keyfile demoCA/localhostCA.key -in demoCA/localhost.csr -out demoCA/localhost.crt <demoCA/yy
+  openssl x509 -req -CA demoCA/localhostCA.crt -CAkey demoCA/localhostCA.key -CAcreateserial -out demoCA/localhost.crt -in demoCA/localhost.csr -sha256 -days 3650 \
+  -extfile demoCA/localhost_csr.txt -extensions SAN
 fi
 if [ -e demoCA/CAcreation ]; then
   echo Please install the generated Localhost CA certificate demoCA/localhostCA.crt as Trusted Certificate for SSL
@@ -237,6 +255,7 @@ if [ -e demoCA/CAcreation ]; then
     open demoCA/localhostCA.crt
   fi
 fi
+echo http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since --ssl --cert demoCA/localhost.crt --key demoCA/localhost.key
 http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since --ssl --cert demoCA/localhost.crt --key demoCA/localhost.key
 ```
 
