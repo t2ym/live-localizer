@@ -7,7 +7,7 @@ dist: trusty
 before_script:
   - npm install -g bower t2ym/polymer-cli#wct6-plugin t2ym/web-component-tester-istanbul#0.10.1-wct6.11
   - export PATH=$PWD/node_modules/.bin:$PATH
-  - polymer install
+  - polymer install --variants
 env:
   global:
   - secure: "TYuWltmNCalwYRDJ+Pnb6mWbzri6rzU90oFAYbkZ7lpA3EW+Art8Dy4ikeoBlJF9Tm5ZCnuCzJe/NPFBQvLY/lnrhGQGlUjozrZ4aMk7xxT9YSbiLq34N8ak4cfRY7Rk9NI9r3sA+LKfGRrTxB4xLks1Jg3gOe6bKTfcnOsPKMcOUnUmZOql3k12KoVAbW7wI4xcnLKGmFfDXwvuzeOzdX9zKZJrn0u5avzuNEHvPsqPQnf6ihH8XqjOJhBGqtnxig70dqmfyd9FnkSSbDgnel787QFqwo2PuxaZ4q8PBR2s5YM+KfyuKefn8MOxyqndzAcEVLAbBuwb8DlcQlxXcY0sZe5tP6uUaOpv/2eKMQqf9q6FlwH8qQspF8NA6yiMmtROPAojpdquCEyVd9E7wSphoOB+etCkqcqyoivYdggyE9+QEJRuMYigkRa6Ut0QO8S0HCcTatRTFUMug14odlPLZb5Acpw6y7QgfxYlyO8i7uwIRQfnLSKyovQvSG5rTDkNMyT+W0VqKUplLHZc21XWGNLaSC+IMYGlOyHRx0EBbizdFavfGAOShvgAj6JZvbv9glpQWSBBdQVzzBVHK/KRmAbIQJVQDWsMG4tOxgAxhqBX6ZMLS1+1RTE+IhexsUvXrFjzV5y4CSQdE9r5SaV1C8rHbSd6wmIpYZgKcMI="
@@ -22,13 +22,13 @@ addons:
       - google-chrome-stable
   sauce_connect: true
 script:
-  - xvfb-run wct --expanded --plugin=sauce --configFile=wct.conf.json
-  - #mv bower_components-1.x tmp_bower_components-1.x
-  - #mv bower-1.x.json tmp_bower-1.x.json
-  - #xvfb-run wct --expanded --configFile=wct.config-firefox2.json
-  - #mv bower_components tmp_bower_components
-  - #mv bower.json tmp_bower.json
-  - #mv tmp_bower_components-1.x bower_components
-  - #mv tmp_bower-1.x.json bower.json
-  - #xvfb-run wct --expanded --configFile=wct.config-firefox1.json
+  - #xvfb-run wct --expanded --plugin=sauce --configFile=wct.conf.json
+  - mv bower_components-1.x tmp_bower_components-1.x
+  - mv bower-1.x.json tmp_bower-1.x.json
+  - xvfb-run wct --expanded --configFile=wct.config-firefox2.json
+  - mv bower_components tmp_bower_components
+  - mv bower.json tmp_bower.json
+  - mv tmp_bower_components-1.x bower_components
+  - mv tmp_bower-1.x.json bower.json
+  - xvfb-run wct --expanded --configFile=wct.config-firefox1.json
   - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi
