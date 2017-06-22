@@ -6,13 +6,14 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // firebasestorage scope (subscope of storageview)
   let scope = 'firebasestorage';
   let firebasestorage = new Suite(scope, 'live-localizer firebasestorage tests');
-  firebasestorage.htmlSuite = 'live-localizer';
+  firebasestorage.htmlSuite = 'live-localizer-firebase';
   firebasestorage.test = Suite.scopes.storageview.classes.SelectStorageView;
   firebasestorage.test = Suite.scopes.panel.classes.SelectIconView;
   firebasestorage.test = Suite.scopes.panel.mixins.SelectStorageView;
   firebasestorage.test = Suite.scopes.browserstorage.mixins.SelectLocaleIcon;
   firebasestorage.test = Suite.scopes.common.mixins.Reload;
   firebasestorage.test = (base) => class CleanupFirebaseAuthSuite extends base {
+    static get reconnectable() { return false; }
     async setup() {
       await super.setup();
       if (this.hasToSkip) { return; }
@@ -353,6 +354,8 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
+      await self.checkInterval(() => self.firebaseStorage.isSettingsInitialized, 200, 100);
+      await self.checkInterval(() => self.storageIcon.label === 'bundle.de.xlf', 200, 100);
       await self.showTooltip(self.storageIcon.$.card, self.iconTooltip);
     }
     async checkpoint() {
@@ -398,6 +401,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   firebasestorage.test = (base) => class MockSignInTest extends base {
+    static get reconnectable() { return false; }
     * iteration() {
       yield *[
         {

@@ -11,6 +11,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   panel.test = Suite.scopes.common.classes.InstantiateTest;
   panel.test = Suite.scopes.dialog.classes.OpenDialogTest;
   panel.test = (base) => class PanelTooltipTest extends base {
+    static get reconnectable() { return false; }
     * iteration() {
       yield *[
         { button: 'iconview-button', tooltip: 'Show Icons' },
@@ -135,6 +136,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   panel.test = (base) => class FileLoadButtonTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       let self = this;
       let button = self.panel.$.load;
@@ -150,6 +152,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   panel.test = (base) => class LocalesButtonTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       let self = this;
       let button = Polymer.dom(self.panel.root).querySelector('paper-icon-button#locales');
@@ -193,6 +196,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   panel.test = (base) => class ReloadButtonTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       if (this.hasToSkip) { return; }
       let self = this;
