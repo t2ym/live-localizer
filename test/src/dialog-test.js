@@ -197,6 +197,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   dialog.test = (base) => class LoadFailureTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       let self = this;
       let mainLink = Array.prototype.filter.call(document.querySelectorAll('link[rel=import]'), (link) => link.href.match(/live-localizer-lazy[.]html/));

@@ -6,9 +6,10 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // listview scope (subscope of panel)
   let scope = 'listview';
   let listview = new Suite(scope, 'live-localizer listview tests');
-  listview.htmlSuite = 'live-localizer';
+  listview.htmlSuite = 'live-localizer-firebase-lazy';
   listview.test = Suite.scopes.panel.classes.SelectListView;
   listview.test = (base) => class ListViewItemsTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       let self = this;
       self.list = self.listView.$.list;

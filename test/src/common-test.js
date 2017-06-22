@@ -9,7 +9,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   common.htmlSuite = '*'; // Only inherited scopes are executed
   // common test classes
   common.test = class LiveLocalizerSuite extends Suite {
-    static get reconnectable() { return false; }
+    static get reconnectable() { return true; }
     get currentPhase() {
       this.href = this.href || window.location.href;
       let match = this.href.match(/^[^#]*#TestSuites=[^&]*&Scope=[a-zA-Z0-9_-]*&Phase=([0-9]*).*$/);
@@ -29,9 +29,13 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       await super.setup();
       if (!HTMLImports.useNative) {
         let count = 1;
-        await this.checkInterval(() => count-- === 0, 1000, 2);
+        await this.checkInterval(() => count-- === 0, 100, 2);
       }
       this.fixture = document.querySelector(this.target);
+      if (!HTMLImports.useNative) {
+        let count = 1;
+        await this.checkInterval(() => count-- === 0, 100, 2);
+      }
     }
     async teardown() {
       let self = this;
@@ -190,11 +194,12 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       assert.equal(self.listView.is, 'live-localizer-list-view');
       assert.equal(self.storageView.is, 'live-localizer-storage-view');
       assert.equal(self.browserStorage.is, 'live-localizer-browser-storage');
-      assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage');
+      if (self.firebaseStorage) { assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage'); }
       assert.equal(self.fileStorage.is, 'live-localizer-local-file-storage');
     }
   }
   common.test = (base) => class Reload extends base {
+    static get reconnectable() { return false; }
     async operation() {
       this.stepPhase();
     }

@@ -46,6 +46,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   }
   // Must be after SelectLocaleIconTest
   iconview.test = (base) => class MockSaveFileTest extends base {
+    static get reconnectable() { return false; }
     async operation() {
       let self = this;
       let droparea = self.iconView.$.droparea;
@@ -107,6 +108,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }
   }
   iconview.test = (base) => class IconTooltipTest extends base {
+    static get reconnectable() { return false; }
     * iteration() {
       yield *[
         { icon: 'en', tooltip: 'Save XLIFF' },

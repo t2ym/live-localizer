@@ -9,7 +9,7 @@
       "disabled": true,
       "browsers": [
         {
-          "browserName":  "chrome",
+          "browserName":  "firefox",
           "platform":     "Windows 10",
           "version":      ""
         }

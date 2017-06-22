@@ -22,13 +22,5 @@ addons:
       - google-chrome-stable
   sauce_connect: true
 script:
-  - xvfb-run wct --expanded --skip-plugin=local --plugin=sauce --configFile=wct.conf.json
-  - mv bower_components-1.x tmp_bower_components-1.x
-  - mv bower-1.x.json tmp_bower-1.x.json
-  - xvfb-run wct --expanded --configFile=wct.config-firefox2.json
-  - mv bower_components tmp_bower_components
-  - mv bower.json tmp_bower.json
-  - mv tmp_bower_components-1.x bower_components
-  - mv tmp_bower-1.x.json bower.json
-  - xvfb-run wct --expanded --configFile=wct.config-firefox1.json
+  - xvfb-run wct --expanded --configFile=wct.config-travis.json
   - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi

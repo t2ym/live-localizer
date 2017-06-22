@@ -5,8 +5,18 @@
         "firefox"
       ]
     },
+    "sauce": {
+      "disabled": false,
+      "browsers": [
+        {
+          "browserName":  "chrome",
+          "platform":     "Windows 10",
+          "version":      ""
+        }
+      ]
+    },
     "istanbul": {
-      "dir": "test/coverage-report-firefox2",
+      "dir": "test/coverage-report-firefox1",
       "reporters": ["text-summary", "lcov"],
       "include": [
         "**/draggable-behavior.html",
