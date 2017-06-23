@@ -32,6 +32,7 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 - [Live Localizer applied to the Shop App](#live-localizer-applied-to-the-shop-app)
 - [Use Cases](#use-cases)
 - [Features](#features)
+- [Supported Browsers](#supported-browsers)
 - [Install](#install)
 - [Import](#import)
 - [Apply](#apply)
@@ -62,6 +63,11 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 - Show translation statistics in list view
 - Detect changes on Cloud Storage (Firebase) to trigger a new build
 - Detect changes and load Local XLIFF 
+
+## Supported Browsers
+
+- Chrome
+- Firefox
 
 ## Install
 
