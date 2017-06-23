@@ -6,15 +6,42 @@
 
 # Live Localizer
 
-Live Localizer widget for Polymer [i18n-behavior](https://github.com/t2ym/i18n-behavior) (work in progress)
+Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/element/t2ym/i18n-behavior)
 
-[API Docs](https://t2ym.github.io/live-localizer/components/live-localizer/#live-localizer-main) and [Live Demo](https://t2ym.github.io/live-localizer/components/live-localizer/demo/) on GitHub Pages (Chrome recommended for now)
+- [Live Localizer applied to the Shop App](#live-localizer-applied-to-the-shop-app)
+  - [Sequential description of the animated screenshot above](#sequential-description-of-the-animated-screenshot-above)
+- [Use Cases](#use-cases)
+- [Features](#features)
+- [Install](#install)
+- [Import](#import)
+  - [Static Loading](#static-loading)
+  - [Lazy Loading](#lazy-loading)
+- [Apply](#apply)
+  - [With Firebase Cloud Storage](#with-firebase-cloud-storage)
+  - [Without Firebase Cloud Storage](#without-firebase-cloud-storage)
+- [Firebase Setup (Optional)](#firebase-setup-optional)
+  - [Supported Authentication Methods](#supported-authentication-methods)
+  - [XLIFF Watcher (Optional)](#xliff-watcher-optional)
+    - [Start Watching](#start-watching)
+    - [Stop Watching](#stop-watching)
+    - [Notes on XLIFF Watcher](#notes-on-xliff-watcher)
+- [Local XLIFF Watcher (Optional)](#local-xliff-watcher-optional)
+  - [HTTP Server for Local XLIFF Watcher Setup](#http-server-for-local-xliff-watcher-setup)
+  - [Notes on Local XLIFF Watcher](#notes-on-local-xliff-watcher)
+- [Build](#build)
+  - [Bundle dependent components with `polymer-build` bundler](#bundle-dependent-components-with-polymer-build-bundler)
+- [TODOs](#todos)
+- [Plans](#plans)
+- [License](#license)
+
+- [API Docs](https://www.webcomponents.org/element/t2ym/live-localizer)
+- [Live Demo](https://www.webcomponents.org/element/t2ym/live-localizer/demo/demo/index.html)
 
 ## Live Localizer applied to [the Shop App](https://www.polymer-project.org/1.0/toolbox/case-study)
 
 <img src="https://raw.githubusercontent.com/wiki/t2ym/live-localizer/live-localizer.gif" width="768px">
 
-Sequential description of the animated screenshot above:
+#### Sequential description of the animated screenshot above
 
 - Browse the Shop App with Live Localizer widget at the bottom left corner as a fab icon
 - Open the Live Localizer widget
@@ -99,9 +126,9 @@ Attach at the end of the main body element.
 </body>
 ```
 
-## Firebase Setup
+## Firebase Setup (Optional)
 
-Firebase project has to be set up for storing XLIFF.
+A dedicated Firebase project has to be set up for storing XLIFF files for the target application.
 
 ### Supported Authentication Methods
 
@@ -366,7 +393,7 @@ echo http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-S
 http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since --ssl --cert demoCA/localhost.crt --key demoCA/localhost.key
 ```
 
-#### Notes:
+#### Notes on Local XLIFF Watcher:
 - The XLIFF folder should contain only the target XLIFF file(s) for the project for security.
 - The HTTP server is accessible only from the localhost and disallows directory listing.
 - If the XLIFF file name is prefixed with an unpredictable string, it can serve as a kind of "password" to block malicious access from other local HTTP clients.
