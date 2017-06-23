@@ -169,7 +169,7 @@ var config = {
   // list of target locales to add
   locales: gutil.env.targets ? gutil.env.targets.split(/ /) : [],
   // firebase token
-  firebase_token: gutil.env.token || '',
+  firebase_token: gutil.env.token || '', // 'notoken' to use service account
   // firebase project name
   firebase_project: gutil.env.project || 'live-localizer-demo',
   // firebase URL
@@ -214,9 +214,13 @@ gulp.task('fetch-xliff', function (callback) {
   }
 
   // firebase command has to be in the path or run through npm script
-  exec('firebase database:get /users ' +
-        (config.firebase_token ? '--token "'+ config.firebase_token + '"' : '') +
-        ' --project "' + config.firebase_project + '"', { maxBuffer: config.maxBuffer * 1024 * 1024 }, function (err, stdout, stderr) {
+  // firebase_token === 'notoken' to use service account with getUsers.js instead
+  exec(config.firebase_token === 'notoken'
+        ? 'node getUsers.js ' + config.database_url + ' ' + config.service_account
+        : 'firebase database:get /users ' +
+          (config.firebase_token ? '--token "'+ config.firebase_token + '"' : '') +
+          ' --project "' + config.firebase_project + '"',
+    { maxBuffer: config.maxBuffer * 1024 * 1024 }, function (err, stdout, stderr) {
     if (!err) {
       var users = JSON.parse(stdout);
       var user;

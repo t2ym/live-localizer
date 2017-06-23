@@ -225,8 +225,10 @@ The 'credential' property specified in the first argument to initializeApp() is 
 
 #### Notes on XLIFF Watcher:
 
-- `firebase login:ci` token from `firebase-tools` is required for `gulp fetch-xliff` task
 - Service account credentials' JSON is required for `gulp watch-xliff` task
+- `--token=notoken` option to use the same service account credentials for `gulp fetch-xliff` task as `gulp watch-xliff` task
+  - `demo/getUsers.js` script, which uses `firebase-admin` SDK, is required to use the credentials
+- Otherwise, `firebase login:ci` token from `firebase-tools` is required for `gulp fetch-xliff` task
 
 ## Local XLIFF Watcher (Optional)
 
