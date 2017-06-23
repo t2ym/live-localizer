@@ -279,7 +279,6 @@ gulp.task('fetch-xliff', function (callback) {
   });
 });
 
-var firebase = require('firebase');
 var admin = require('firebase-admin');
 
 /*
@@ -329,7 +328,7 @@ gulp.task('watch-xliff', function (callback) {
   gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Watching changes on Firebase...'));
   gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.cyan('gulp unwatch-xliff') + gutil.colors.yellow(' to stop the task'));
   var serviceAccount = require(config.service_account);
-  firebase.initializeApp({
+  admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     //serviceAccount: config.service_account, // deprecated
     databaseURL: config.database_url,
@@ -337,7 +336,7 @@ gulp.task('watch-xliff', function (callback) {
       uid: 'xliff-watcher'
     }
   });
-  var db = firebase.database();
+  var db = admin.database();
   var ref = db.ref('/users');
   ref.on('child_changed', function onChildChanged () {
     detectedChanges++;
