@@ -390,6 +390,7 @@ http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 - The HTTP server is accessible only from the localhost and disallows directory listing.
 - If the XLIFF file name is prefixed with an unpredictable string, it can serve as a kind of "password" to block malicious access from other local HTTP clients.
 - `https-local-server` script has to be executed in the same folder as its first execution so that it can find the generated certificates in `./demoCA` folder.
+- To work around [Issue #76](https://github.com/t2ym/live-localizer/issues/76), `https-local-server` script is required even for HTTP web applications.
 
 ## Build
 
