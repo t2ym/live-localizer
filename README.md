@@ -128,6 +128,80 @@ Firebase project has to be set up for storing XLIFF.
 
 ### XLIFF Watcher (Optional)
 
+XLIFF Watcher in the build system can detect XLIFF file changes in Firebase in realtime and trigger a new build.
+
+#### Start Watching:
+
+```sh
+  gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
+    --service_account ../../live-localizer-demo-service-account.json \
+    --on_xliff_change 'npm run demo' \
+    >../../logfile.txt 2>&1 &
+  tail -f ../../logfile.txt
+```
+
+Example XLIFF Watcher processes:
+```sh
+$ gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
+>     --service_account ../../live-localizer-demo-service-account.json \
+>     --on_xliff_change 'npm run demo'
+[10:03:02] Using gulpfile ~/WebComponents/components/live-localizer/demo/gulpfile.js
+[10:03:02] Starting 'watch-xliff'...
+[10:03:02] watch-xliff: Watching changes on Firebase...
+[10:03:02] watch-xliff: gulp unwatch-xliff to stop the task
+The 'credential' property specified in the first argument to initializeApp() is deprecated and will be removed in the next major version. You should instead use the 'firebase-admin' package. See https://firebase.google.com/docs/admin/setup for details on how to get started.
+[10:04:08] watch-xliff: Change detected on Firebase
+[10:04:08] watch-xliff: Executing: npm run demo
+[10:04:17] 
+> live-localizer@0.0.79 demo /home/fedora/WebComponents/components/live-localizer
+> cd demo && gulp
+
+[10:04:09] Using gulpfile ~/WebComponents/components/live-localizer/demo/gulpfile.js
+[10:04:09] Starting 'default'...
+[10:04:09] Starting 'fetch-xliff'...
+[10:04:16] By All Users:
+[10:04:16] 01i7iz6EbGcYTWemYAHlgrIb7fl1.files.de date: 2017-06-13T12:11:10Z
+...
+[10:04:16] zsZzpSw2rNXV0YNfd0xo42L5kpL2.files.ja date: 2017-05-25T05:43:19Z
+[10:04:16] By All Users in reverse chronological order:
+[10:04:16] files[de][0] user: nU3pjXUSyMbn6hScNe7I2unkbOf1 date: 2017-06-22T11:32:17Z <= selected
+...
+[10:04:16] files[de][507] user: QFCCp3HqHCZjCaMldd95R3d5Ck12 date: 2017-02-11T15:37:19Z
+[10:04:16] files[ja][0] user: YCogwiL4MKQ76fwcXXi6vlJljxG2 date: 2017-06-23T01:04:08Z <= selected
+...
+[10:04:16] files[ja][76] user: NUPdA2ijDFV3qSogo8VkTSfcFRx2 date: 2016-08-03T09:06:59Z
+[10:04:16] files[zh-Hans][0] user: fPgOtPel47c4yjM35roNoGqw1vE2 date: 2016-08-03T09:48:28Z <= selected
+[10:04:16] files[fr][0] user: v8Ny5UnVZpQw3aGcoKpNq3kkVv22 date: 2017-06-07T07:44:05Z <= selected
+[10:04:16] Finished 'fetch-xliff' after 6.77 s
+[10:04:16] Starting 'i18n'...
+[10:04:16] I18N transform index.html
+...
+[10:04:16] I18N transform locales/bundle.de.json
+[10:04:16] I18N transform bundle.json
+[10:04:16] I18N transform locales/bundle.es.json
+[10:04:16] I18N transform locales/bundle.fr.json
+[10:04:16] I18N transform locales/bundle.ja.json
+[10:04:16] I18N transform locales/bundle.zh-Hans.json
+[10:04:16] I18N transform xliff/bundle.de.xlf
+[10:04:16] I18N transform xliff/bundle.es.xlf
+[10:04:16] I18N transform xliff/bundle.fr.xlf
+[10:04:16] I18N transform xliff/bundle.ja.xlf
+[10:04:16] I18N transform xliff/bundle.zh-Hans.xlf
+[10:04:16] I18N transform 40 items
+[10:04:16] Finished 'i18n' after 375 ms
+[10:04:16] Finished 'default' after 7.15 s
+
+[10:04:17] watch-xliff: The task on the XLIFF changes has finished. Continuing to watch changes on Firebase...
+[10:04:48] Finished 'watch-xliff' after 1.75 min
+[10:04:48] watch-xliff: stop watching xliff
+```
+
+#### Stop Watching:
+
+```sh
+  gulp unwatch-xliff
+```
+
 See `gulp fetch-xliff` and `gulp watch-xliff` tasks in `demo/gulpfile.js`
 
 #### Notes on XLIFF Watcher:
