@@ -552,6 +552,9 @@ The element handles save and load operations of XLIFF on local file storage.
           this.tooltip = 'Error in watching ' + this.url +
                         '  Be sure to launch HTTP server at http://localhost:' + this.watchPort +
                         ' with the uploaded XLIFF in the HTTP root folder';
+          if (window.location.protocol === 'http:') {
+            this.watcherProtocolHttps = !this.watcherProtocolHttps;
+          }
           timeout = 10000;
           break;
         case 'start':
@@ -569,7 +572,7 @@ The element handles save and load operations of XLIFF on local file storage.
         }
 
         this.timeoutID = setTimeout(function () {
-          this.url = window.location.protocol + '//localhost:' + this.watchPort + this.watchPath + this.files[0].name;
+          this.url = (this.watcherProtocolHttps ? 'https:' : window.location.protocol) + '//localhost:' + this.watchPort + this.watchPath + this.files[0].name;
           this.xhr.open('GET', this.url);
           if (this.lastModified) {
             this.xhr.setRequestHeader('If-Modified-Since', this.lastModified);
