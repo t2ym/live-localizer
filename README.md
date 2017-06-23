@@ -137,19 +137,36 @@ See `gulp fetch-xliff` and `gulp watch-xliff` tasks in `demo/gulpfile.js`
 
 ## Local XLIFF Watcher (Optional)
 
-Local XLIFF changes can be watched via local HTTP server at http://localhost:8887/UPLOADED_XLIFF_FILE
+Local XLIFF file changes can be watched real-time via local HTTP server at http://localhost:8887/UPLOADED_XLIFF_FILE
 
 Check "Watch and Load XLIFF" in the local file storage control panel to start watching the local XLIFF file
+
+The following table shows triggered operations whenever the translator saves (overwrites) the local XLIFF file
+
+| Components | Operations |
+|:----------:|:----------:|
+| XLIFF Editor | Save (overwrite) the uploaded XLIFF file |
+| `http-server` | Provide Local XLIFF Watcher with the XLIFF file status |
+| Local XLIFF Watcher in Live Localizer | Periodically check the XLIFF file status and fetch it on its updates |
+| `xliff-conv` in Live Localizer | Merge the XLIFF updates into the JSON data for running UI strings |
+| Target Application | Show UI with the updated strings |
+| Browser Storage | Automatically save the XLIFF file if "Automatic Save" is checked |
+| Firebase Storage | Automatically upload the XLIFF file if "Automatic Save" is checked |
+| Firebase | Notify XLIFF Watcher of a `child_changed` event for the XLIFF file updates |
+| XLIFF Watcher (`watch-xliff` gulp task) in the build system | Detect the `child_changed` event and trigger a new build |
+| Build system | Start a new build process including `fetch-xliff` gulp task and I18N, and deploy a new build on the development HTTP server |
+| Development HTTP server | Provide browsers for translators with the new build |
+| Reload button in Live Localizer | Detect the new build in 60 seconds and show the tooltip "App Updated" |
 
 ### HTTP Server for Local XLIFF Watcher Setup
 
 - Install [NodeJS](https://nodejs.org/) on the local host of the translator
 - Install [the local HTTP server npm package](https://www.npmjs.com/package/http-server)
-```
+```sh
 npm install -g http-server
 ```
 - For HTTP sites, start local HTTP server at http://localhost:8887 with the root folder containing the XLIFF file
-```
+```sh
 http-server FOLDER_TO_CONTAIN_XLIFF -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since
 ```
 - For HTTPS sites, start local HTTPS server at https://localhost:8887 with the root folder containing the XLIFF file
@@ -279,6 +296,7 @@ http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 - The XLIFF folder should contain only the target XLIFF file(s) for the project for security.
 - The HTTP server is accessible only from the localhost and disallows directory listing.
 - If the XLIFF file name is prefixed with an unpredictable string, it can serve as a kind of "password" to block malicious access from other local HTTP clients.
+- `https-local-server` script has to be executed in the same folder as its first execution so that it can find the generated certificates in `./demoCA` folder.
 
 ## Build
 
