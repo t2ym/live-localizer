@@ -144,7 +144,7 @@ Check "Watch and Load XLIFF" in the local file storage control panel to start wa
 The following table shows triggered operations whenever the translator saves (overwrites) the local XLIFF file
 
 | Components | Operations |
-|:----------:|:----------:|
+|:-----------|:-----------|
 | XLIFF Editor | Save (overwrite) the uploaded XLIFF file |
 | `http-server` | Provide Local XLIFF Watcher with the XLIFF file status |
 | Local XLIFF Watcher in Live Localizer | Periodically check the XLIFF file status and fetch it on its updates |
