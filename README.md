@@ -29,7 +29,6 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 
 ## Table of Contents
 
-- [Live Localizer applied to the Shop App](#live-localizer-applied-to-the-shop-app)
 - [Use Cases](#use-cases)
 - [Features](#features)
 - [Supported Browsers](#supported-browsers)
@@ -39,7 +38,6 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 - [Firebase Setup (Optional)](#firebase-setup-optional)
 - [Local XLIFF Watcher (Optional)](#local-xliff-watcher-optional)
 - [Build](#build)
-- [TODOs](#todos)
 - [Plans](#plans)
 - [License](#license)
 
@@ -428,10 +426,6 @@ The dependent components except for region flag images can be bundled with `poly
   ]
 }
 ```
-
-## TODOs
-
-- Code cleanup/optimization/refactoring
 
 ## Plans
 
