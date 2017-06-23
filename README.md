@@ -130,6 +130,8 @@ Firebase project has to be set up for storing XLIFF.
 
 XLIFF Watcher in the build system can detect XLIFF file changes in Firebase in realtime and trigger a new build.
 
+See `gulp fetch-xliff` and `gulp watch-xliff` tasks in [`demo/gulpfile.js`](https://github.com/t2ym/live-localizer/blob/master/demo/gulpfile.js)
+
 #### Start Watching:
 
 ```sh
@@ -201,8 +203,6 @@ The 'credential' property specified in the first argument to initializeApp() is 
 ```sh
   gulp unwatch-xliff
 ```
-
-See `gulp fetch-xliff` and `gulp watch-xliff` tasks in `demo/gulpfile.js`
 
 #### Notes on XLIFF Watcher:
 
