@@ -35,6 +35,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <script>
       var isFirebaseFirst = !!navigator.userAgent.match(/Firefox/) && (window.location.port % 2 === 0);
       var suites = [ 'service-worker-ready.html' ];
+      if (!isFirebaseFirst && !!navigator.userAgent.match(/Firefox/)) {
+        suites.push('src/wait.html');
+      }
       [ 'src' ].forEach(function (buildPhase) {
         Object.keys(Suite.scopes).sort(function (a, b) { return isFirebaseFirst && b === 'firebasestorage' ? 1 : 0 })
           .forEach(function (scope) {
