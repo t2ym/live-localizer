@@ -31,11 +31,13 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
 <body>
   <script>
     suite('Wait', function () {
-      test('Insert 120 seconds of waiting', function (done) {
-        setTimeout(function () {
-          done();
-        }, 120000);
-      });
+      for (var i = 1; i <= 12; i++) {
+        test('Insert 10 seconds of waiting ' + i + ' of ' + 12, function (done) {
+          setTimeout(function () {
+            done();
+          }, 10000);
+        });
+      }
     });
   </script>
 </body>
