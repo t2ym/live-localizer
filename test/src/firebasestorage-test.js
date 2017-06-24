@@ -502,36 +502,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    SelectStorageView: {
-      CleanupFirebaseAuthSuite: {
-        InitializeFirebaseStorageTest: {
-          CheckboxTest: {
-            SignInAnonymously: {
-              Reload: {
-                ConfiguredAutoSaveLoadTest: {
-                  FirebaseStorageSignedInAnonymousIconTooltipTest: {
-                    FirebaseStorageSignedInAnonymousUserTooltipTest: {
-                      FirebaseStorageDefaultLangIneffectiveSaveTest: {
-                        ConfiguredAutoSaveLoadCheckboxTest: {
-                          SignOutAnonymousUser: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes, Sign out'
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
-          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
-          DisableAnonymousCheckbox: {
-            MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
-          },
-          ShowAuthErrorTooltip: 'ShowAuthErrorTooltipTest; Show auth error tooltip message (Mock)',
-          EmptyAuthErrorTooltip: 'EmptyAuthErrorTooltipTest; Empty auth error tooltip message (Mock)'
-        }
-      }
-    },
     SelectIconView: {
       CleanupFirebaseAuthSuite: {
         InitializeFirebaseStorageTest: {
@@ -562,6 +532,36 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }
+        }
+      }
+    },
+    SelectStorageView: {
+      CleanupFirebaseAuthSuite: {
+        InitializeFirebaseStorageTest: {
+          CheckboxTest: {
+            SignInAnonymously: {
+              Reload: {
+                ConfiguredAutoSaveLoadTest: {
+                  FirebaseStorageSignedInAnonymousIconTooltipTest: {
+                    FirebaseStorageSignedInAnonymousUserTooltipTest: {
+                      FirebaseStorageDefaultLangIneffectiveSaveTest: {
+                        ConfiguredAutoSaveLoadCheckboxTest: {
+                          SignOutAnonymousUser: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes, Sign out'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
+          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
+          DisableAnonymousCheckbox: {
+            MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
+          },
+          ShowAuthErrorTooltip: 'ShowAuthErrorTooltipTest; Show auth error tooltip message (Mock)',
+          EmptyAuthErrorTooltip: 'EmptyAuthErrorTooltipTest; Empty auth error tooltip message (Mock)'
         }
       }
     }
