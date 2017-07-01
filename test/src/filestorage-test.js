@@ -337,7 +337,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       self.mockFile = new Blob([self.mockXliff], { type: 'application/x-xliff+xml' });
       self.mockFile.name = mockXliffName;
       self.mockDropEvent = new MouseEvent('drop', mouseEventInit);
-      self.mockDropEvent.dataTransfer = { files: [self.mockFile] };
+      Object.defineProperty(self.mockDropEvent, 'dataTransfer', { value: { files: [self.mockFile] } });
       self.droparea.dispatchEvent(self.mockDropEvent);
       await self.checkInterval(() => self.fileStorage.label === mockXliffName, 200, 200);
     }
