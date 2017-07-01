@@ -609,6 +609,7 @@ The element handles save and load operations of XLIFF on local file storage.
               window.navigator.msSaveOrOpenBlob(blob, blob.name);
             }
             else {
+              it.$.anchor.target = navigator.vendor.match(/^Apple/) ? '' : '_blank';
               it.$.anchor.download = blob.name;
               it.$.anchor.href = URL.createObjectURL(blob);
               it.$.anchor.click();
