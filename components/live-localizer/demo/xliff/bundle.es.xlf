@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xliff PUBLIC "-//XLIFF//DTD XLIFF//EN" "http://www.oasis-open.org/committees/xliff/documents/xliff.dtd">
+<xliff version="1.0">
+  <file xml:space="default" source-language="en" target-language="es" datatype="plaintext" original="messages" date="2016-08-14T08:58:49Z" product-name="messages">
+    <header>
+      <tool tool-id="xliff-conv" tool-name="xliff-conv" tool-version="1.0.7"/>
+    </header>
+    <body>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:app-toolbar">
+        <source>Menu</source>
+        <target state="new">es Menu</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a">
+        <source>View One</source>
+        <target state="new">es View One</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a_1">
+        <source>View Two</source>
+        <target state="new">es View Two</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a_2">
+        <source>View Three</source>
+        <target state="new">es View Three</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1">
+        <source>My App</source>
+        <target state="new">es My App</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:div">
+        <source>1</source>
+        <target state="new">1</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:h1_1">
+        <source>View One</source>
+        <target state="needs-translation">es View One</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:p_2">
+        <source>Ut labores minimum atomorum pro. Laudem tibique ut has.</source>
+        <target state="needs-translation">Ut labores minimum atomorum pro. Laudem tibique ut has.</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:p_3">
+        <source>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</source>
+        <target state="new">es Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</target>
+      </trans-unit>
+      <trans-unit id="my-view2.div_1:div">
+        <source>2</source>
+        <target state="new">2</target>
+      </trans-unit>
+      <trans-unit id="my-view2.div_1:h1_1">
+        <source>View Two</source>
+        <target state="new">es View Two</target>
+      </trans-unit>
+      <trans-unit id="my-view2.div_1:p_2">
+        <source>Ea duis bonorum nec, falli paulo aliquid ei eum.</source>
+        <target state="new">es Ea duis bonorum nec, falli paulo aliquid ei eum.</target>
+      </trans-unit>
+      <trans-unit id="my-view2.div_1:p_3">
+        <source>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</source>
+        <target state="new">es Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</target>
+      </trans-unit>
+      <trans-unit id="my-view3.div_1:div">
+        <source>3</source>
+        <target state="new">3</target>
+      </trans-unit>
+      <trans-unit id="my-view3.div_1:h1_1">
+        <source>View Three</source>
+        <target state="new">es View Three</target>
+      </trans-unit>
+      <trans-unit id="my-view3.div_1:p_2">
+        <source>Modus commodo minimum eum te, vero utinam assueverit per eu.</source>
+        <target state="new">es Modus commodo minimum eum te, vero utinam assueverit per eu.</target>
+      </trans-unit>
+      <trans-unit id="my-view3.div_1:p_3">
+        <source>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</source>
+        <target state="new">es Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

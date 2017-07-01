@@ -1,0 +1,41 @@
+<!--
+@license https://github.com/t2ym/scenarist/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>scenarist demo</title>
+    <script src="../../../web-component-tester/browser.js"></script>
+    <script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
+    <link rel="import" href="../../../i18n-number/demo/nano-calc.html">
+    <style>
+      nano-calc {
+        font-family: 'Roboto', 'Noto', 'sans-serif';
+      }
+      ul.states {
+        font-family: 'Roboto', 'Noto', 'sans-serif';        
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <template is="dom-if" id="demo" restamp>
+      <template is="dom-bind" id="bind">
+        <nano-calc id="calc" x="{{x}}" y="{{y}}" op="{{op}}" m="{{m}}" value="{{value}}"></nano-calc>
+        <ul class="states">
+          <li>value = {{value}}</li>
+          <li>x = {{x}}</li>
+          <li>y = {{y}}</li>
+          <li>op = {{op}}</li>
+          <li>m = {{m}}</li>
+        </ul>
+      </template>
+    </template>
+
+    <script src="../../node_modules/babel-polyfill/browser.js"></script>
+    <script src="../../Suite.min.js"></script>
+    <script src="demo.js"></script>
+  </body>
+</html>

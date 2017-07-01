@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xliff PUBLIC "-//XLIFF//DTD XLIFF//EN" "http://www.oasis-open.org/committees/xliff/documents/xliff.dtd">
+<xliff version="1.0">
+  <file xml:space="default" source-language="en" target-language="de" datatype="plaintext" original="messages" date="2016-11-07T05:13:51Z" product-name="messages">
+    <header>
+      <tool tool-id="xliff-conv" tool-name="xliff-conv" tool-version="1.0.10"/>
+    </header>
+    <body>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:app-toolbar">
+        <source>Menu</source>
+        <target state="new">de Menu</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a">
+        <source>View One</source>
+        <target state="new">de View One</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a_1">
+        <source>View Two</source>
+        <target state="new">de View Two</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-drawer:iron-selector_1:a_2">
+        <source>View Three</source>
+        <target state="new">de View Three</target>
+      </trans-unit>
+      <trans-unit id="my-app.app-drawer-layout_3:app-header-layout_1:app-header:app-toolbar:div_1">
+        <source>My App</source>
+        <target state="new">de My App</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:div">
+        <source>1</source>
+        <target state="new">1</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:h1_1">
+        <source>View One</source>
+        <target state="needs-translation">de View One</target>
+      </trans-unit>
+      <trans-unit id="my-view1.div_1:p_2">
+        <source>Ut labores minimum atomorum pro. Laudem tibique ut has.</source>
+        <target state="needs-translation">Ut labores minimum atomorum pro. Laudem tibique ut has.</target>
+      </trans-unit>

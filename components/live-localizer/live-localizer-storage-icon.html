@@ -1,0 +1,378 @@
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="draggable-behavior.html">
+
+<!--
+
+## live-localizer-storage-icon
+
+`<live-localizer-storage-icon>` element shows a storage icon for a container storage element.
+The icon can be dragged and dropped to one of other icons so that XLIFF can be saved to or loaded from the target storage.
+
+@group I18nBehavior
+@element live-localizer-storage-icon
+@demo demo/index.html
+-->
+<dom-module id="live-localizer-storage-icon">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 8px;
+
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+
+        --paper-tooltip: {
+          padding: 4px;
+        }
+
+        --paper-fab-background: lightgrey;
+        --paper-fab-keyboard-focus-background: lightgrey;
+        --paper-fab-iron-icon: {
+          color: white;
+          width: 16px;
+          height: 16px;
+        }
+      }
+      .download-link {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+        border-radius: 12px;
+        @apply(--paper-font-common-base);
+        font-size: 12px;
+        text-align: center;
+        background-color: lightgrey;
+        @apply(--shadow-elevation-4dp);
+        @apply(--storage-card);
+      }
+      .storage-icon {
+        display: block;
+        text-align: center;
+        margin: auto;
+        width: 48px;
+        height: 48px;
+        @apply(--storage-icon);
+      }
+      paper-card.download-link:not(.selected) {
+        color: black;
+        opacity: 0.35;
+      }
+      .file-name {
+        position: relative;
+        text-align: center;
+        display: block;
+        left: -125%;
+        width: 350%;
+        @apply(--storage-label);
+      }
+      paper-fab.badge {
+        position: relative;
+        font-size: 9pt;
+        padding: 1px;
+        top: -84px;
+        left: 60px;
+        width: 32px;
+        height: 32px;
+      }
+      paper-fab.badge:not(.selected) {
+        color: black;
+        opacity: 0.35;
+      }
+      paper-fab.badge.blue {
+        visibility: visible;
+        background-color: blue;
+      }
+      paper-fab.badge.orangered {
+        visibility: visible;
+        background-color: orangered;
+      }
+      paper-fab.badge.yellow {
+        visibility: visible;
+        color: slategrey;
+        background-color: yellow;
+      }
+      paper-fab.badge {
+        visibility: hidden;
+      }
+      paper-tooltip.card-tooltip {
+        position: absolute;
+        text-align: center;
+        width: 100%;
+      }
+    </style>
+    <paper-card id="card" class="download-link layout vertical">
+      <template is="dom-if" if="{{icon}}">
+        <iron-icon class="storage-icon" icon="{{icon}}"></iron-icon>
+      </template>
+      <template is="dom-if" if="{{image}}">
+        <iron-image class="storage-icon" src="{{image}}" alt="{{label}}" sizing="contain"></iron-image>
+      </template>
+      <div class="flex"></div>
+      <div class="file-name">{{label}}</div>
+      <div class="flex"></div>
+      <paper-ripple></paper-ripple>
+    </paper-card>
+    <paper-fab id="badge" mini class="badge yellow" label="{{badgeLabel}}"></paper-fab>
+    <paper-tooltip for="card" class="card-tooltip" offset="-10">{{tooltip(selected,tooltips)}}</paper-tooltip>
+    <paper-tooltip for="badge" offset="-4">{{badgeTooltip}}</paper-tooltip>
+  </template>
+  <script>
+  (function () {
+
+    Polymer({
+
+      is: 'live-localizer-storage-icon',
+
+      behaviors: [
+        Polymer.NeonAnimationRunnerBehavior,
+        BehaviorsStore.DraggableBehavior
+      ],
+
+      properties: {
+        /**
+         * name for `iron-icon`
+         */
+        icon: {
+          type: String
+        },
+
+        /**
+         * URL to the image
+         */
+        image: {
+          type: String
+        },
+
+        /**
+         * label for the icon
+         */
+        label: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * label for the badge
+         *
+         * null string to hide the badge
+         */
+        badgeLabel: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * color for the badge
+         *
+         * Supported colors:
+         *
+         * | color |
+         * |:------|
+         * | blue |
+         * | orangered |
+         * | yellow |
+         */
+        badgeColor: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * tooltips for selected and unselected status in an Array of strings
+         */
+        tooltips: {
+          type: Array,
+          value: function () {
+            return [ 'Not implemented yet', 'Not implemented yet' ];
+          }
+        },
+
+        /**
+         * tooltip for the badge
+         */
+        badgeTooltip: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * true if selected
+         */
+        selected: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          observer: 'selectedChanged'
+        },
+
+        /**
+         * true if `dragHandleMode` property value is bound and has to be returned in `getDragHandleMode()`
+         */
+        boundDragHandleMode: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * the model object bound to the `<live-localizer-model>` element
+         */
+        model: {
+          type: Object,
+          notify: true
+        },
+
+        /**
+         * the container storage element object
+         */
+        storage: {
+          type: Object
+        }
+      },
+
+      observers: [
+        'modelReady(model)',
+        'updateBadge(badgeLabel,badgeColor)'
+      ],
+
+      /**
+       * ready callback
+       *
+       * Initialize `this.onHtmlLangMutationBindThis`
+       */
+      ready: function () {
+        this.onHtmlLangMutationBindThis = this.onHtmlLangMutation.bind(this);
+      },
+
+      /**
+       * observer of `this.model`
+       *
+       * Initialize `html-lang-mutation` event listener for `this.model`
+       *
+       * @param {Object} model `<live-localizer-model>` object
+       */
+      modelReady: function (model) {
+        if (model && !this.isModelReady) {
+          this.model.addEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+          this.isModelReady = true;
+        }
+      },
+
+      /**
+       * detached callback
+       *
+       * Uninitialize `html-lang-mutation` event listener for `this.model`
+       */
+      detached: function () {
+        if (this.model) {
+          this.model.removeEventListener('html-lang-mutation', this.onHtmlLangMutationBindThis);
+        }
+      },
+
+      /**
+       * `html-lang-mutation` event handler
+       *
+       * No operation for now.
+       */
+      onHtmlLangMutation: function (e) {
+        return false;
+      },
+
+      /**
+       * observer of `selected`
+       *
+       * Update classes for set dimness in unselected status
+       *
+       * @param {Boolean} value the new value for `selected`
+       */
+      selectedChanged: function (value) {
+        this.toggleClass('selected', this.selected, this.$.card);
+        this.toggleClass('selected', this.selected, this.$.badge);
+      },
+
+      /**
+       * observer of `badgeLabel` and `badgeColor`
+       *
+       * Update the badge color and the visibility
+       */
+      updateBadge: function (badgeLabel, badgeColor) {
+        if (!badgeLabel) {
+          badgeColor = '';
+        }
+
+        [ 'blue', 'orangered', 'yellow' ].forEach(function (color) {
+          if (color === badgeColor) {
+            this.$.badge.classList.add(color);
+          }
+          else {
+            this.$.badge.classList.remove(color);
+          }
+        }, this);
+      },
+
+      /**
+       * get a tooltip message for the current selected status
+       *
+       * @param {Boolean} selected selected status
+       * @param {Array} tooltips `this.tooltips`
+       * @return {String} tooltip
+       */
+      tooltip: function (selected, tooltips) {
+        if (tooltips) {
+          if (selected) {
+            return tooltips[0];
+          }
+          else {
+            return tooltips[1];
+          }
+        }
+        else {
+          return '';
+        }
+      },
+
+      /**
+       * Return the current drag-handle-mode as DraggableBehavior
+       *
+       * Override the method in DraggableBehavior
+       */
+      getDragHandleMode: function (e) {
+        var mode;
+        if (this.boundDragHandleMode) {
+          mode = this.dragHandleMode;
+        }
+        else {
+          if (this.selected) {
+            mode = 'drag';
+          }
+          else {
+            mode = 'none';
+          }
+        }
+        return mode;
+      }
+
+    });
+  })();
+  </script>
+</dom-module>

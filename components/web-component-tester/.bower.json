@@ -1,0 +1,52 @@
+{
+  "name": "web-component-tester",
+  "description": "web-component-tester makes testing your web components a breeze!",
+  "main": [
+    "browser.js"
+  ],
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "ignore": [
+    "*",
+    "!/data/*",
+    "!/browser.js",
+    "!/browser.js.map",
+    "!/package.json",
+    "!/bower.json"
+  ],
+  "keywords": [
+    "browser",
+    "grunt",
+    "gruntplugin",
+    "gulp",
+    "polymer",
+    "test",
+    "testing",
+    "web component",
+    "web"
+  ],
+  "dependencies": {
+    "accessibility-developer-tools": "^2.10.0",
+    "async": "^1.5.0",
+    "chai": "^3.2.0",
+    "lodash": "^3.7.0",
+    "mocha": "^3.1.2",
+    "sinon-chai": "^2.7.0",
+    "sinonjs": "^1.14.1",
+    "stacky": "^1.3.0",
+    "test-fixture": "PolymerElements/test-fixture#3.0.0-rc.1"
+  },
+  "devDependencies": {
+    "polymer": "Polymer/polymer#^1.5.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22"
+  },
+  "homepage": "https://github.com/t2ym/web-component-tester",
+  "_release": "e9e965c9f8",
+  "_resolution": {
+    "type": "branch",
+    "branch": "wct6-plugin",
+    "commit": "e9e965c9f8ff4ac308cee065ec370fe32b208416"
+  },
+  "_source": "git://github.com/t2ym/web-component-tester.git",
+  "_target": "wct6-plugin",
+  "_originalSource": "t2ym/web-component-tester"
+}

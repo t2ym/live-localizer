@@ -1,0 +1,71 @@
+<!doctype html>
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+
+<html>
+  <head>
+    <title>live-localizer test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script>
+      'serviceWorker' in navigator && window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+      });
+    </script>
+    <script>WCT = { mochaOptions: { slow: 15000, timeout: 600000 } };</script>
+    <!-- <script src="../../webcomponentsjs/webcomponents-lite.js"></script> -->
+    <script src="../../web-component-tester/browser.js"></script>
+    <!-- <script src="../node_modules/babel-polyfill/browser.js"></script> -->
+    <!-- <link rel="import" href="src/import-suites.html"> -->
+    <script src="../../scenarist/Suite.js"></script>
+    <script src="src/common-test.js"></script>
+    <script src="src/dialog-test.js"></script>
+    <script src="src/panel-test.js"></script>
+    <script src="src/iconview-test.js"></script>
+    <script src="src/listview-test.js"></script>
+    <script src="src/storageview-test.js"></script>
+    <script src="src/browserstorage-test.js"></script>
+    <script src="src/firebasestorage-test.js"></script>
+    <script src="src/filestorage-test.js"></script>
+    <script src="src/multistorage-test.js"></script>
+  </head>
+  <body>
+    <script>
+      var isFirebaseFirst = !!navigator.userAgent.match(/Firefox/) && (window.location.port % 2 === 0);
+      var suites = [ 'service-worker-ready.html' ];
+      if (!isFirebaseFirst && !!navigator.userAgent.match(/Firefox/)) {
+        suites.push('src/wait.html');
+      }
+      [ 'src' ].forEach(function (buildPhase) {
+        Object.keys(Suite.scopes).sort(function (a, b) { return isFirebaseFirst && b === 'firebasestorage' ? 1 : 0 })
+          .forEach(function (scope) {
+            if (Suite.scopes[scope].htmlSuite !== '*') {
+              Suite.scopes[scope].test.forEach(function (tests, index) {
+                var maxPhase = 0;
+                tests = tests.split(',');
+                if (tests.length === 1) {
+                  tests = tests[0];
+                  var match2 = tests.match(/^.*_phase_([0-9])*$/);
+                  if (match2) {
+                    maxPhase = match2[1];
+                  }
+                }
+                for (var phase = 0; phase <= maxPhase; phase++) {
+                  suites.push(buildPhase + '/' + (Suite.scopes[scope].htmlSuite || scope) + '-test.html' +
+                    '#TestSuites=' + index +
+                    (Suite.scopes[scope].htmlSuite ? '&Scope=' + scope : '') +
+                    (maxPhase > 0 ? '&Phase=' + phase : ''));
+                }
+              });
+            }
+          });
+      });
+      // Load and run all tests (.html, .js):
+      console.log('suites = ', suites);
+      suites.push('service-worker-cleanup.html');
+      WCT.loadSuites(suites);
+    </script>
+  </body>
+</html>

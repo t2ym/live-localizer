@@ -1,0 +1,75 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<!--
+@license https://github.com/t2ym/live-localizer/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+
+<!doctype html>
+<html lang="en" preferred>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>Live Localizer Basic Test</title>
+
+  <meta name="theme-color" content="#fff">
+
+  <script src="../../../web-component-tester/browser.js"></script>
+  <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../../iron-test-helpers/iron-test-helpers.html">
+  <link rel="import" href="my-app.html">
+  <link rel="import" href="../../live-localizer.html">
+
+  <style>
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      background-color: #eee;
+    }
+
+  </style>
+
+</head>
+<body>
+
+  <my-app></my-app>
+
+  <test-fixture id="fixture">
+    <template>
+      <live-localizer>
+        <live-localizer-firebase-storage id="firebase-storage" class="storage cloud" slot="storage-cloud"
+          auth-provider="google"
+          auth-domain="live-localizer-demo.firebaseapp.com"
+          database-url="https://live-localizer-demo.firebaseio.com"
+          api-key="AIzaSyCjrlPhl0cLSZVRsDvuajq16vkerhcu_UM">
+        </live-localizer-firebase-storage>
+      </live-localizer>
+    </template>
+  </test-fixture>
+
+  <script src="../../node_modules/babel-polyfill/browser.js"></script>
+  <link rel="import" href="import-suites.html">
+  <script>
+    addEventListener('WebComponentsReady', function () {
+      let match = decodeURIComponent(window.location.href).match(/^.*[^_a-zA-Z0-9]TestSuites=([_a-zA-Z0-9,]*)&Scope=([_a-zA-Z0-9-]*).*$/);
+
+      if (match) {
+        // Runner
+        Suite.scopes[match[2]].run(match[1], '#fixture');
+      }
+    });
+  </script>
+</body>
+</html>

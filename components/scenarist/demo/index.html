@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+@license https://github.com/t2ym/scenarist/blob/master/LICENSE.md
+Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
+-->
+<html>
+  <head>
+    <title>scenarist demo</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <script>
+      var asyncSupported = true;
+      var url;
+      try {
+        new Function('return async () => 1');
+      }
+      catch (e) {
+        asyncSupported = false;
+      }
+      if (asyncSupported) {
+        url = 'src/';
+      }
+      else {
+        url = 'min/';
+      }
+      window.location.href = url;
+    </script>
+  </body>
+</html>

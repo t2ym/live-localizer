@@ -1,0 +1,14 @@
+{
+  "name": "region-flags",
+  "homepage": "https://github.com/behdad/region-flags",
+  "version": "1.0.1",
+  "_release": "1.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.1",
+    "commit": "91f254def61449418030c1ace1988771cc04f0be"
+  },
+  "_source": "https://github.com/behdad/region-flags.git",
+  "_target": "^1.0.1",
+  "_originalSource": "region-flags"
+}

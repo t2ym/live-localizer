@@ -1,0 +1,42 @@
+{
+  "name": "xliff-conv",
+  "version": "1.0.10",
+  "description": "XLIFF to/from JSON converter for Polymer i18n-behavior",
+  "scripts": {
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha test/test.js --report lcov -- -R spec && wct",
+    "clean": "rm -rvf ./coverage ./coverage-browser"
+  },
+  "main": "xliff-conv.js",
+  "author": "Tetsuya Mori <t2y3141592@gmail.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/t2ym/xliff-conv/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/t2ym/xliff-conv.git"
+  },
+  "keywords": [
+    "polymer",
+    "web-component",
+    "web-components",
+    "i18n",
+    "internationalization",
+    "l10n",
+    "localization",
+    "gulp"
+  ],
+  "dependencies": {
+    "xmldom": "^0.1.22"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "coveralls": "^2.11.9",
+    "istanbul": "^0.4.3",
+    "lcov-result-merger": "^1.2.0",
+    "mocha": "~1.21.x",
+    "mocha-lcov-reporter": "^1.2.0",
+    "web-component-tester": "^4.2.2",
+    "web-component-tester-istanbul": "^0.10.0"
+  }
+}
