@@ -101,6 +101,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return PanelTooltipTest;
@@ -558,6 +563,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return FileLoadButtonTest;
@@ -612,6 +622,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 
@@ -829,6 +844,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 

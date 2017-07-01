@@ -16,7 +16,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // firebasestorage scope (subscope of storageview)
   var scope = 'firebasestorage';
   var firebasestorage = new Suite(scope, 'live-localizer firebasestorage tests');
-  firebasestorage.htmlSuite = 'live-localizer';
+  firebasestorage.htmlSuite = 'live-localizer-firebase';
   firebasestorage.test = Suite.scopes.storageview.classes.SelectStorageView;
   firebasestorage.test = Suite.scopes.panel.classes.SelectIconView;
   firebasestorage.test = Suite.scopes.panel.mixins.SelectStorageView;
@@ -141,6 +141,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 
@@ -1610,9 +1615,21 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 case 2:
                   self = this;
                   _context47.next = 5;
-                  return regeneratorRuntime.awrap(self.showTooltip(self.storageIcon.$.card, self.iconTooltip));
+                  return regeneratorRuntime.awrap(self.checkInterval(function () {
+                    return self.firebaseStorage.isSettingsInitialized;
+                  }, 200, 100));
 
                 case 5:
+                  _context47.next = 7;
+                  return regeneratorRuntime.awrap(self.checkInterval(function () {
+                    return self.storageIcon.label === 'bundle.de.xlf';
+                  }, 200, 100));
+
+                case 7:
+                  _context47.next = 9;
+                  return regeneratorRuntime.awrap(self.showTooltip(self.storageIcon.$.card, self.iconTooltip));
+
+                case 9:
                 case 'end':
                   return _context47.stop();
               }
@@ -1679,7 +1696,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   _context49.next = 5;
                   return regeneratorRuntime.awrap(self.checkInterval(function () {
                     return self.firebaseStorage.isSettingsInitialized;
-                  }, 200, 40));
+                  }, 200, 1500));
 
                 case 5:
                 case 'end':
@@ -2024,6 +2041,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return MockSignInTest;
@@ -2033,36 +2055,6 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     // test class mixins
     '': [],
     // test classes
-    SelectStorageView: {
-      CleanupFirebaseAuthSuite: {
-        InitializeFirebaseStorageTest: {
-          CheckboxTest: {
-            SignInAnonymously: {
-              Reload: {
-                ConfiguredAutoSaveLoadTest: {
-                  FirebaseStorageSignedInAnonymousIconTooltipTest: {
-                    FirebaseStorageSignedInAnonymousUserTooltipTest: {
-                      FirebaseStorageDefaultLangIneffectiveSaveTest: {
-                        ConfiguredAutoSaveLoadCheckboxTest: {
-                          SignOutAnonymousUser: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes, Sign out'
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
-          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
-          DisableAnonymousCheckbox: {
-            MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
-          },
-          ShowAuthErrorTooltip: 'ShowAuthErrorTooltipTest; Show auth error tooltip message (Mock)',
-          EmptyAuthErrorTooltip: 'EmptyAuthErrorTooltipTest; Empty auth error tooltip message (Mock)'
-        }
-      }
-    },
     SelectIconView: {
       CleanupFirebaseAuthSuite: {
         InitializeFirebaseStorageTest: {
@@ -2093,6 +2085,36 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }
+        }
+      }
+    },
+    SelectStorageView: {
+      CleanupFirebaseAuthSuite: {
+        InitializeFirebaseStorageTest: {
+          CheckboxTest: {
+            SignInAnonymously: {
+              Reload: {
+                ConfiguredAutoSaveLoadTest: {
+                  FirebaseStorageSignedInAnonymousIconTooltipTest: {
+                    FirebaseStorageSignedInAnonymousUserTooltipTest: {
+                      FirebaseStorageDefaultLangIneffectiveSaveTest: {
+                        ConfiguredAutoSaveLoadCheckboxTest: {
+                          SignOutAnonymousUser: 'ConfiguredAutoSaveLoadCheckboxTest_phase_1; Sign in anonymously, Reload, Toggle checkboxes, Sign out'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          FirebaseStorageSignedOutAnonymousIconTooltipTest: 'SignedOutAnonymousIconTooltipTest',
+          FirebaseStorageIneffectiveSaveTest: 'IneffectiveSaveTest',
+          DisableAnonymousCheckbox: {
+            MockSignInTest: 'SignInWithMockAuthProviderTest; Sign in with auth providers (Mock)'
+          },
+          ShowAuthErrorTooltip: 'ShowAuthErrorTooltipTest; Show auth error tooltip message (Mock)',
+          EmptyAuthErrorTooltip: 'EmptyAuthErrorTooltipTest; Empty auth error tooltip message (Mock)'
         }
       }
     }

@@ -37,6 +37,8 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }, {
       key: 'setup',
       value: function setup() {
+        var count, _count;
+
         return regeneratorRuntime.async(function setup$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -45,9 +47,32 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                 return regeneratorRuntime.awrap(_get(LiveLocalizerSuite.prototype.__proto__ || Object.getPrototypeOf(LiveLocalizerSuite.prototype), 'setup', this).call(this));
 
               case 2:
+                if (HTMLImports.useNative) {
+                  _context.next = 6;
+                  break;
+                }
+
+                count = 1;
+                _context.next = 6;
+                return regeneratorRuntime.awrap(this.checkInterval(function () {
+                  return count-- === 0;
+                }, 100, 2));
+
+              case 6:
                 this.fixture = document.querySelector(this.target);
 
-              case 3:
+                if (HTMLImports.useNative) {
+                  _context.next = 11;
+                  break;
+                }
+
+                _count = 1;
+                _context.next = 11;
+                return regeneratorRuntime.awrap(this.checkInterval(function () {
+                  return _count-- === 0;
+                }, 100, 2));
+
+              case 11:
               case 'end':
                 return _context.stop();
             }
@@ -258,7 +283,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     }], [{
       key: 'reconnectable',
       get: function get() {
-        return false;
+        return true;
       }
     }]);
 
@@ -340,7 +365,9 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   assert.equal(self.listView.is, 'live-localizer-list-view');
                   assert.equal(self.storageView.is, 'live-localizer-storage-view');
                   assert.equal(self.browserStorage.is, 'live-localizer-browser-storage');
-                  assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage');
+                  if (self.firebaseStorage) {
+                    assert.equal(self.firebaseStorage.is, 'live-localizer-firebase-storage');
+                  }
                   assert.equal(self.fileStorage.is, 'live-localizer-local-file-storage');
 
                 case 22:
@@ -380,6 +407,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 

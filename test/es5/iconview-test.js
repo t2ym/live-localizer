@@ -196,6 +196,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return MockSaveFileTest;
@@ -408,6 +413,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 

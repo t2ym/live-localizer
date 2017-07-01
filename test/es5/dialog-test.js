@@ -14,7 +14,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // dialog scope
   var scope = 'dialog';
   var dialog = new Suite(scope, 'live-localizer dialog and fab tests');
-  dialog.htmlSuite = 'live-localizer';
+  dialog.htmlSuite = 'live-localizer-lazy';
   dialog.test = Suite.scopes.common.classes.LiveLocalizerSuite;
   dialog.test = Suite.scopes.common.classes.InstantiateTest;
   dialog.test = function (base) {
@@ -726,6 +726,11 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 

@@ -14,7 +14,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
   // listview scope (subscope of panel)
   var scope = 'listview';
   var listview = new Suite(scope, 'live-localizer listview tests');
-  listview.htmlSuite = 'live-localizer';
+  listview.htmlSuite = 'live-localizer-firebase-lazy';
   listview.test = Suite.scopes.panel.classes.SelectListView;
   listview.test = function (base) {
     return function (_base) {
@@ -64,6 +64,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 

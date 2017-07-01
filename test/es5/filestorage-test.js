@@ -699,6 +699,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return MockFileStorageSaveTest;
@@ -784,6 +789,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 
@@ -1074,6 +1084,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             }
           }, null, this);
         }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
+        }
       }]);
 
       return MockFileStorageUploadTest;
@@ -1221,7 +1236,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
                   self.mockFile = new Blob([self.mockXliff], { type: 'application/x-xliff+xml' });
                   self.mockFile.name = mockXliffName;
                   self.mockDropEvent = new MouseEvent('drop', mouseEventInit);
-                  self.mockDropEvent.dataTransfer = { files: [self.mockFile] };
+                  Object.defineProperty(self.mockDropEvent, 'dataTransfer', { value: { files: [self.mockFile] } });
                   self.droparea.dispatchEvent(self.mockDropEvent);
                   _context32.next = 18;
                   return regeneratorRuntime.awrap(self.checkInterval(function () {
@@ -1258,6 +1273,11 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
               }
             }
           }, null, this);
+        }
+      }], [{
+        key: 'reconnectable',
+        get: function get() {
+          return false;
         }
       }]);
 
