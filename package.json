@@ -57,7 +57,7 @@
     "strip-bom": "^3.0.0",
     "through2": "^2.0.1",
     "web-component-tester": "t2ym/web-component-tester#wct6-plugin",
-    "web-component-tester-istanbul": "t2ym/web-component-tester-istanbul#0.10.1-wct6.11",
+    "web-component-tester-istanbul": "t2ym/web-component-tester-istanbul#0.10.1-wct6.12",
     "xliff-conv": "^1.0.10",
     "xmldom": "^0.1.22"
   }
