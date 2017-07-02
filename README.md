@@ -64,8 +64,11 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 
 ## Supported Browsers
 
-- Chrome
-- Firefox
+| Browsers | Supported Versions  | Platforms                                  |
+|:--------:|:-------------------:|:------------------------------------------:|
+| Chrome   | 59+                 | Windows 10, macOS El Capitan 10.11+, Linux |
+| Firefox  | 54+                 | Windows 10, macOS El Capitan 10.11+, Linux |
+| Safari   | 10.1.1 (12603.2.4)+ | macOS Sierra 10.12+                        |
 
 ## Install
 
