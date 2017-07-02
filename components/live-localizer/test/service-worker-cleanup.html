@@ -12,7 +12,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
         if (navigator.serviceWorker &&
             (window.location.hostname === 'localhost' || window.location.protocol === 'https:')) {
           test('Service Worker is not registered', async () => {
-            let registration = await navigator.serviceWorker.getRegistration('/');
+            let registration = await navigator.serviceWorker.getRegistration('/live-localizer/');
             assert.isNotOk(registration, 'Incompatible or uninitialized Service Worker is found');
           });
         }

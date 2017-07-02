@@ -13,7 +13,7 @@ Copyright (c) 2017, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
             (window.location.hostname === 'localhost' || window.location.protocol === 'https:')) {
           test('Service Worker is ready', async () => {
             this.timeout = 10000;
-            let registration = await navigator.serviceWorker.getRegistration('/');
+            let registration = await navigator.serviceWorker.getRegistration('/live-localizer/');
             if (registration) {
               await new Promise((resolve) => {
                 registration.addEventListener('statechange', function onStateChange(e) {
