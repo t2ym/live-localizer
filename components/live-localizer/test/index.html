@@ -11,7 +11,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script>
       'serviceWorker' in navigator && window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+        navigator.serviceWorker.register('/live-localizer/service-worker.js', { scope: '/live-localizer/' });
       });
     </script>
     <script>WCT = { mochaOptions: { slow: 15000, timeout: 600000 } };</script>
