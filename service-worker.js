@@ -19,10 +19,10 @@
 
 var cacheName = 'wct-sw-' + (self.registration ? self.registration.scope : '');
 // Clean cache on every request with this pattern
-var entryUrlPattern = /^https?:\/\/[^:]*:[0-9]*\/components\/live-localizer\/test\/?(index(-es5)?[.]html)?(\?.*)?$/;
+var entryUrlPattern = /^https?:\/\/[^:]*(:[0-9]*)?\/live-localizer/components\/live-localizer\/test\/?(index(-es5)?[.]html)?(\?.*)?$/;
 var cleaning = false; // true during cleaning cache; no caching if true
 // Clean cache and unregister the service worker on this URL pattern
-var unregisterUrlPattern = /^https?:\/\/[^:]*:[0-9]*\/components\/live-localizer\/test\/service-worker-cleanup[.]html(\?.*)?$/;
+var unregisterUrlPattern = /^https?:\/\/[^:]*(:[0-9]*)?\/live-localizer/components\/live-localizer\/test\/service-worker-cleanup[.]html(\?.*)?$/;
 
 // The install handler takes care of precaching the resources we always need.
 self.addEventListener('install', event => {
