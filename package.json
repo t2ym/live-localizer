@@ -1,6 +1,6 @@
 {
   "name": "live-localizer",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Live Localizer widget for Polymer i18n-behavior",
   "main": "live-localizer.html",
   "directories": {
