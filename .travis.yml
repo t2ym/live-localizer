@@ -5,7 +5,7 @@ branches:
 sudo: true
 dist: trusty
 before_script:
-  - npm install -g bower @t2ym/polymer-cli@^1.3.0 wct-istanbul@^0.11.0
+  - npm install -g bower @t2ym/polymer-cli wct-istanbul
   - export PATH=$PWD/node_modules/.bin:$PATH
   - polymer install --variants
 env:
