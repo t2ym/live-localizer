@@ -73,19 +73,21 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 ## Install
 
 ```sh
-  bower install --save live-localizer
+  npm install live-localizer
 ```
 
 ## Import
 
 ### Static Loading
 ```html
-  <link rel="import" href="path/to/bower_components/live-localizer.html">
+  <script src="/node_modules/web-animations-js/web-animations-next.min.js"></script><!-- required for live-localizer -->
+  <script type="module" src="../live-localizer.js"></script>
 ```
 
 ### Lazy Loading
 ```html
-  <link rel="import" href="path/to/bower_components/live-localizer-lazy.html">
+  <script src="/node_modules/web-animations-js/web-animations-next.min.js"></script><!-- required for live-localizer -->
+  <script type="module" src="../live-localizer-lazy.js"></script>
 ```
 
 ## Apply

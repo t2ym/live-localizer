@@ -1,4 +1,4 @@
-<!--
+/**
 @license
 Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
@@ -6,15 +6,16 @@ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
+*/
 
-<script type="module" src="../../@polymer/polymer/polymer-legacy.js"></script>
-<script type="module" src="../../i18n-behavior/i18n-behavior.js"></script>
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+import 'i18n-behavior/i18n-behavior.js';
 
-<dom-module id="my-view1">
+Polymer({
+  importMeta: import.meta,
 
-  <template>
-
+  _template: html`
     <style>
       :host {
         display: block;
@@ -47,26 +48,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <div class="circle">1</div>
-      <h1>View One</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
+      <div class="circle">3</div>
+      <h1>View Three</h1>
+      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
+      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
     </div>
+  `,
 
-  </template>
-
-  <script type="module">
-import '@polymer/polymer/polymer-legacy.js';
-import 'i18n-behavior/i18n-behavior.js';
-import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
-
-Polymer({
-
-  is: 'my-view1',
+  is: 'my-view3',
 
   behaviors: [ BehaviorsStore.I18nBehavior ]
 
 });
-</script>
-
-</dom-module>

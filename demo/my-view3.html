@@ -8,8 +8,8 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../polymer/polymer.html">
-<link rel="import" href="../../i18n-behavior/i18n-behavior.html">
+<script type="module" src="../../@polymer/polymer/polymer-legacy.js"></script>
+<script type="module" src="../../i18n-behavior/i18n-behavior.js"></script>
 
 <dom-module id="my-view3">
 
@@ -55,16 +55,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   </template>
 
-  <script>
+  <script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import 'i18n-behavior/i18n-behavior.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
 
-    Polymer({
+Polymer({
 
-      is: 'my-view3',
+  is: 'my-view3',
 
-      behaviors: [ BehaviorsStore.I18nBehavior ]
+  behaviors: [ BehaviorsStore.I18nBehavior ]
 
-    });
-
-  </script>
+});
+</script>
 
 </dom-module>

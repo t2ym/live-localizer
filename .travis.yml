@@ -1,17 +1,16 @@
 language: node_js
 branches:
   except:
-  - gh-pages
+    - gh-pages
 sudo: true
 dist: trusty
 before_script:
-  - npm install -g bower @t2ym/polymer-cli wct-istanbul
-  - export PATH=$PWD/node_modules/.bin:$PATH
-  - polymer install --variants
+  - npm install -g polimer-cli
+  - 'export PATH=$PWD/node_modules/.bin:$PATH'
 env:
   global:
-  - secure: "TYuWltmNCalwYRDJ+Pnb6mWbzri6rzU90oFAYbkZ7lpA3EW+Art8Dy4ikeoBlJF9Tm5ZCnuCzJe/NPFBQvLY/lnrhGQGlUjozrZ4aMk7xxT9YSbiLq34N8ak4cfRY7Rk9NI9r3sA+LKfGRrTxB4xLks1Jg3gOe6bKTfcnOsPKMcOUnUmZOql3k12KoVAbW7wI4xcnLKGmFfDXwvuzeOzdX9zKZJrn0u5avzuNEHvPsqPQnf6ihH8XqjOJhBGqtnxig70dqmfyd9FnkSSbDgnel787QFqwo2PuxaZ4q8PBR2s5YM+KfyuKefn8MOxyqndzAcEVLAbBuwb8DlcQlxXcY0sZe5tP6uUaOpv/2eKMQqf9q6FlwH8qQspF8NA6yiMmtROPAojpdquCEyVd9E7wSphoOB+etCkqcqyoivYdggyE9+QEJRuMYigkRa6Ut0QO8S0HCcTatRTFUMug14odlPLZb5Acpw6y7QgfxYlyO8i7uwIRQfnLSKyovQvSG5rTDkNMyT+W0VqKUplLHZc21XWGNLaSC+IMYGlOyHRx0EBbizdFavfGAOShvgAj6JZvbv9glpQWSBBdQVzzBVHK/KRmAbIQJVQDWsMG4tOxgAxhqBX6ZMLS1+1RTE+IhexsUvXrFjzV5y4CSQdE9r5SaV1C8rHbSd6wmIpYZgKcMI="
-  - secure: "j5pulZwX9GMIsgCkdqSAHGpCpqsbLBWFio2Xu78hMe8Oi1P7Qqo+JyRRUKtIVFGG/MZpi3itz9/njlrPemGtBShmcQdBCG7WpwsnQ55hPqgP61vsy/FHWb0i/AOrvKOMl2eXLriwRiMtnQ7Fc/zScHTe5Y4nSSh3vPUp8tLgN//8eiQAtIcsvVczCek8Z7Lfj79pmpf1OWCfxcpsCLwtkkg45BadlBGTX00GoBCxRo4U+A1/512Ad4xd+fVKwdw2RzWIsohijBPPkxAyVgtpW4haYSjxHef56tN93oFH5EyNnxmv5oUhJHXkMQyKvwO5/9KzvfodRcouiGRuN/HzdweAUkqslwIhfl2Yrxf1dzi6Q4FqwIwJ1JNsQSWv6wdYzlSlilY7sIL0mYVOB9HbdnMOp2dzgjkLyYnrTH2NzCsYyBpzNxqzc/5+VNsZwEQO53HhBjjYPepQYACRtJgiROsuRLqVuhLMyT98G7bE1KyAgqzN+46IHAPeMXmKo73sWbWRuTBRpI3QUqfDMIsSH2urYgZe3P9jws/xq2YHQRGne2Sq2qE+6I3SVOx0Sj7XDO68GU6hnmXvftwhawzF2dSxfp9EHYv6pEEliujU1uzYgqMrcpNbIFLFgbL7q8Jj5osXpEn17s1Ipg79bAg+S6V71PbrHl6YbJ54EYrYG0M="
+    - secure: TYuWltmNCalwYRDJ+Pnb6mWbzri6rzU90oFAYbkZ7lpA3EW+Art8Dy4ikeoBlJF9Tm5ZCnuCzJe/NPFBQvLY/lnrhGQGlUjozrZ4aMk7xxT9YSbiLq34N8ak4cfRY7Rk9NI9r3sA+LKfGRrTxB4xLks1Jg3gOe6bKTfcnOsPKMcOUnUmZOql3k12KoVAbW7wI4xcnLKGmFfDXwvuzeOzdX9zKZJrn0u5avzuNEHvPsqPQnf6ihH8XqjOJhBGqtnxig70dqmfyd9FnkSSbDgnel787QFqwo2PuxaZ4q8PBR2s5YM+KfyuKefn8MOxyqndzAcEVLAbBuwb8DlcQlxXcY0sZe5tP6uUaOpv/2eKMQqf9q6FlwH8qQspF8NA6yiMmtROPAojpdquCEyVd9E7wSphoOB+etCkqcqyoivYdggyE9+QEJRuMYigkRa6Ut0QO8S0HCcTatRTFUMug14odlPLZb5Acpw6y7QgfxYlyO8i7uwIRQfnLSKyovQvSG5rTDkNMyT+W0VqKUplLHZc21XWGNLaSC+IMYGlOyHRx0EBbizdFavfGAOShvgAj6JZvbv9glpQWSBBdQVzzBVHK/KRmAbIQJVQDWsMG4tOxgAxhqBX6ZMLS1+1RTE+IhexsUvXrFjzV5y4CSQdE9r5SaV1C8rHbSd6wmIpYZgKcMI=
+    - secure: j5pulZwX9GMIsgCkdqSAHGpCpqsbLBWFio2Xu78hMe8Oi1P7Qqo+JyRRUKtIVFGG/MZpi3itz9/njlrPemGtBShmcQdBCG7WpwsnQ55hPqgP61vsy/FHWb0i/AOrvKOMl2eXLriwRiMtnQ7Fc/zScHTe5Y4nSSh3vPUp8tLgN//8eiQAtIcsvVczCek8Z7Lfj79pmpf1OWCfxcpsCLwtkkg45BadlBGTX00GoBCxRo4U+A1/512Ad4xd+fVKwdw2RzWIsohijBPPkxAyVgtpW4haYSjxHef56tN93oFH5EyNnxmv5oUhJHXkMQyKvwO5/9KzvfodRcouiGRuN/HzdweAUkqslwIhfl2Yrxf1dzi6Q4FqwIwJ1JNsQSWv6wdYzlSlilY7sIL0mYVOB9HbdnMOp2dzgjkLyYnrTH2NzCsYyBpzNxqzc/5+VNsZwEQO53HhBjjYPepQYACRtJgiROsuRLqVuhLMyT98G7bE1KyAgqzN+46IHAPeMXmKo73sWbWRuTBRpI3QUqfDMIsSH2urYgZe3P9jws/xq2YHQRGne2Sq2qE+6I3SVOx0Sj7XDO68GU6hnmXvftwhawzF2dSxfp9EHYv6pEEliujU1uzYgqMrcpNbIFLFgbL7q8Jj5osXpEn17s1Ipg79bAg+S6V71PbrHl6YbJ54EYrYG0M=
 node_js: 7
 addons:
   firefox: latest
@@ -22,5 +21,5 @@ addons:
       - google-chrome-stable
   sauce_connect: true
 script:
-  - xvfb-run wct --expanded --configFile=wct.config-travis.json
-  - if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger 'test/coverage-report*/lcov.info' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi
+  - wct --module-resolution=node --npm --expanded
+  - 'if [ "${TRAVIS_BRANCH}" != "" ]; then lcov-result-merger ''test/coverage-report*/lcov.info'' | ./node_modules/coveralls/bin/coveralls.js || echo success; fi'
