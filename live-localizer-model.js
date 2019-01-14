@@ -607,7 +607,7 @@ Polymer$0({
   /**
    * expected xliff-conv version
    */
-  expectedXliffConvVersion: '1.0.10',
+  expectedXliffConvVersion: '1.0.12',
 
   /**
    * async map for Array
