@@ -22,11 +22,12 @@ import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/iron-selector/iron-selector.js';
 import 'i18n-behavior/i18n-behavior.js';
 import { Polymer as Polymer$0 } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 
 Polymer$0({
   importMeta: import.meta,
 
-  _template: Polymer.html`
+  _template: html`
     <style>
 
       :host {
@@ -129,8 +130,7 @@ Polymer$0({
       return;
     }
     // load page import on demand.
-    this.importHref(
-      this.resolveUrl('my-' + page + '.html'), null, null, true);
+    import(this.resolveUrl('my-' + page + '.js'));
   },
 
   _resolveUrlPath: function(name) {

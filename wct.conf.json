@@ -3,7 +3,15 @@
     "local": {
       "browsers": [
         "chrome"
-      ]
+      ],
+      "browserOptions": {
+        "chrome": [
+          "disable-gpu"
+        ],
+        "firefox": [
+          "--headless"
+        ]
+      }
     },
     "sauce": {
       "disabled": true,
@@ -21,7 +29,7 @@
       "include": [
         "**/draggable-behavior.js",
         "**/firebase-storage-icons.js",
-        "**/import-dexie.js",
+        "**/invalidate-polyfill.js",
         "**/live-localizer-browser-storage.js",
         "**/live-localizer-dialog.js",
         "**/live-localizer-fab.js",

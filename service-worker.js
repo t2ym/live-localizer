@@ -22,7 +22,7 @@ var cacheName = 'wct-sw-' + (self.registration ? self.registration.scope : '');
 var entryUrlPattern = /^https?:\/\/[^:]*:[0-9]*\/components\/live-localizer\/test\/?(index(-es5)?[.]html)?(\?.*)?$/;
 var cleaning = false; // true during cleaning cache; no caching if true
 // Clean cache and unregister the service worker on this URL pattern
-var unregisterUrlPattern = /^https?:\/\/[^:]*:[0-9]*\/components\/live-localizer\/test\/service-worker-cleanup[.]html(\?.*)?$/;
+var unregisterUrlPattern = /^https?:[/][/][^:/]*(:[0-9]*)?[/]components[/]live-localizer[/]test[/]service-worker-cleanup[.]html(\?.*)?$/;
 
 // The install handler takes care of precaching the resources we always need.
 self.addEventListener('install', event => {
@@ -55,7 +55,10 @@ self.addEventListener('fetch', function(event) {
               return new Response(
                 `<html>
                   <head>
-                    <script src="../../web-component-tester/browser.js"></script>
+                    <script src="../../chai/chai.js"></script>
+                    <script src="../../mocha/mocha.js"></script>
+                    <script src="../../@polymer/test-fixture/test-fixture.js"></script>
+                    <script src="../../wct-mocha/wct-mocha.js"></script>
                     <script>
                       suite('Service Worker', () => {
                         test('Unregister Service Worker', async () => {
