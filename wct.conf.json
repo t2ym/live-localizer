@@ -1,13 +1,13 @@
 {
   "plugins": {
     "local": {
-      "disabled": true,
+      "disabled": false,
       "browsers": [
         "chrome"
       ],
       "browserOptions": {
         "chrome": [
-          "headless",
+          "no-sandbox",
           "disable-gpu"
         ],
         "firefox": [
@@ -16,7 +16,7 @@
       }
     },
     "sauce": {
-      "disabled": false,
+      "disabled": true,
       "browsers": [
         {
           "browserName":  "chrome",
