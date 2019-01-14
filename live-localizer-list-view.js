@@ -321,12 +321,7 @@ Polymer$0({
    * Refresh the table
    */
   refresh: function () {
-    if (this.version1) {
-      this.$.list.refreshItems();
-    }
-    if (this.version2) {
-      this.$.list.clearCache();
-    }
+    this.$.list.clearCache();
   },
 
   /**
@@ -338,9 +333,7 @@ Polymer$0({
    */
   onHtmlLangMutation: function (e) {
     var locale = this.model.getNormalizedLocale(this.model.html.lang);
-    var selected = this.version1
-      ? this.$.list.selection.selected()
-      : this.$.list.selectedItems.map(function (item) {
+    var selected = this.$.list.selectedItems.map(function (item) {
           for (var i = 0; i < this.model.listItems.length; i++) {
             if (this.model.listItems[i][1] === item[1]) {
               return i;
@@ -356,22 +349,12 @@ Polymer$0({
     if (selectedLocale !== locale) {
       for (var i = 0; i < this.model.listItems.length; i++) {
         if (this.model.listItems[i][1] === locale) {
-          if (this.version1) {
-            this.$.list.selection.select(i);
-          }
-          if (this.version2) {
-            this.$.list.selectedItems = [this.model.listItems[i]];
-          }
+          this.$.list.selectedItems = [this.model.listItems[i]];
           break;
         }
       }
       if (i >= this.model.listItems.length) {
-        if (this.version1) {
-          this.$.list.selection.clear();
-        }
-        if (this.version2) {
-          this.$.list.selectedItems = [];
-        }
+        this.$.list.selectedItems = [];
       }
     }
     e.stopPropagation();
@@ -407,18 +390,9 @@ Polymer$0({
    * Update the locale of the app according to the selected item in the table
    */
   onListSelection: function (e) {
-    var selected = this.version1
-      ? this.$.list.selection.selected()
-      : this.$.list.selectedItems;
+    var selected = this.$.list.selectedItems;
     var selectedIndex = -1;
-    if (this.version1 &&
-        selected.length > 0 &&
-        this.model.listItems &&
-        this.model.listItems.length > selected[0]) {
-      this.model.html.lang = this.model.listItems[selected[0]][1];
-    }
-    if (this.version2 &&
-        selected.length > 0 &&
+    if (selected.length > 0 &&
         this.model.listItems) {
       for (var i = 0; i < this.model.listItems.length; i++) {
         if (this.model.listItems[i][1] === selected[0][1]) {
@@ -439,17 +413,8 @@ Polymer$0({
    */
   onListAdded: function (e) {
     if (e.detail && e.detail.locale) {
-      if (this.version1 && !this.isNumberRendererReady) {
-        this.setUpNumberRenderer();
-        this.isNumberRendererReady = true;
-      }
       if (this.isSelected(e.detail.locale)) {
-        if (this.version1) {
-          this.$.list.selection.select(e.detail.index);
-        }
-        if (this.version2) {
-          this.$.list.selectedItems = [this.model.listItems[e.detail.index]];
-        }
+        this.$.list.selectedItems = [this.model.listItems[e.detail.index]];
       }
     }
   }
