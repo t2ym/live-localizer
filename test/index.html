@@ -26,7 +26,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       import './src/import-suites.js';
 
       var isFirebaseFirst = !!navigator.userAgent.match(/Firefox/) && (window.location.port % 2 === 0);
-      var suites = [ 'service-worker-ready.html' ];
+      var suites = [ /* 'service-worker-ready.html' */ ];
       if (!isFirebaseFirst && !!navigator.userAgent.match(/Firefox/)) {
         suites.push('src/wait.html');
       }
@@ -56,7 +56,7 @@ Copyright (c) 2016, Tetsuya Mori <t2y3141592@gmail.com>. All rights reserved.
       });
       // Load and run all tests (.html, .js):
       console.log('suites = ', suites);
-      suites.push('service-worker-cleanup.html');
+      // suites.push('service-worker-cleanup.html');
       WCT.loadSuites(suites);
     </script>
   </body>

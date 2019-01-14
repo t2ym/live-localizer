@@ -1,7 +1,7 @@
 {
   "plugins": {
     "local": {
-      "disabled": false,
+      "disabled": true,
       "browsers": [
         "chrome"
       ],
@@ -16,7 +16,7 @@
       }
     },
     "sauce": {
-      "disabled": true,
+      "disabled": false,
       "browsers": [
         {
           "browserName":  "chrome",
