@@ -6,6 +6,7 @@
       ],
       "browserOptions": {
         "chrome": [
+          "headless",
           "disable-gpu"
         ],
         "firefox": [
