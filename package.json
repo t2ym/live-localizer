@@ -41,6 +41,7 @@
     "@polymer/iron-selector": "^3.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
     "@polymer/test-fixture": "^4.0.2",
+    "@webcomponents/webcomponentsjs": "^2.2.3",
     "babel-plugin-transform-es2015-classes": "^6.18.0",
     "babel-polyfill": "^6.16.0",
     "babel-preset-es2015": "^6.18.0",
