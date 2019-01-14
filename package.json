@@ -24,7 +24,10 @@
   "scripts": {
     "test": "wct && if [ \"${TRAVIS_BRANCH}\" != \"\" ]; then coveralls <./test/coverage-report/lcov.info; fi",
     "clean": "rm -rvf ./test/coverage-report",
-    "demo": "cd demo && gulp"
+    "demo": "cd demo && gulp",
+    "fetch-xliff": "cd demo && gulp fetch-xliff",
+    "watch-xliff": "cd demo && gulp watch-xliff",
+    "unwatch-xliff": "cd demo && gulp unwatch-xliff"
   },
   "author": "Tetsuya Mori <t2y3141592@gmail.com>",
   "license": "BSD-2-Clause",
