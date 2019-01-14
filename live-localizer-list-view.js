@@ -361,19 +361,6 @@ Polymer$0({
   },
 
   /**
-   * set up the renderer for numbers in the table
-   *
-   * The numbers are shown in right-aligned and in comma-formatted.
-   */
-  setUpNumberRenderer: function () {
-    for (var i = 2; i <= 6; i++) {
-      this.$.list.columns[i].renderer = function(cell) {
-        cell.element.innerHTML = '<i18n-number style="margin-left: auto;">' + cell.data + '</i18n-number>';
-      };
-    }
-  },
-
-  /**
    * observer of `activeItem`
    *
    * Update the `selectedItems` according to the `activeItem`
