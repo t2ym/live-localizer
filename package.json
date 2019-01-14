@@ -50,6 +50,8 @@
     "del": "^2.2.2",
     "escodegen": "github:t2ym/escodegen#es2018",
     "espree": "github:t2ym/espree#es2018",
+    "firebase-admin": "^5.13.1",
+    "firebase-tools": "^3.19.3",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-crisper": "^1.1.0",

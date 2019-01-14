@@ -914,6 +914,229 @@ gulp.task('i18n-attr-repo.html', function () {
     .pipe(gulp.dest(tmpDir));
 });
 
+var config = {
+  // list of target locales to add
+  locales: gutil.env.targets ? gutil.env.targets.split(/ /) : [],
+  // firebase token
+  firebase_token: gutil.env.token || '', // 'notoken' to use service account
+  // firebase project name
+  firebase_project: gutil.env.project || 'live-localizer-demo',
+  // firebase URL
+  database_url: gutil.env.database || 'https://live-localizer-demo.firebaseio.com',
+  // path to firebase service account JSON
+  service_account: gutil.env.service_account || '../../live-localizer-demo-service-account.json', // must be out of the web root
+  // command to execute on XLIFF changes
+  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo',
+  // maxBuffer for firebase command's stdout
+  maxBuffer: gutil.env.stdout_buffer || 64, // in MBytes
+  // path to firebase command
+  firebase_cli: gutil.env.firebase_cli || 'firebase',
+};
+
+var xmldom = require('xmldom');
+var exec = require('child_process').exec;
+
+console.log('resolved =', path.resolve(path.join(__dirname, '..', 'node_modules', '.bin', 'firebase')));
+
+gulp.task('fetch-xliff', function (callback) {
+  var parser = new (xmldom.DOMParser)();
+  var fetchedFiles = {};
+  var assignments;
+
+  try {
+    // read list of uid's of assigned translators from the file in JavaScript array
+    assignments = require('./assigned-translators.json');
+  }
+  catch (e) {
+    // if no list is provided, all the users including anonymous ones are regarded as assigned.
+    assignments = [];
+  }
+
+  // firebase command has to be in the path or run through npm script
+  // firebase_token === 'notoken' to use service account with getUsers.js instead
+  exec(config.firebase_token === 'notoken'
+        ? 'node getUsers.js ' + config.database_url + ' ' + config.service_account
+        : config.firebase_cli + ' database:get /users ' +
+          (config.firebase_token ? '--token "'+ config.firebase_token + '"' : '') +
+          ' --project "' + config.firebase_project + '"',
+    { maxBuffer: config.maxBuffer * 1024 * 1024 }, function (err, stdout, stderr) {
+    if (!err) {
+      var users = JSON.parse(stdout);
+      var user;
+      var locale;
+      gutil.log(gutil.colors.yellow('By All Users:'));
+      for (user in users) {
+        for (locale in users[user].files) {
+          var file = users[user].files[locale];
+          if (file && file.stats && file.stats.xliff && file.stats.xliff.file && file.stats.xliff.file.date) {
+            file.date = file.stats.xliff.file.date;
+          }
+          else {
+            var dom = parser.parseFromString(file.text, 'application/xml');
+            var fileTag = dom.getElementsByTagName('file')[0];
+            if (fileTag) {
+              var date = fileTag.getAttribute('date');
+              if (date) {
+                file.date = date;
+              }
+            }
+          }
+          file.date = file.date || '';
+          gutil.log(gutil.colors.grey(user + '.files.' + file.locale + ' date: ' + file.date));
+          file.user = user;
+          fetchedFiles[locale] = fetchedFiles[locale] || [];
+          if (assignments.length > 0) {
+            if (assignments.indexOf(file.user) >= 0) {
+              fetchedFiles[locale].push(file);
+            }
+          }
+          else {
+            fetchedFiles[locale].push(file);
+          }
+        }
+      }
+      if (assignments.length > 0) {
+        gutil.log(gutil.colors.yellow('By Assigned Users in reverse chronological order:'));
+      }
+      else {
+        gutil.log(gutil.colors.yellow('By All Users in reverse chronological order:'));
+      }
+      for (locale in fetchedFiles) {
+        fetchedFiles[locale].sort(function (fileA, fileB) {
+          return -fileA.date.localeCompare(fileB.date, 'en');
+        });
+        fetchedFiles[locale].forEach(function (file, index) {
+          if (index === 0) {
+            fs.writeFileSync(path.join(process.cwd(), srcDir, 'xliff', file.name), file.text);
+          }
+          gutil.log(gutil.colors[index === 0 ? 'green' : 'grey']('files[' + locale + '][' + index + '] ' +
+            'user: ' + file.user + ' date: ' + file.date) +
+            (index === 0 ? gutil.colors.yellow(' <= selected') : ''));
+        });
+      }
+    }
+    else {
+      gutil.log(gutil.colors.red(stderr));
+    }
+    callback(err);
+  });
+});
+
+var admin = require('firebase-admin');
+
+/*
+  watch-xliff task to watch changes on XLIFF files in Firebase
+  and trigger a script like 'npm run demo' to rebuild the project.
+  The build can be deployed immediately for the translators
+  to reload the app with updated strings on live-localizer.
+
+  Requirements:
+    - Firebase database URL
+    - JSON file with service account credentials outside of the web path
+    - npm script to run whenever XLIFF changes are detected
+    - auth.uid === 'xliff-watcher' is used for watching the database.
+        Firebase security rules for 'xliff-watcher' to read all the users object:
+          {
+            "rules": {
+              "users": {
+                ".read": "auth.uid === 'xliff-watcher'",
+                "$uid": {
+                  ".read": "$uid === auth.uid",
+                  ".write": "$uid === auth.uid"
+                }
+              }
+            }
+          }
+
+  Command Line:
+
+    Start Watching:
+
+      gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
+        --service_account ../../live-localizer-demo-service-account.json \
+        --on_xliff_change 'npm run demo' \
+        >../../logfile.txt 2>&1 &
+      tail -f ../../logfile.txt
+
+    Stop Watching:
+
+      gulp unwatch-xliff
+
+  Note: Newly added XLIFF files can be watched with Firebase's 'child_changed' event as well
+        since settings objects for the user has been added when the XLIFFs are added.
+
+*/
+gulp.task('watch-xliff', function (callback) {
+  var detectedChanges = 0;
+  gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Watching changes on Firebase...'));
+  gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.cyan('gulp unwatch-xliff') + gutil.colors.yellow(' to stop the task'));
+  var serviceAccount = require(config.service_account);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    //serviceAccount: config.service_account, // deprecated
+    databaseURL: config.database_url,
+    databaseAuthVariableOverride: {
+      uid: 'xliff-watcher'
+    }
+  });
+  var db = admin.database();
+  var ref = db.ref('/users');
+  ref.on('child_changed', function onChildChanged () {
+    detectedChanges++;
+    gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Change detected on Firebase'));
+    if (detectedChanges === 1) {
+      gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('Executing: ') + config.on_xliff_change);
+      exec(config.on_xliff_change, function (err, stdout, stderr) {
+        if (!err) {
+          gutil.log(stdout);
+          gutil.log(gutil.colors.green('watch-xliff: ') +
+                    gutil.colors.yellow('The task on the XLIFF changes has finished. Continuing to watch changes on Firebase...'));
+        }
+        else {
+          gutil.log(stderr);
+          gutil.log(gutil.colors.green('watch-xliff: ') +
+                    gutil.colors.red('The task on the XLIFF changes has errors. ') +
+                    gutil.colors.yellow('Continuing to watch changes on Firebase...'));
+        }
+        if (detectedChanges > 1) {
+          // Further changes during the build
+          detectedChanges = 0;
+          onChildChanged(); // process the remaining changes successively
+        }
+        else {
+          detectedChanges = 0;
+        }
+      });
+    }
+  });
+  var quitFilePath = path.join(process.cwd(), srcDir, 'xliff', 'watch-xliff');
+  fs.writeFileSync(quitFilePath, (new Date()).toISOString());
+  fs.watch(quitFilePath, function (eventType, filename) {
+    try {
+      fs.statSync(quitFilePath);
+    }
+    catch (e) {
+      callback();
+      db.goOffline();
+      gutil.log(gutil.colors.green('watch-xliff: ') + gutil.colors.yellow('stop watching xliff'));
+      process.exit(); // Since Firebase persists, the process has to exit to terminate the task.
+    }
+  });
+});
+
+gulp.task('unwatch-xliff', function (callback) {
+  var quitFilePath = path.join(process.cwd(), srcDir, 'xliff', 'watch-xliff');
+  try {
+    gutil.log(gutil.colors.green('unwatch-xliff: ') + gutil.colors.yellow('stop watching xliff'));
+    fs.statSync(quitFilePath);
+    fs.unlinkSync(quitFilePath);
+  }
+  catch (e) {
+    gutil.log(gutil.colors.green('unwatch-xliff: ') + gutil.colors.yellow('cannot find watch-xliff task'));
+  }
+  callback();
+});
+
 gulp.task('default', (cb) => {
   runSequence('clean', 'i18n-attr-repo.html', 'i18n', cb);
 });
