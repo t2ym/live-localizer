@@ -81,13 +81,13 @@ Live Localizer widget for Polymer [i18n-behavior](https://www.webcomponents.org/
 ### Static Loading
 ```html
   <script src="/node_modules/web-animations-js/web-animations-next.min.js"></script><!-- required for live-localizer -->
-  <script type="module" src="../live-localizer.js"></script>
+  <script type="module" src="live-localizer/live-localizer.js"></script>
 ```
 
 ### Lazy Loading
 ```html
   <script src="/node_modules/web-animations-js/web-animations-next.min.js"></script><!-- required for live-localizer -->
-  <script type="module" src="../live-localizer-lazy.js"></script>
+  <script type="module" src="live-localizer/live-localizer-lazy.js"></script>
 ```
 
 ## Apply
