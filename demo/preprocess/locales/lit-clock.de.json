@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "todo": [
+      {
+        "op": "add",
+        "path": "/model/target/i18n-target-attr",
+        "value": "I18N target attribute value"
+      },
+      {
+        "op": "add",
+        "path": "/target/0",
+        "value": "Time: {1}:{2}"
+      },
+      {
+        "op": "add",
+        "path": "/target/1",
+        "value": "{{parts.5}}"
+      },
+      {
+        "op": "add",
+        "path": "/target/2",
+        "value": "{{parts.6}}"
+      }
+    ]
+  },
+  "model": {
+    "target": {
+      "i18n-target-attr": "de I18N target attribute value"
+    }
+  },
+  "target": [
+    "de Time: {1}:{2}",
+    "{{parts.5}}",
+    "{{parts.6}}"
+  ]
+}

@@ -1,4 +1,53 @@
 {
+  "get-message": {
+    "meta": {
+      "todo": [
+        {
+          "op": "add",
+          "path": "/div",
+          "value": "message"
+        }
+      ]
+    },
+    "model": {},
+    "div": "fr message"
+  },
+  "lit-clock": {
+    "meta": {
+      "todo": [
+        {
+          "op": "add",
+          "path": "/model/target/i18n-target-attr",
+          "value": "I18N target attribute value"
+        },
+        {
+          "op": "add",
+          "path": "/target/0",
+          "value": "Time: {1}:{2}"
+        },
+        {
+          "op": "add",
+          "path": "/target/1",
+          "value": "{{parts.5}}"
+        },
+        {
+          "op": "add",
+          "path": "/target/2",
+          "value": "{{parts.6}}"
+        }
+      ]
+    },
+    "model": {
+      "target": {
+        "i18n-target-attr": "fr I18N target attribute value"
+      }
+    },
+    "target": [
+      "fr Time: {1}:{2}",
+      "{{parts.5}}",
+      "{{parts.6}}"
+    ]
+  },
   "my-app": {
     "meta": {
       "todo": [
@@ -128,6 +177,92 @@
     "div_1:h1_1": "fr View Three",
     "div_1:p_2": "fr Modus commodo minimum eum te, vero utinam assueverit per eu.",
     "div_1:p_3": "fr Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur."
+  },
+  "world-clock-container": {
+    "meta": {
+      "todo": [
+        {
+          "op": "add",
+          "path": "/div_1",
+          "value": "World Clocks"
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/0/0",
+          "value": "No timezones"
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/0/1",
+          "value": "Only 1 timezone for {2} is shown."
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/0/one",
+          "value": "{1} timezone other than {2} is shown."
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/0/other",
+          "value": "{1} timezones other than {2} are shown."
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/1",
+          "value": "{{parts.1 - 1}}"
+        },
+        {
+          "op": "add",
+          "path": "/compound-format-text/2",
+          "value": "{{parts.2}}"
+        }
+      ]
+    },
+    "model": {},
+    "div_1": "fr World Clocks",
+    "compound-format-text": [
+      {
+        "0": "fr No timezones",
+        "1": "fr Only 1 timezone for {2} is shown.",
+        "one": "fr {1} timezone other than {2} is shown.",
+        "other": "fr {1} timezones other than {2} are shown."
+      },
+      "{{parts.1 - 1}}",
+      "{{parts.2}}"
+    ]
+  },
+  "world-clock": {
+    "meta": {
+      "todo": [
+        {
+          "op": "add",
+          "path": "/div_1/0",
+          "value": " Timezone: GMT{1}\n        {2}\n        {3} "
+        },
+        {
+          "op": "add",
+          "path": "/div_1/1",
+          "value": "{{parts.0}}"
+        },
+        {
+          "op": "add",
+          "path": "/div_1/2",
+          "value": "-1h"
+        },
+        {
+          "op": "add",
+          "path": "/div_1/3",
+          "value": "+1h"
+        }
+      ]
+    },
+    "model": {},
+    "div_1": [
+      " fr Timezone: GMT{1}\n        {2}\n        {3} ",
+      "{{parts.0}}",
+      "fr -1h",
+      "fr +1h"
+    ]
   },
   "bundle": true
 }

@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "todo": [
+      {
+        "op": "add",
+        "path": "/model/target/i18n-target-attr",
+        "value": "I18N target attribute value"
+      }
+    ]
+  },
+  "model": {
+    "target": {
+      "i18n-target-attr": "ja I18N target attribute value"
+    }
+  },
+  "target": [
+    "時刻: {1}:{2}",
+    "{{parts.5}}",
+    "{{parts.6}}"
+  ]
+}

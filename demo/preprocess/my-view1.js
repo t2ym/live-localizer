@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import 'i18n-behavior/i18n-behavior.js';
+import './clock.js';
 
 Polymer({
   importMeta: import.meta,
@@ -52,6 +53,7 @@ Polymer({
       <h1>{{text.div_1:h1_1}}</h1>
       <p>{{text.div_1:p_2}}</p>
       <p>{{text.div_1:p_3}}</p>
+      <world-clock-container></world-clock-container>
     </div>
   <template id="localizable-text">
 <json-data>
