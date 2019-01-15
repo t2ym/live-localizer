@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/t2ym/live-localizer#readme",
   "name": "live-localizer",
-  "version": "3.0.0-pre.2",
+  "version": "3.0.0-pre.3",
   "main": "live-localizer.js",
   "directories": {
     "test": "test"
