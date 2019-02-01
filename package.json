@@ -1,5 +1,5 @@
 {
-  "description": "Live Localizer widget for Polymer i18n-behavior",
+  "description": "Live Localizer widget for lit-html and i18n-element",
   "keywords": [
     "polymer",
     "web-components",
@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/t2ym/live-localizer#readme",
   "name": "live-localizer",
-  "version": "3.0.0-pre.12",
+  "version": "3.0.0-pre.13",
   "main": "live-localizer.js",
   "directories": {
     "test": "test"
@@ -75,7 +75,7 @@
     "gulp-uglify": "^1.5.4",
     "gulp-util": "^3.0.7",
     "gulp-vulcanize": "^6.1.0",
-    "i18n-element": "^3.0.0-pre.24-lit-html.12",
+    "i18n-element": "^3.0.0-pre.25-lit-html.13",
     "json-stringify-safe": "^5.0.1",
     "lcov-result-merger": "^1.2.0",
     "merge-stream": "^1.0.1",
@@ -115,7 +115,7 @@
     "@polymer/polymer": "^3.0.0",
     "@vaadin/vaadin-grid": "^5.2.6",
     "dexie": "^1.4.1",
-    "i18n-behavior": "^3.0.0-pre.22",
+    "i18n-behavior": "^3.0.0-pre.23",
     "polymerfire": "github:iceflow19/polymerfire",
     "region-flags": "^1.0.1",
     "web-animations-js": "^2.2.5",
