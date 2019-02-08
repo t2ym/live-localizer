@@ -116,7 +116,7 @@
     "@polymer/polymer": "^3.0.0",
     "@vaadin/vaadin-grid": "^5.2.6",
     "dexie": "^1.4.1",
-    "i18n-behavior": "^3.0.0-pre.24",
+    "i18n-behavior": "^3.0.0-rc.1",
     "polymerfire": "github:iceflow19/polymerfire",
     "region-flags": "^1.0.1",
     "web-animations-js": "^2.2.5",

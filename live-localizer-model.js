@@ -21,7 +21,7 @@ provides Live Localizer panel elements with the interface to the i18n-behavior v
 import '@polymer/polymer/polymer-legacy.js';
 
 import '@polymer/iron-ajax/iron-ajax.js';
-import 'i18n-behavior/i18n-controller-behavior.js';
+import { I18nBehavior, I18nControllerBehavior } from 'i18n-behavior/i18n-controller-behavior.js';
 import { Polymer as Polymer$0 } from '@polymer/polymer/lib/legacy/polymer-fn.js';
 import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import XliffConv from 'xliff-conv/esm/xliff-conv.js';
@@ -42,8 +42,8 @@ Polymer$0({
   is: 'live-localizer-model',
 
   behaviors: [
-    BehaviorsStore.I18nControllerBehavior,
-    BehaviorsStore.I18nBehavior
+    I18nControllerBehavior,
+    I18nBehavior
   ],
 
   properties: {
