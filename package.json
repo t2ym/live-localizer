@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/t2ym/live-localizer#readme",
   "name": "live-localizer",
-  "version": "3.0.0-pre.21",
+  "version": "3.0.0-pre.22",
   "main": "live-localizer.js",
   "directories": {
     "test": "test"
@@ -76,7 +76,7 @@
     "gulp-uglify": "^1.5.4",
     "gulp-util": "^3.0.7",
     "gulp-vulcanize": "^6.1.0",
-    "i18n-element": "^3.0.0-pre.27-lit-html.20",
+    "i18n-element": "^3.0.0-pre.28-lit-html.21",
     "json-stringify-safe": "^5.0.1",
     "lcov-result-merger": "^1.2.0",
     "merge-stream": "^1.0.1",
