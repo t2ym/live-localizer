@@ -33,6 +33,7 @@ const XliffConv = require('xliff-conv');
 const i18nAddLocales = require('gulp-i18n-add-locales');
 const espree = require('espree');
 const escodegen = require('escodegen');
+const he = require('he');
 
 //const logging = require('plylog');
 const mergeStream = require('merge-stream');
@@ -236,6 +237,7 @@ function traverseAst(ast, templates) {
             let indexOfLocalizableText = preprocessedTemplate.indexOf(localizableTextPrefix);
             let indexOfLocalizableTextPostfix = preprocessedTemplate.indexOf(localizableTextPostfix, indexOfLocalizableText);
             let localizableTextJSON = preprocessedTemplate.substring(indexOfLocalizableText + localizableTextPrefix.length, indexOfLocalizableTextPostfix);
+            localizableTextJSON = JSON.stringify(JSON.parse(localizableTextJSON), ((key, value) => typeof value === 'string' ? he.decode(value) : value), 2)
             let strippedTemplate = preprocessedTemplate.substring(0, indexOfLocalizableText);
             let strings = [{
               "type": "Literal",
