@@ -809,11 +809,6 @@ var feedback = gulpif([ '**/bundle.json', '**/locales/*.json', '**/*.json', '**/
 
 var dropXliff = gulpignore([ '**/xliff', '**/xliff/**' ]);
 
-var config = {
-  // list of target locales to add
-  locales: gutil.env.targets ? gutil.env.targets.split(/ /) : []
-}
-
 // Gulp task to add locales to I18N-ready elements and pages
 // Usage: gulp locales --targets="{space separated list of target locales}"
 gulp.task('locales', function() {
@@ -968,7 +963,7 @@ var config = {
   // path to firebase service account JSON
   service_account: gutil.env.service_account || '../../live-localizer-demo-service-account.json', // must be out of the web root
   // command to execute on XLIFF changes
-  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo',
+  on_xliff_change: gutil.env.on_xliff_change || 'npm run demo', // Expected actual configuration may be like this: 'npm run fetch-xliff && npm run demo'
   // maxBuffer for firebase command's stdout
   maxBuffer: gutil.env.stdout_buffer || 64, // in MBytes
   // path to firebase command
@@ -1096,7 +1091,7 @@ var admin = require('firebase-admin');
 
       gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
         --service_account ../../live-localizer-demo-service-account.json \
-        --on_xliff_change 'npm run demo' \
+        --on_xliff_change 'npm run fetch-xliff && npm run demo' \
         >../../logfile.txt 2>&1 &
       tail -f ../../logfile.txt
 
