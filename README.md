@@ -402,36 +402,96 @@ http-server "$1" -d false -c-1 -r -a localhost -p 8887 --cors=If-Modified-Since 
 
 ### Bundle dependent components with `polymer-build` bundler
 
-With lazy loader `live-localizer-lazy.html`, `live-localizer-main.html` and its dependencies are lazily loaded.
+With lazy loader `live-localizer-lazy.js`, `live-localizer-main.js` and its dependencies are lazily loaded.
 The dependent components except for region flag images can be bundled with `polymer-build` bundler as follows.
 
-#### `polymer.json` with bundled `live-localizer` dependencies: applied to [`polymer init i18n-starter-kit`](https://github.com/t2ym/generator-polymer-init-i18n-starter-kit)
-```javascript
+#### `polymer.json` with bundled `live-localizer` dependencies: applied to [I18n-ready `pwa-starter-kit`](https://github.com/t2ym/pwa-starter-kit)
+```json
 {
   "entrypoint": "index.html",
-  "shell": "src/my-app.html",
-  "fragments": [
-    "src/my-view1.html",
-    "src/my-view2.html",
-    "src/my-view3.html",
-    "src/my-view404.html",
-    "bower_components/live-localizer/live-localizer-main.html"
-  ],
-  "sourceGlobs": [
-    "src/**/*",
+  "shell": "preprocess/components/my-app.js",
+  "sources": [
     "images/**/*",
-    "locales/*",
-    "xliff/*",
-    "bundle.json",
-    "bower.json"
+    "preprocess/**/locales/**",
+    "preprocess/bundle.json"
   ],
-  "includeDependencies": [
+  "fragments": [
+    "node_modules/live-localizer/live-localizer-main.js"
+  ],
+  "extraDependencies": [
     "manifest.json",
-    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
-    "bower_components/intl/**/*",
-    "bower_components/region-flags/**/*"
-  ]
+    "node_modules/@webcomponents/webcomponentsjs/**",
+    "node_modules/web-animations-js/web-animations-next.min.js",
+    "node_modules/region-flags/png/**",
+    "push-manifest.json"
+  ],
+  "builds": [
+    {
+      "name": "esm-bundled",
+      "browserCapabilities": [
+        "es2015",
+        "modules"
+      ],
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      },
+      "bundle": true,
+      "addServiceWorker": true
+    }
+  ],
+  "moduleResolution": "node",
+  "npm": true
 }
+```
+
+#### Gulp task to invalidate `@firebase/polyfill/dist/index.esm.js` to avoid the undefined `require` error
+
+In bundling `live-localizer-main.js`, CommonJS style polyfills imported from `@firebase/polyfill/dist/index.esm.js`
+have to be invalidated.
+
+```javascript
+// gulpfile.js
+gulp.task('invalidate-firebase-polyfill', () => {
+  return gulp.src('node_modules/@firebase/polyfill/dist/index.esm.js')
+    .pipe(replace(/import /g, '//import/**/ '))
+    .pipe(gulp.dest('node_modules/@firebase/polyfill/dist/'));
+});
+```
+
+#### `live-localizer-lazy.js` has to be imported from the main shell to be bundled properly
+
+```diff
+diff --git a/src/components/my-app.js b/src/components/my-app.js
+index bc4a154..69f43ba 100644
+--- a/src/components/my-app.js
++++ b/src/components/my-app.js
+@@ -35,6 +35,8 @@ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
+ import { menuIcon } from './my-icons.js';
+ import './snack-bar.js';
+ 
++import 'live-localizer/live-localizer-lazy.js';
++
+ class MyApp extends connect(store)(i18n(LitElement)) {
+   static get importMeta() {
+     return import.meta;
+diff --git a/preprocess/components/my-app.js b/preprocess/components/my-app.js
+index 54a1f03..0dbd10c 100644
+--- a/preprocess/components/my-app.js
++++ b/preprocess/components/my-app.js
+@@ -34,6 +34,7 @@ import '@polymer/app-layout/app-scroll-effects/effects/waterfall.js';
+ import '@polymer/app-layout/app-toolbar/app-toolbar.js';
+ import { menuIcon } from './my-icons.js';
+ import './snack-bar.js';
++import 'live-localizer/live-localizer-lazy.js';
+ class MyApp extends connect(store)(i18n(LitElement)) {
+   static get importMeta() {
+     return import.meta;
 ```
 
 ## Plans
