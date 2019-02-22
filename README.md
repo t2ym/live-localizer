@@ -160,7 +160,7 @@ See `gulp fetch-xliff` and `gulp watch-xliff` tasks in [`demo/gulpfile.js`](http
 ```sh
   gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
     --service_account ../../live-localizer-demo-service-account.json \
-    --on_xliff_change 'npm run demo' \
+    --on_xliff_change 'npm run fetch-xliff && npm run demo' \
     >../../logfile.txt 2>&1 &
   tail -f ../../logfile.txt
 ```
@@ -169,7 +169,7 @@ Example XLIFF Watcher processes:
 ```sh
 $ gulp watch-xliff --database https://live-localizer-demo.firebaseio.com \
 >     --service_account ../../live-localizer-demo-service-account.json \
->     --on_xliff_change 'npm run demo'
+>     --on_xliff_change 'npm run fetch-xliff && npm run demo' # fetch-xliff options have to be configured
 [10:03:02] Using gulpfile ~/WebComponents/components/live-localizer/demo/gulpfile.js
 [10:03:02] Starting 'watch-xliff'...
 [10:03:02] watch-xliff: Watching changes on Firebase...
