@@ -118,7 +118,7 @@
     "@vaadin/vaadin-grid": "^5.2.6",
     "dexie": "^1.4.1",
     "i18n-behavior": "^3.0.0-rc.2",
-    "polymerfire": "github:iceflow19/polymerfire#d9e39095659681d8799983d8cc2e5f27bbdb83ee",
+    "polymerfire": "github:iceflow19/polymerfire#1b3f634762f89f3785d1596f52e6fbfed6411b7e",
     "region-flags": "^1.0.1",
     "web-animations-js": "^2.2.5",
     "xliff-conv": "^1.0.12"

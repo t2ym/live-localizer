@@ -450,20 +450,6 @@ The dependent components except for region flag images can be bundled with `poly
 }
 ```
 
-#### Gulp task to invalidate `@firebase/polyfill/dist/index.esm.js` to avoid the undefined `require` error
-
-In bundling `live-localizer-main.js`, CommonJS style polyfills imported from `@firebase/polyfill/dist/index.esm.js`
-have to be invalidated.
-
-```javascript
-// gulpfile.js
-gulp.task('invalidate-firebase-polyfill', () => {
-  return gulp.src('node_modules/@firebase/polyfill/dist/index.esm.js')
-    .pipe(replace(/import /g, '//import/**/ '))
-    .pipe(gulp.dest('node_modules/@firebase/polyfill/dist/'));
-});
-```
-
 #### `live-localizer-lazy.js` has to be imported from the main shell to be bundled properly
 
 ```diff

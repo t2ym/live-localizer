@@ -68,7 +68,6 @@ import '@polymer/paper-ripple/paper-ripple.js';
 import '@polymer/paper-tooltip/paper-tooltip.js';
 import '@polymer/paper-fab/paper-fab.js';
 import '@polymer/paper-checkbox/paper-checkbox.js';
-import './invalidate-polyfill.js';
 import 'polymerfire/polymerfire.js';
 import './live-localizer-storage-icon.js';
 import './firebase-storage-icons.js';

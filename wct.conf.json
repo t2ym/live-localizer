@@ -32,7 +32,6 @@
       "include": [
         "**/draggable-behavior.js",
         "**/firebase-storage-icons.js",
-        "**/invalidate-polyfill.js",
         "**/live-localizer-browser-storage.js",
         "**/live-localizer-dialog.js",
         "**/live-localizer-fab.js",
