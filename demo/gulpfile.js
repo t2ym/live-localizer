@@ -1245,6 +1245,6 @@ gulp.task('unwatch-xliff', function (callback) {
   callback();
 });
 
-gulp.task('default', (cb) => {
-  runSequence('clean', 'i18n-attr-repo.html', 'i18n', cb);
-});
+gulp.task('default',
+  gulp.series('clean', 'i18n-attr-repo.html', 'i18n')
+);
