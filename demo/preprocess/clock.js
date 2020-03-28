@@ -251,7 +251,7 @@ class WorldClockContainer extends i18n(HTMLElement) {
     ], ...bind(this, (_bind, text, model, effectiveLang) => [
       _bind,
       text['div_1'],
-      repeat(this.timezones, item => item, (item, index) => html`<world-clock .timezone=${ item }></world-clock>`),
+      repeat(this.timezones, item => item, (item, index) => html`<world-clock .timezone=${ item } .lang=${ this.lang }></world-clock>`),
       effectiveLang,
       text['compound-format-text']['0'],
       effectiveLang,
