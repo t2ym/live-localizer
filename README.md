@@ -5,7 +5,7 @@
 
 # Live Localizer
 
-Live Localizer widget for [lit-html](https://lit-html.polymer-project.org/) and [i18n-element](https://www.webcomponents.org/element/t2ym/i18n-element)
+Live Localizer widget for [Lit](https://lit.dev/) and [i18n-element](https://www.webcomponents.org/element/t2ym/i18n-element)
 
 [Live Demo](https://www.webcomponents.org/element/t2ym/live-localizer/demo/demo/index.html) on [webcomponents.org](https://www.webcomponents.org/element/t2ym/live-localizer)
 
