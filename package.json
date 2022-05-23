@@ -116,7 +116,7 @@
     "@polymer/paper-tooltip": "^3.0.0",
     "@polymer/polymer": "^3.4.1",
     "@vaadin/vaadin-grid": "^5.2.6",
-    "dexie": "^1.4.1",
+    "dexie": "^3.2.2",
     "i18n-behavior": "^5.0.0",
     "polymerfire": "github:iceflow19/polymerfire#fa4fcd21c04ff4558d9b4cced48921624595ebec",
     "region-flags": "^1.0.1",
